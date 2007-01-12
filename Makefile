@@ -29,17 +29,16 @@
 # Set compiler and options here:
 
 # -- flags which work for ifort (version>8) on Linux
-FC= ifort 
-OPT77 = -w95 -cm 
-OPT90 =
-DEBUG =
-OPT =  -tpp7 -axW -Vaxlib -assume byterecl -static     
+#FC= ifort 
+#OPT77 = -w95 -cm 
+#OPT90 =
+#OPT =  -tpp7 -axW -Vaxlib -assume byterecl -static     
 
 # -- flags which work for gfortran on Mac (and probably Linux)
-#FC = gfortran -O5 
-#OPT90 =
-#OPT77 = -w
-#OPT = 
+FC = gfortran -O5 
+OPT90 =
+OPT77 = -w
+OPT = 
 
 EXECDIR=../../
 
