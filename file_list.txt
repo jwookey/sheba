@@ -1,9 +1,9 @@
+=======
 sheba.in          ! configuration file
 syn.e             ! input files (SAC time series files)      
 syn.n             ..
-syn.z             ..
-
-syn_corr.e        ! output (anisotropy corrected) files (SAC time series files)
+syn.z          C file_list.txt
+e        ! output (anisotropy corrected) files (SAC time series files)
 syn_corr.n        ..
 syn_corr.z        ..
 
@@ -15,4 +15,3 @@ syn.clusters      ! Cluster analysis results file
 syn.clustxy       ! Cluster analysis results file  
 syn.error         ! Best-window error surface (for plotting)   
 syn.scm           ! SAC macro to set result parameters in SAC
-
