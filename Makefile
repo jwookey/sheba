@@ -41,7 +41,7 @@ OPT =  -tpp7 -axW -Vaxlib -assume byterecl -static
 #OPT77 = -w
 #OPT = 
 
-EXECDIR=../
+EXECDIR=../../
 
 #-------------------------------------------------------------------------------
 # No editing *should* be required below here ...
