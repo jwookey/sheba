@@ -1,0 +1,32 @@
+Basic (single window) algorithm.
+
+- Read in input traces
+- window input traces
+- generate Hilbert transform of traces (using FFT and IFFT)
+- loop over fast-direction -90 -> 90
+      - rotate real traces to fast-slow reference frame
+      - rotate Hilbert traces to fast-slow reference frame
+      - loop over time-lags
+            - time-lag real and Hilbert traces 1/2 dt
+            - if required, apply ScS correction
+                  - calculate the reflection matrix in the F-S ref. frame
+                  - corrected traces are the sum of the real traces
+                      multiplied by the real part of the R' matrix and  
+                      the Hilbert traces multiplied by the imaginary part
+                      part of the R' matrix 
+            - time-lag corrected traces by remaining dt
+            - calculate either second eigenvalue of the covariance matrix or                     transverse energy (requires source polarisation) for current 
+                dt, phi
+      - end time-lag loop
+- end fast-direction loop
+- interpolate error grid in the time-lag direction
+- normalise interpolated error grid, use 95% confidence interval to determine
+    error estimate in phi and delta-t
+- determine dt and phi corresponding to minimum L2 or TE
+- resample traces to be equal to error grid interpolation
+- generate Hilbert transform of interpolated traces
+- rotate real and Hilbert interpolated traces to best phi
+- time-lag real and Hilbert interpolated traces 1/2 best dt
+- if required, apply ScS correction as before
+- time-lag corrected traces second 1/2 best dt
+- generate covariance matrix of corrected traces, use to determine source            polarisation 

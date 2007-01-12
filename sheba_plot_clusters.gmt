@@ -1,0 +1,13 @@
+#!/bin/csh
+gmtset PAPER_MEDIA A4+ MEASURE_UNIT inch
+# get the information
+source $1.gmt
+#
+awk '{print $6,$4,$7,$5}' $1.clustxy > xy.sheba_tmp
+#
+psxy xy.sheba_tmp -JX6/6 -R0/"$TLAG_SCALE"/-90/90 -B"$TLAG_MINORTICK"a"$TLAG_MAJORTICK":"@~\144@~t (s)":/15a30:"@~\146@~ (@~\260@~)"::".$1":WSne -Sc0.05 -G0 -X1 -Y1 -K > $1_clusters.eps
+psxy $1.clusters -JX -R -St.2 -W1/255/0/0 -O -K -Exy0.05/1/255/0/0 >> $1_clusters.eps
+echo $TLAG $FAST > soln.sheba_tmp
+psxy soln.sheba_tmp -JX -R -Sx0.5 -W1/0/0/255 -O >> $1_clusters.eps
+
+\rm *.sheba_tmp

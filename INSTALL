@@ -1,0 +1,80 @@
+================================================================================
+INSTRUCTIONS FOR INSTALLING AND RUNNING SHEBA, THE SHEAR-WAVE SPLITTING
+ANALYSIS CODE. 
+================================================================================
+
+--------------------------------------------------------------------------------
+Section 1: Introduction
+
+1.1 Disclaimer and terms of use
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE.  
+
+It may be modified for your own purposes but should not be redistributed without
+sufficient reference to the fact that it has been altered. Please let me know
+about any bugs that you find (especially if you have a fix for them). 
+
+1.2 References
+
+The code SHEBA was written by James Wookey (University of Bristol) based in part
+on subroutines written by Nick Teanby. The algorithm used by SHEBA for multi-
+window analysis is described in:
+
+Teanby, N; Kendall, J-M. and Van Der Baan, M. (2004), "Automation of shear-wave
+   splitting measurements using cluster analysis", BSSA, vol 94, pp 453-463
+
+Various other papers are referenced in individual subroutines. 
+
+--------------------------------------------------------------------------------
+Section 2: Prerequisites
+
+2.1 Operating system
+
+	SHEBA has been compiled on run successfully on several platforms including
+      Linux, MacOSX and Solaris. Other UNIX variants are likely to work, but 
+      no guarantees! 
+
+      The multiple window analysis can be quite computationally expensive, so
+      older machines (for example older sparc machines) may struggle. If this
+      is the case, use the 'nwind one' option. 	
+
+2.2 SHEBA requires utilities from several packages to compile and run: 
+
+	- SAC, SAC2000 or MacSAC (the sac.a library is NOT required however)
+
+      - GMT (several GMT programs are used for plotting) 
+
+      - A postscript viewer. GV is recommended (and assumed by the SAC macro).  
+
+	- PSUTILS and GHOSTSCRIPT are required for the "plot yes" option, though
+        this could potentially be circumvented.
+
+	- A Fortran 90 compiler. The gnu compiler GFORTRAN is compatible. Other
+        compilers known to have worked are ifort, xlf, g95 and Solaris f90. G77
+        and other Fortran 77 compilers will NOT work. 
+
+--------------------------------------------------------------------------------
+Section 3: Where to install
+	
+	Put the directory SHEBA_distrib in your SAC macros directory (e.g., 
+/usr/local/sac/macros). Make will put scripts and binaries in this parent 
+directory. 
+
+--------------------------------------------------------------------------------
+Section 3: Compiling
+
+	- Edit the Makefile to set up your compiler and options. Since the code
+        can be quite intensive, optimisation is recommended. 
+      
+      - Type 'make'. This will compile all the codes, and install binaries, 
+        shell scripts and SAC macros. 'make clean' will remove all object
+        files to allow a clean install.   
+
+--------------------------------------------------------------------------------
+Section 4: Running the code
+
+	- SHEBA is most easily run from the SAC macro split_sheba. 
+      - Type, e.g.: m split_sheba file MYFILE comps E N Z pick yes 
+	- For other options see the split_sheba macro

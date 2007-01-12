@@ -1,0 +1,33 @@
+#!/bin/csh
+#
+#  Clean up after SHEBA
+#
+set fbase1 = `ls *.clusters`
+set fbase = `echo ${fbase1:r}`
+echo "Cleaning up after SHEBA, fbase =" $fbase
+rm -f ${fbase}.clusters
+rm -f ${fbase}.clus
+rm -f ${fbase}.clusters
+rm -f ${fbase}.clusters
+rm -f ${fbase}.clustxy
+rm -f ${fbase}.error
+rm -f ${fbase}.gmt
+rm -f ${fbase}.lam2
+rm -f ${fbase}.scm
+rm -f ${fbase}.xy1
+rm -f ${fbase}.xy2
+rm -f ${fbase}_corr.BHE
+rm -f ${fbase}_corr.BHN
+rm -f ${fbase}_corr.BHZ
+rm -f ${fbase}_errclu.eps
+rm -f ${fbase}_sheba.result
+rm -f ${fbase}_sheba.stats
+rm -f ${fbase}_result.ps
+rm -f ${fbase}_sheba.final_result
+rm -f split_inp.ps split_rot.ps split_wav.ps
+rm -f sheba.in
+rm -f sheba.log
+rm -f sheba.result
+rm -f tlag_limit.jwo
+rm -f tmp.r
+rm -f tmp.t
