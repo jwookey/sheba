@@ -15,3 +15,5 @@ syn.clusters      ! Cluster analysis results file
 syn.clustxy       ! Cluster analysis results file  
 syn.error         ! Best-window error surface (for plotting)   
 syn.scm           ! SAC macro to set result parameters in SAC
+
+This is a trivial change to test CVS
