@@ -2,11 +2,12 @@
 !     S H E B A - Shear-wave Birefringence Analysis
 !=======================================================================
 !
-!     AUTHOR  : James Wookey,
-!               School of Earth Sciences, University of Bristol
-!     DATE    : $Date: 2007/02/06 13:39:00 $
-!     VERSION : $Revision: 1.3 $
-!     VERSION : $Name:  $
+!     James Wookey, School of Earth Sciences, University of Bristol
+!
+!=======================================================================
+!
+!     CVS DATE    : $Date: 2007/02/06 13:40:48 $
+!     CVS VERSION : $Name:  $-$Revision: 1.4 $
 !
 !-----------------------------------------------------------------------
 !     This software is distributed in the hope that it will be useful,
