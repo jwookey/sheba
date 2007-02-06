@@ -1,18 +1,12 @@
 !=======================================================================
 !     S H E B A - Shear-wave Birefringence Analysis
 !=======================================================================
-!     Fortran 90/95 Source Code File
-!-----------------------------------------------------------------------
 !
-!     PROGRAM : sheba
-!     FILE    : sheba.f
-!     AUTHOR  : James Wookey
-!     PLACE   : School of Earth Sciences, University of Leeds
-!     DATE    : December 2003
-!     PURPOSE : Various subroutines for sheba
-!     VERSION : $Revision: 1.2 $
-!     COMPLETE: No
-!     COMMENTS: 
+!     AUTHOR  : James Wookey,
+!               School of Earth Sciences, University of Bristol
+!     DATE    : $Date: 2007/02/06 13:39:00 $
+!     VERSION : $Revision: 1.3 $
+!     VERSION : $Name:  $
 !
 !-----------------------------------------------------------------------
 !     This software is distributed in the hope that it will be useful,
