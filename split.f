@@ -1,23 +1,14 @@
 !=======================================================================
-!     S H E B A - Shear-wave Birefringence Analysis
+!  S H E B A - Shear-wave Birefringence Analysis
 !=======================================================================
-!     Fortran 90/95 Source Code File
-!-----------------------------------------------------------------------
+!  This software is distributed in the hope that it will be useful,
+!  but WITHOUT ANY WARRANTY; without even the implied warranty of
+!  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!=======================================================================
 !
-!     PROGRAM : sheba
-!     FILE    : split.f
-!     AUTHOR  : Nicholas Teanby and James Wookey
-!     PLACE   : School of Earth Sciences, University of Leeds
-!     DATE    : December 2003
-!     PURPOSE : Splitting analysis main subroutine
-!     VERSION : 1.0
-!     COMPLETE: No
-!     COMMENTS: 
+!  James Wookey, School of Earth Sciences, University of Bristol
+!  CVS: $Revision: 1.2 $ $Date: 2007/02/06 14:03:49 $
 !
-!-----------------------------------------------------------------------
-!     This software is distributed in the hope that it will be useful,
-!     but WITHOUT ANY WARRANTY; without even the implied warranty of
-!     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 !-----------------------------------------------------------------------
 !
 ! SUBROUTINES IN THIS FILE WERE WRITTEN BY N. TEANBY UNIVERSITY OF LEEDS

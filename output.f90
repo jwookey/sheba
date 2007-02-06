@@ -1,34 +1,14 @@
-!=======================================================================
-!     S H E B A - Shear-wave Birefringence Analysis
-!=======================================================================
-!     Fortran 90/95 Source Code File
-!-----------------------------------------------------------------------
+!===============================================================================
+!  S H E B A - Shear-wave Birefringence Analysis
+!===============================================================================
+!  This software is distributed in the hope that it will be useful,
+!  but WITHOUT ANY WARRANTY; without even the implied warranty of
+!  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!===============================================================================
 !
-!     PROGRAM : sheba
-!     FILE    : output.f
-!     AUTHOR  : James Wookey
-!     PLACE   : School of Earth Sciences, University of Leeds
-!     DATE    : December 2003
-!     PURPOSE : Various subroutines for sheba
-!     VERSION : 1.0
-!     COMPLETE: No
-!     COMMENTS: 
+!  James Wookey, School of Earth Sciences, University of Bristol
+!  CVS: $Revision: 1.2 $ $Date: 2007/02/06 14:03:49 $
 !
-!-----------------------------------------------------------------------
-!     This software is distributed in the hope that it will be useful,
-!     but WITHOUT ANY WARRANTY; without even the implied warranty of
-!     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!-----------------------------------------------------------------------
-!
-!      sheba is a prototype code to implement various algorithms for
-!      analysing shear-wave splitting. 
-!
-!-----------------------------------------------------------------------
-!     Changes log
-!-----------------------------------------------------------------------
-!     2003-12-04     * Incept date
-!     2004-06-15     * added a duplicate file named after the input data
-!     2006-08-21     * output of NDF, SNR and EIGs
 
 !=======================================================================
       subroutine output_result(t1)

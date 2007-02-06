@@ -1,22 +1,14 @@
 !===============================================================================
-!     S H E B A - Shear-wave Birefringence Analysis
+!  S H E B A - Shear-wave Birefringence Analysis
 !===============================================================================
-!     Fortran 90/95 Source Code File
-!-------------------------------------------------------------------------------
+!  This software is distributed in the hope that it will be useful,
+!  but WITHOUT ANY WARRANTY; without even the implied warranty of
+!  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!===============================================================================
 !
-!     PROGRAM : sheba_stack
-!     FILE    : sheba_stack.f
-!     AUTHOR  : James Wookey
-!     PLACE   : School of Earth Sciences, University of Leeds
-!     DATE    : January 2005
-!     PURPOSE : 
-!     VERSION : 1.2
-!     COMMENTS: 
+!  James Wookey, School of Earth Sciences, University of Bristol
+!  CVS: $Revision: 1.2 $ $Date: 2007/02/06 14:03:49 $
 !
-!-------------------------------------------------------------------------------
-!     This software is distributed in the hope that it will be useful,
-!     but WITHOUT ANY WARRANTY; without even the implied warranty of
-!     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 !-------------------------------------------------------------------------------
 !
 !      SHEBA_STACK stacks single event error surfaces, after 

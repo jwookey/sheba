@@ -1,37 +1,14 @@
-!=======================================================================
-!     S H E B A - Shear-wave Birefringence Analysis
-!=======================================================================
-!     Fortran 90/95 Source Code File
-!-----------------------------------------------------------------------
+!===============================================================================
+!  S H E B A - Shear-wave Birefringence Analysis
+!===============================================================================
+!  This software is distributed in the hope that it will be useful,
+!  but WITHOUT ANY WARRANTY; without even the implied warranty of
+!  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!===============================================================================
 !
-!     PROGRAM : sheba
-!     FILE    : sheba_config.f
-!     AUTHOR  : James Wookey
-!     PLACE   : School of Earth Sciences, University of Leeds
-!     DATE    : December 2003
-!     PURPOSE : 
-!     VERSION : 1.0
-!     COMPLETE: No
-!     COMMENTS: 
+!  James Wookey, School of Earth Sciences, University of Bristol
+!  CVS: $Revision: 1.2 $ $Date: 2007/02/06 14:03:49 $
 !
-!-----------------------------------------------------------------------
-!     This software is distributed in the hope that it will be useful,
-!     but WITHOUT ANY WARRANTY; without even the implied warranty of
-!     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!-----------------------------------------------------------------------
-!
-!      SHEBA is a prototype code to implement various algorithms for
-!      analysing shear-wave splitting. 
-!
-!      The basic analysis is after Silver and Chan, 1991.
-!      Also incorporated are many routines from Nicholas Teanby,
-!      Georg Rumpker, and Chris Chapman. Individual routines are 
-!      attributed to their various authors
-!
-!-----------------------------------------------------------------------
-!     Changes log
-!-----------------------------------------------------------------------
-!     2003-12-04     * Incept date
 
 !=======================================================================
       module sheba_config ! Utility module for F90/95 for SAC files

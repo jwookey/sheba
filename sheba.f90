@@ -1,32 +1,27 @@
-!=======================================================================
-!     S H E B A - Shear-wave Birefringence Analysis
-!=======================================================================
+!===============================================================================
+!  S H E B A - Shear-wave Birefringence Analysis
+!===============================================================================
+!  This software is distributed in the hope that it will be useful,
+!  but WITHOUT ANY WARRANTY; without even the implied warranty of
+!  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!===============================================================================
 !
-!     James Wookey, School of Earth Sciences, University of Bristol
+!  James Wookey, School of Earth Sciences, University of Bristol
+!  CVS: $Revision: 1.5 $ $Date: 2007/02/06 14:03:49 $
 !
-!=======================================================================
-!
-!     CVS DATE    : $Date: 2007/02/06 13:40:48 $
-!     CVS VERSION : $Name:  $-$Revision: 1.4 $
-!
-!-----------------------------------------------------------------------
-!     This software is distributed in the hope that it will be useful,
-!     but WITHOUT ANY WARRANTY; without even the implied warranty of
-!     MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-!-----------------------------------------------------------------------
 
-!=======================================================================
+!===============================================================================
       subroutine sheba()
-!=======================================================================
+!===============================================================================
 !  
 !     The main SHEBA soubroutine. This controls the shear-wave 
 !     analysis
 !
-!-----------------------------------------------------------------------
+!-------------------------------------------------------------------------------
       use f90sac  ! use the f90sac module
       use sheba_config ! use the sheba_config module
       use event_info ! use event_info module
-!-----------------------------------------------------------------------
+!-------------------------------------------------------------------------------
       implicit none
       type (SACTrace) :: h1,h2,v ! the re-ordered traces for analysis
       type (SACTrace) :: h1_corr,h2_corr ! the corrected traces
@@ -193,4 +188,4 @@
 
       return
       end subroutine sheba
-!=======================================================================
+!===============================================================================
