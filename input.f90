@@ -7,7 +7,7 @@
 !===============================================================================
 !
 !  James Wookey, School of Earth Sciences, University of Bristol
-!  CVS: $Revision: 1.2 $ $Date: 2007/02/06 14:03:49 $
+!  CVS: $Revision: 1.3 $ $Date: 2007/02/06 16:32:30 $
 !
 
 !=======================================================================
@@ -59,29 +59,11 @@
          config % src_fast = 0.0 ; config % src_tlag = 0.0 
       endif
 
-      
-!  ** read ScS phase correction options
-      read(10,*,err=901) config % iscs_corr
+!  ** these options were never properly implemented and have been 
+!     removed from this version of the code
 
-      if (config % iscs_corr == 1) then
-         read(10,*,err=901) config % scs_slw
-!  *** warn about ScS correction
-         write(0,'(a)') '-------------------------------------'
-         write(0,'(a)') ' WARNING! ScS option is a prototype'
-         write(0,'(a)') '   and may well give poor results'
-         write(0,'(a)') '------------------------------------'
-      else
-         config % scs_slw = 0.0
-      endif
-
-!  ** read ScS phase correction options
-      read(10,*,err=901) config % i_rotate_to_ABC
-
-      if (config % i_rotate_to_ABC == 1) then
-         read(10,*,err=901) config % slw
-      else
-         config % slw = 0.0
-      endif
+      config % iscs_corr = 0
+      config % i_rotate_to_ABC = 0 ;
          
       return           
 !  ** error handling

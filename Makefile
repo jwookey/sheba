@@ -18,6 +18,8 @@
 #   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
 #
 #-------------------------------------------------------------------------------
+#   CVS: $Revision: 1.4 $ $Date: 2007/02/06 16:32:30 $:q
+#-------------------------------------------------------------------------------
 #
 #   SHEBA requires a FORTRAN 90 compiler. Compilers known to work are:    
 #      Linux : ifc/ifort, g95, gfortran
@@ -40,7 +42,7 @@ OPT90 =
 OPT77 = -w
 OPT = 
 
-EXECDIR=../../
+EXECDIR=../
 
 #-------------------------------------------------------------------------------
 # No editing *should* be required below here ...

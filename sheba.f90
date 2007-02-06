@@ -7,7 +7,7 @@
 !===============================================================================
 !
 !  James Wookey, School of Earth Sciences, University of Bristol
-!  CVS: $Revision: 1.5 $ $Date: 2007/02/06 14:03:49 $
+!  CVS: $Revision: 1.6 $ $Date: 2007/02/06 16:32:30 $
 !
 
 !===============================================================================
@@ -46,26 +46,6 @@
 !  ** check window length
       call check_windows(h1)
 
-!  ** check whether we need to obtain the ScS phase slowness
-!  ** if iscs_corr=1 and scs_slw in input file is -ve, then
-!  ** we need to calculate the slowness of the ScS phase
-!  ** to do this we need evdp and gcarc to be set in the V file
-      if (config % iscs_corr == 1) then
-         if (config % scs_slw < 0.0 ) then
-!        ** check headers            
-            if (v % gcarc == SAC_rnull .or. v % evdp == SAC_rnull) then
-               print*,'SHEBA: GCARC or EVDP not available in trace ', & 
-                     'header for ScS slowness calculation.'
-               STOP     
-            endif
-            write(*,'(a,f6.2,a,f7.2,a)') & 
-            ' Getting ScS slowness for dist =',v % gcarc, & 
-            ' deg and depth =', v % evdp,' km'
-            call scs_slw(v % gcarc, v % evdp, config % scs_slw) 
-            write(*,'(a,f6.3,a)')' Slowness =',config % scs_slw
-         endif
-      endif
-
 !  **  save the input polarisation
       config % input_h1_pol = h1 % cmpaz
 
@@ -75,34 +55,12 @@
 !  ** copy the traces before UMA correction
       call f90sac_clonetrace(h1,h1_proc)
       call f90sac_clonetrace(h2,h2_proc)
-     
-      print*,'after clone trace'
-      
+          
       
 !  **  if required pre-correct for UMA
       if (config % iuma_corr == 1) then
          call desplit(h1_proc,h2_proc,config % uma_phi,config % uma_dt)
       endif
-
-!  ** ABC rotation not yet implemented
-
-!      config % i_rotate_to_ABC = 1
-!      config % slw = 10.9916
-
-!  ** if required, rotate radial and transverse
-      if (config % i_rotate_to_ABC == 1) then
-         call enz2abc(h1_proc,h2_proc,v,config % slw) ! forward direction
-      endif
-
-!     fname = trim(config % fname_base) // '_tmp.a'
-!     call f90sac_writetrace(fname,h1)
-!
-!     fname = trim(config % fname_base) // '_tmp.b'
-!     call f90sac_writetrace(fname,h2)
-!
-!     fname = trim(config % fname_base) // '_tmp.c'
-!     call f90sac_writetrace(fname,v)
-     
 
 !  **  run the Silver and Chan analysis
       call cluster_split(h1_proc,h2_proc)

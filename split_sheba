@@ -1,9 +1,11 @@
 *SACMACRO
 *-------------------------------------------------------------------------------
-*     SPLIT_SHEBA macro
+*   SPLIT_SHEBA macro
 *-------------------------------------------------------------------------------
-*     (c) James Wookey 2004-2006
+*   (c) James Wookey 2004-2006
 *-------------------------------------------------------------------------------
+*	 CVS: $Revision: 1.2 $ $Date: 2007/02/06 16:32:30 $
+*
 * This is a SAC macro to run to run the shear-wave splitting analysis code, 
 * SHEBA. It basically inserts the correct picks into the data files to be 
 * analysed, builds the input file for SHEBA, runs SHEBA and plots the results.
@@ -22,12 +24,6 @@
 *  pick [(maybe)|yes]   - (re)pick analysis window limits
 *  corr [(no)|phi t]    - remove a given phi/dt before analysis
 *  src_corr [(no)|phi t]- remove a given phi/dt AFTER analysis (at each node) 
-*  rz_rotate [(no)|yes|slow]- rotate RZ to BC frame before analysis
-*  scs [(no)|yes|plat]  - account for ScS reflection phase distortion  
-*                         if yes, ScS slowness is calculated by SHEBA  
-*                         from event depth and epicentral distance. 
-*                         Otherwise a slowness can be specified
-*                         NOTE: This is a prototype option only!
 *
 *  nwind [(one)|n1 n2]  - number of starting and ending windows, these
 *                         are analysed using N. Teanby's cluster analysis
@@ -181,32 +177,13 @@ endif
 sc echo $max_tlag$ >> sheba.in
 if no ne $corr$
       sc echo 1 >> sheba.in
-      sc echo $corr$ >> sheba.in
+      sc echo $corr$ >> sheba.in:q
 else
       sc echo 0 >> sheba.in
 endif
 if no ne $src_corr$
       sc echo 1 >> sheba.in
       sc echo $src_corr$ >> sheba.in
-else
-      sc echo 0 >> sheba.in
-endif
-if $scs$ eq no
-      sc echo 0 >> sheba.in
-elseif $scs$ eq yes
-      sc echo 1 >> sheba.in
-      sc echo -1.0 >> sheba.in
-else
-      sc echo 1 >> sheba.in
-      sc echo $scs$ >> sheba.in
-endif
-if no ne $rz_rotate$
-      sc echo 1 >> sheba.in
-      if yes ne $rz_rotate$
-            sc echo $rz_rotate$ >> sheba.in
-      else
-            sc echo &1,user9& >> sheba.in
-      endif
 else
       sc echo 0 >> sheba.in
 endif

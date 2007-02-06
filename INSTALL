@@ -44,9 +44,9 @@ Section 2: Prerequisites
 
 	- SAC, SAC2000 or MacSAC (the sac.a library is NOT required however)
 
-      - GMT (several GMT programs are used for plotting) 
+	- GMT (several GMT programs are used for plotting) 
 
-      - A postscript viewer. GV is recommended (and assumed by the SAC macro).  
+	- A postscript viewer. GV is recommended (and assumed by the SAC macro).  
 
 	- PSUTILS and GHOSTSCRIPT are required for the "plot yes" option, though
         this could potentially be circumvented.
@@ -67,8 +67,13 @@ Section 3: Compiling
 
 	- Edit the Makefile to set up your compiler and options. Since the code
         can be quite intensive, optimisation is recommended. 
+
+	- If you are using MacSAC on an intel-based Mac or linux box you will need
+	  to edit the file f90sac_distrib.f90. Change the parameter 
+	  f90sac_force_byteswap to be .true. so the big-endian SAC files will be
+	  properly handled.  
       
-      - Type 'make'. This will compile all the codes, and install binaries, 
+	- Type 'make'. This will compile all the codes, and install binaries, 
         shell scripts and SAC macros. 'make clean' will remove all object
         files to allow a clean install.   
 

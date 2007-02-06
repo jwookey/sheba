@@ -7,7 +7,7 @@
 !===============================================================================
 !
 !  James Wookey, School of Earth Sciences, University of Bristol
-!  CVS: $Revision: 1.2 $ $Date: 2007/02/06 14:03:49 $
+!  CVS: $Revision: 1.3 $ $Date: 2007/02/06 16:32:30 $
 !
 
 !=======================================================================
@@ -36,7 +36,7 @@
             integer :: iuma_corr
             real :: uma_dt, uma_phi
             
-!           * ScS specific stuff
+!           * ScS specific stuff (no longer implemented)
             integer :: iscs_corr ! scs correct flag
             real :: scs_slw ! slowness of ScS phase s/deg
 
@@ -47,7 +47,7 @@
             integer :: i_src_corr
             real :: src_tlag, src_fast
 
-!        ** pre-analysis ABC rotation
+!        ** pre-analysis ABC rotation (unused option)
             integer :: i_rotate_to_ABC
             real :: slw
 
