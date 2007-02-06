@@ -10,7 +10,7 @@
 !     PLACE   : School of Earth Sciences, University of Leeds
 !     DATE    : December 2003
 !     PURPOSE : Various subroutines for sheba
-!     VERSION : 1.0
+!     VERSION : $Revision: 1.2 $
 !     COMPLETE: No
 !     COMMENTS: 
 !
