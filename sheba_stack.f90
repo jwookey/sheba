@@ -7,7 +7,7 @@
 !===============================================================================
 !
 !  James Wookey, School of Earth Sciences, University of Bristol
-!  CVS: $Revision: 1.2 $ $Date: 2007/02/06 14:03:49 $
+!  CVS: $Revision: 1.3 $ $Date: 2007/02/13 10:16:25 $
 !
 !-------------------------------------------------------------------------------
 !
@@ -33,6 +33,7 @@
       real :: dtlag_step,lam2min,dfast,dtlag,fast,tlag
       real :: wgt(nsurfmax)
       integer ifast,itlag,i,j,iskip
+      integer :: iargc
       real idfast,idtlag
       character (len = 12) :: fmt
       character (len = 80) :: arg,wfname ! weight file name

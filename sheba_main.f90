@@ -7,12 +7,12 @@
 !===============================================================================
 !
 !  James Wookey, School of Earth Sciences, University of Bristol
-!  CVS: $Revision: 1.2 $ $Date: 2007/02/06 14:03:49 $
+!  CVS: $Revision: 1.3 $ $Date: 2007/02/13 10:16:25 $
 !
 
 
 !=======================================================================
-      program sheba_main
+   program sheba_main
 !=======================================================================
       use f90sac  ! use the f90sac module
       use sheba_config ! use the config module
@@ -20,17 +20,20 @@
       implicit none
          real, parameter :: sheba_version = 0.99
 
-!        * print copyright information
-         call sheba_banner(sheba_version) 
+! ** print copyright information
+     call sheba_banner(sheba_version) 
 
-!     * get input file information
-         call read_config()
+!  ** initialise configuration
+      call sheba_config_init()
 
-!     * run the analysis
-         call sheba()
+!  ** get input file information
+      call read_config()
 
-!     * finish up
+!  ** run the analysis
+      call sheba()
+
+!  ** finish up
       
-         stop
-      end program sheba_main
+      stop
+   end program sheba_main
 !=======================================================================

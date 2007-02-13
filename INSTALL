@@ -49,7 +49,7 @@ Section 2: Prerequisites
 	- A postscript viewer. GV is recommended (and assumed by the SAC macro).  
 
 	- PSUTILS and GHOSTSCRIPT are required for the "plot yes" option, though
-        this could potentially be circumvented.
+        this could potentially be circumvented. 
 
 	- A Fortran 90 compiler. The gnu compiler GFORTRAN is compatible. Other
         compilers known to have worked are ifort, xlf, g95 and Solaris f90. G77

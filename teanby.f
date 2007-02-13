@@ -7,7 +7,7 @@
 !=======================================================================
 !
 !  James Wookey, School of Earth Sciences, University of Bristol
-!  CVS: $Revision: 1.2 $ $Date: 2007/02/06 14:03:49 $
+!  CVS: $Revision: 1.3 $ $Date: 2007/02/13 10:16:25 $
 !
 !-----------------------------------------------------------------------
 !
@@ -1349,7 +1349,7 @@ c-----------------------------------------------------------------------
       implicit none
       integer n,np,m,np_local,iter,maxiter
       real TINY
-      parameter (np_local=50000,maxiter=100,TINY=1.e-100)
+      parameter (np_local=50000,maxiter=100,TINY=1.e-32)
       real x0(np),y0(np),xc(np),yc(np),vxc(np),vyc(np),xscale,yscale,bic
       real x(np_local),y(np_local)
       real xmin,xmax,ymin,ymax,distmin,xsum,ysum,dist,term1,term2

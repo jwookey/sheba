@@ -2,6 +2,8 @@
 <!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>currentDocument</key>
+	<string>misc.f90</string>
 	<key>documents</key>
 	<array>
 		<dict>
@@ -39,6 +41,10 @@
 		<dict>
 			<key>filename</key>
 			<string>misc.f90</string>
+			<key>lastUsed</key>
+			<date>2007-02-07T15:19:30Z</date>
+			<key>selected</key>
+			<true/>
 		</dict>
 		<dict>
 			<key>filename</key>
@@ -111,10 +117,14 @@
 		<dict>
 			<key>filename</key>
 			<string>INSTALL</string>
+			<key>lastUsed</key>
+			<date>2007-02-07T15:19:30Z</date>
 		</dict>
 		<dict>
 			<key>filename</key>
 			<string>Makefile</string>
+			<key>lastUsed</key>
+			<date>2007-02-07T09:51:28Z</date>
 		</dict>
 		<dict>
 			<key>filename</key>
@@ -123,15 +133,97 @@
 		<dict>
 			<key>filename</key>
 			<string>split_sheba</string>
+			<key>lastUsed</key>
+			<date>2007-02-06T16:42:35Z</date>
 		</dict>
 	</array>
 	<key>fileHierarchyDrawerWidth</key>
 	<integer>200</integer>
 	<key>metaData</key>
-	<dict/>
+	<dict>
+		<key>INSTALL</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>48</integer>
+				<key>line</key>
+				<integer>51</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>6</integer>
+		</dict>
+		<key>Makefile</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>8</integer>
+				<key>line</key>
+				<integer>108</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>0</integer>
+		</dict>
+		<key>misc.f90</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>53</integer>
+				<key>line</key>
+				<integer>9</integer>
+			</dict>
+			<key>columnSelection</key>
+			<false/>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>0</integer>
+			<key>selectFrom</key>
+			<dict>
+				<key>column</key>
+				<integer>8</integer>
+				<key>line</key>
+				<integer>9</integer>
+			</dict>
+			<key>selectTo</key>
+			<dict>
+				<key>column</key>
+				<integer>53</integer>
+				<key>line</key>
+				<integer>9</integer>
+			</dict>
+		</dict>
+		<key>split_sheba</key>
+		<dict>
+			<key>caret</key>
+			<dict>
+				<key>column</key>
+				<integer>0</integer>
+				<key>line</key>
+				<integer>0</integer>
+			</dict>
+			<key>firstVisibleColumn</key>
+			<integer>0</integer>
+			<key>firstVisibleLine</key>
+			<integer>0</integer>
+		</dict>
+	</dict>
+	<key>openDocuments</key>
+	<array>
+		<string>Makefile</string>
+		<string>INSTALL</string>
+		<string>misc.f90</string>
+		<string>split_sheba</string>
+	</array>
 	<key>showFileHierarchyDrawer</key>
 	<true/>
 	<key>windowFrame</key>
-	<string>{{30, 18}, {669, 1010}}</string>
+	<string>{{331, 18}, {669, 1010}}</string>
 </dict>
 </plist>

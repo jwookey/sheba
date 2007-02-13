@@ -7,7 +7,7 @@
 !===============================================================================
 !
 !  James Wookey, School of Earth Sciences, University of Bristol
-!  CVS: $Revision: 1.3 $ $Date: 2007/02/06 16:32:30 $
+!  CVS: $Revision: 1.4 $ $Date: 2007/02/13 10:16:25 $
 !
 
 !=======================================================================
@@ -52,11 +52,11 @@
             real :: slw
 
 !           * Cluster analysis parameters, hardwired
-            real :: dtlag_max = 2.0
-            real :: dfast_max = 20.0
-            real :: fast_scale = 90.0
-            integer :: min_pts_per_cluster = 5
-            integer :: max_no_clusters = 5
+            real :: dtlag_max 
+            real :: dfast_max 
+            real :: fast_scale
+            integer :: min_pts_per_cluster
+            integer :: max_no_clusters
  
          end type sheba_config_type     
 
@@ -72,6 +72,28 @@
          real*8, parameter :: to_deg = 57.2957795130823d0 ;  
          real*4, parameter :: angtol = 0.001 ; ! angle comparison tol.
          real*8, parameter :: to_km = 111.194926644559 ;
+
+   CONTAINS
+ 
+!===============================================================================
+   subroutine sheba_config_init()
+!===============================================================================
+!
+!     Set the date and time in a SAC object
+!
+      implicit none
+
+!  ** Cluster analysis parameters, hardwired
+      config % dtlag_max = 2.0
+      config % dfast_max = 20.0
+      config % fast_scale = 90.0
+      config % min_pts_per_cluster = 5
+      config % max_no_clusters = 5
+
+      return
+   end subroutine sheba_config_init
+!===============================================================================
+      
  
 !=======================================================================
       end module sheba_config
