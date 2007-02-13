@@ -18,7 +18,7 @@
 #   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
 #
 #-------------------------------------------------------------------------------
-#   CVS: $Revision: 1.6 $ $Date: 2007/02/13 10:16:25 $
+#   CVS: $Revision: 1.7 $ $Date: 2007/02/13 10:17:32 $
 #-------------------------------------------------------------------------------
 #
 #   SHEBA requires a FORTRAN 90 compiler. Compilers known to work are:    
@@ -35,6 +35,12 @@
 #OPT77 = -w95 -cm 
 #OPT90 =
 #OPT =  -tpp7 -axW -Vaxlib -assume byterecl -static     
+
+# -- flags which work for f90 on Solaris
+#FC = f90
+#OPT90 =
+#OPT77 =
+#OPT = 
 
 # -- flags which work for gfortran on Mac (and probably Linux)
 FC = gfortran -O5 
