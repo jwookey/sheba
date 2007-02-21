@@ -7,7 +7,7 @@
 !===============================================================================
 !
 !  James Wookey, School of Earth Sciences, University of Bristol
-!  CVS: $Revision: 1.3 $ $Date: 2007/02/06 16:32:30 $
+!  CVS: $Revision: 1.4 $ $Date: 2007/02/21 16:13:41 $
 !
 
 !=======================================================================
@@ -103,12 +103,33 @@
            traces(2)%cmpaz == SAC_rnull .or.  & 
            traces(3)%cmpaz == SAC_rnull) then
          print*,'<!> ERROR IN SHEBA: cmpaz header not set in one or more files'
+         STOP
       endif   
       if ( traces(1)%cmpinc == SAC_rnull .or.  &
            traces(2)%cmpinc == SAC_rnull .or.  & 
            traces(3)%cmpinc == SAC_rnull) then
          print*,'<!> ERROR IN SHEBA: cmpinc header not set in one or more files'
+         STOP
       endif   
+
+!  ** check that traces are the same length, delta and origin time
+      if ( traces(1)%npts /= traces(2)%npts .or.  &
+           traces(1)%npts /= traces(3)%npts ) then
+         print*,'<!> ERROR IN SHEBA: Traces are different lengths'
+         STOP
+      endif   
+      if ( traces(1)%delta /= traces(2)%delta .or.  &
+           traces(1)%delta /= traces(3)%delta ) then
+         print*,'<!> ERROR IN SHEBA: Traces have different sampling rates'
+         STOP
+      endif   
+
+      if ( f90sac_compare_origin_time(traces(1),traces(2)) /= 0 .or.  &
+           f90sac_compare_origin_time(traces(1),traces(3)) /= 0 ) then
+         print*,'<!> ERROR IN SHEBA: Traces have different origin times'
+         STOP
+      endif   
+
 
 !  ** determine ordering and check inclinations
       ii = 1
