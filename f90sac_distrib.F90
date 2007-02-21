@@ -6,12 +6,11 @@
 !-------------------------------------------------------------------------------
 !===============================================================================
 !
-!  PROGRAM : f90sac
-!  FILE    : f90sac.f90
-!  DATE    : December 2003
-!  VERSION : 3.0 (distribution version)
+!  PROGRAM : f90sac_distrib
+!  VERSION : 3.2 (Distrib. version)
+!  CVS: $Revision: 1.2 $ $Date: 2007/02/21 15:55:32 $
 !
-!  (C) James Wookey, December 2003 - June 2006
+!  (C) James Wookey
 !  Department of Earth Sciences, University of Bristol
 !  Wills Memorial Building, Queen's Road, Bristol, BR8 1RJ, UK
 !  j.wookey@bristol.ac.uk
@@ -26,7 +25,7 @@
 !   This has been successfully compiled using Solaris f90 and IFC versions
 !   6-8.1. NOTE: Check parameter f90sac_32bit_record_length is set to the
 !   correct value for your compiler. UPDATE the free compilers g95 and 
-!   gfortran also work.
+!   gfortran also work. Ditto xlf.
 !
 !   NOTE: This version of the code assumes IO filestream 99 is available 
 !         for reading and writing. 
@@ -51,45 +50,6 @@
 !
 !   See http://www.gnu.org/licenses/gpl.txt for full GPL terms.
 !
-!-------------------------------------------------------------------------------
-!     Changes log
-!-------------------------------------------------------------------------------
-!
-!     2003-12-04  v0.9   * Incept date
-!     2003-12-05  v1.0   * Added basic error checking to f90sac_readtrace
-!                          and changed all subroutine names
-!     2004-01-26  v1.0   * Added a white-noise function
-!     2004-02-05  v1.0   * Added a windowing function
-!     2004-02-19  v1.0   * Added an SAC x/y file data structure
-!     2004-03-08  v1.0   * added subroutines to set event and station info
-!     2004-03-09  v1.0   * organised error/warning reporting
-!     2004-05-03  v2.0   * changed to f90 file
-!     2004-05-26  v2.1   * updated the file definitions to standard f90/95
-!     2004-07-02  v2.11  * minor comment fixes
-!     2004-07-21  v2.2   * added a subroutine f90sac_rotate2d_rz
-!     2004-09-08  v2.3   * added functions f90sac_resampleup,
-!                                          f90sac_cattraces
-!     2004-10-22  v2.31  * included NR routines in the file for ease 
-!     2004-11-02  v2.32  * included option to suppress warnings 
-!     2005-01-11  v2.4   * included option for setting record length
-!     2005-02-16  v2.5   * added function f90sac_jd2ymd
-!     2005-02-16  v2.6   * change dateseed routine to use date_and_time
-!                          for compatibility with more f90 compilers
-!     2005-05-03  v2.61  * disabled free filestream search in read/write
-!                          for compatibility with Mac OSX Darwin. Also
-!                          disable deallocation of trace memory prior to
-!                          read because of error message using XLF
-!     2005-07-05  v2.62  * fixed spelling mistake (unused18)
-!     2005-08-17  v2.63  * disable memory deallocation in newtrace
-!     2005-08-18  v2.7   * added an attribute to the SAC trace type:
-!                          iTraceActive. This is not input/output, but is set
-!                          by the _newtrace, _destroytrace, and _readtrace. This
-!                          is to deal with the allocation/deallocation problem
-!     2006-01-16  v2.8   * added functions for getting and setting the SAC
-!                          header by using header name strings. Also added
-!                          routines for reading/writing the header of a file.
-!     2006-06-05  v3.0   * redesign of I/O routines to incorporate byte-swapping
-!                          see parameter f90sac_force_byteswap
 !===============================================================================
 
    module f90sac ! Utility module for F90/95 for SAC files
@@ -98,6 +58,7 @@
    implicit none
 
 !  ** DECLARE CONTAINED FUNCTIONS
+      public :: f90sac_compare_origin_time
       public :: f90sac_orient2d
       public :: f90sac_rotate2d
       public :: f90sac_rotate2d_rz
@@ -125,13 +86,6 @@
       public :: f90sac_setevent
       public :: f90sac_cattraces
       public :: f90sac_dateseed
-
-!  ** The f90sac_addwnoise subroutine requires the Numerical Recipes function
-!  ** ran1. If this is not available, either comment the function
-!  ** out, or substitute an appropriate alternative.
-!  ** Similarly, f90sac_resampleup uses NR routines splint and spline.
-!      public :: f90sac_addwnoise
-!      public :: f90sac_resampleup 
                 
 !  ** define a long (32 bit) integer and 32 bit real      
       integer, parameter, private :: int4 = selected_int_kind(9) ;
@@ -149,14 +103,15 @@
 !  ** within each call)
       integer, parameter :: f90sac_iounit = 99 ;
 
-!  ** define the 'active' value for the iTraceActive header
-      integer, parameter :: TraceIsActive = 11075 ;
 
 !  ** set whether automatic byteswapping is done
-!     this should only be set to .true. if the SAC data you are using is not
-!     in the native endian format. For example, if you use MacSAC on an intel-
-!     based Mac, or i386 Linux box. 
       logical, parameter :: f90sac_force_byteswap = .false. ;
+
+!  ** define the 'active' value for the iTraceActive header
+      integer, parameter :: TraceIsActive = 11075 ;
+      
+!  ** noise generator seed value
+      integer, private :: f90sac_random_seed ;      
 
 !=============================================================================== 
 !  ** Define a specialised data structure for containing SAC files
@@ -261,6 +216,80 @@
 !===============================================================================
 
    CONTAINS
+
+!===============================================================================
+   function f90sac_compare_origin_time(t1,t2)
+!===============================================================================
+!
+!     Compare origin times of two SAC traces (using nzyear,nzjday etc)
+!        returns:
+!        -1 = t1 is earlier
+!         0 = same time
+!         1 = t2 is earlier
+!
+      implicit none
+      type (SACtrace) :: t1,t2
+      integer f90sac_compare_origin_time
+      
+!
+      f90sac_compare_origin_time = 0
+      
+      if (t1%nzyear<t2%nzyear) then
+         f90sac_compare_origin_time=-1
+         return
+      elseif (t1%nzyear>t2%nzyear) then
+         f90sac_compare_origin_time=1
+         return
+      else
+         if (t1%nzjday<t2%nzjday) then
+            f90sac_compare_origin_time=-1
+            return
+         elseif (t1%nzjday>t2%nzjday) then
+            f90sac_compare_origin_time=1
+            return
+         else
+            if (t1%nzhour<t2%nzhour) then
+               f90sac_compare_origin_time=-1
+               return
+            elseif (t1%nzhour>t2%nzhour) then
+               f90sac_compare_origin_time=1
+               return
+            else
+               if (t1%nzmin<t2%nzmin) then
+                  f90sac_compare_origin_time=-1
+                  return
+               elseif (t1%nzmin>t2%nzmin) then
+                  f90sac_compare_origin_time=1
+                  return
+               else
+                  if (t1%nzsec<t2%nzsec) then
+                     f90sac_compare_origin_time=-1
+                     return
+                  elseif (t1%nzsec>t2%nzsec) then
+                     f90sac_compare_origin_time=1
+                     return
+                  else
+                     if (t1%nzmsec<t2%nzmsec) then
+                      f90sac_compare_origin_time=-1
+                        return
+                     elseif (t1%nzmsec>t2%nzmsec) then
+                        f90sac_compare_origin_time=1
+                        return
+                     else
+                        f90sac_compare_origin_time=0
+                        return
+                     endif         
+                  endif         
+               endif         
+            endif   
+         endif   
+      endif
+
+         
+      return
+      end function f90sac_compare_origin_time
+!===============================================================================
+
 
 !===============================================================================
    subroutine f90sac_cattraces(t1,t2,tc)
@@ -903,7 +932,7 @@
       out%scale     = SAC_rnull
       out%odelta    = SAC_rnull
       out%b         = 0.0
-      out%e         = SAC_rnull
+      out%e         = real(nsamp-1)*delta
       out%o         = SAC_rnull
       out%a         = SAC_rnull
       out%internal0 = SAC_rnull
@@ -1672,9 +1701,6 @@
       out%unused5   = sacrh(068) 
       out%unused6   = sacrh(069) 
       out%unused7   = sacrh(070) 
-
-
-      print*,out%delta
       
       do i=1,40
          read(lu,rec=i+70,err=901) sacih(i)
@@ -2751,39 +2777,107 @@
 
 
 !===============================================================================
-   subroutine f90sac_enumhdr(tr,hdrstr,id_hdr)
+   subroutine f90sac_enumhdr(hdrstr,id_hdr)
 !===============================================================================
 !
 !     Return the header ID number (just the header's place in the SACfile list)
 !     If the header can't be found, -1 is returned
 !     
       implicit none
-      type (SACtrace) :: tr
-      integer :: id_hdr,ifound
+!      type (SACtrace) :: tr
+      integer :: id_hdr
       character (len=*) :: hdrstr
       character (len=10) :: headers(133)
 
-     data headers / &
-     'delta','depmin','depmax','scale','odelta','b','e','o','a','internal0',    &
-     't0','t1','t2','t3','t4','t5','t6','t7','t8','t9','f','resp0','resp1',     &
-     'resp2','resp3','resp4','resp5','resp6','resp7','resp8','resp9','stla',    &
-     'stlo','stel','stdp','evla','evlo','evel','evdp','mag','user0','user1',    &
-     'user2','user3','user4','user5','user6','user7','user8','user9','dist',    &
-     'az','baz','gcarc','internal1','internal2','depmen','cmpaz','cmpinc',      &
-     'xminimum','xmaximum','yminimum','ymaximum','unused1','unused2',           &
-     'unused3','unused4','unused5','unused6','unused7','nzyear','nzjday',       &
-     'nzhour','nzmin','nzsec','nzmsec','nvhdr','norid','nevid','npts',          &
-     'internal3','nwfid','nxsize','nysize','unused8','iftype','idep',           &
-     'iztype','unused9','iinst','istreg','ievreg','ievtyp','iqual','isynth',    &
-     'imagtyp','imagsrc','unused10','unused11','unused12','unused13',           &
-     'unused14','unused15','unused16','unused17','leven','lpspol','lovrok',     &
-     'lcalda','unused18','kstnm','kevnm','khole','ko','ka','kt0','kt1','kt2',   &
-     'kt3','kt4','kt5','kt6','kt7','kt8','kt9','kf','kuser0','kuser1','kuser2', &
-     'kcmpnm','knetwk','kdatrd','kinst'/
+!    data headers / &
+!    'delta','depmin','depmax','scale','odelta','b','e','o','a','internal0',    &
+!    't0','t1','t2','t3','t4','t5','t6','t7','t8','t9','f','resp0','resp1',     &
+!    'resp2','resp3','resp4','resp5','resp6','resp7','resp8','resp9','stla',    &
+!    'stlo','stel','stdp','evla','evlo','evel','evdp','mag','user0','user1',    &
+!    'user2','user3','user4','user5','user6','user7','user8','user9','dist',    &
+!    'az','baz','gcarc','internal1','internal2','depmen','cmpaz','cmpinc',      &
+!    'xminimum','xmaximum','yminimum','ymaximum','unused1','unused2',           &
+!    'unused3','unused4','unused5','unused6','unused7','nzyear','nzjday',       &
+!    'nzhour','nzmin','nzsec','nzmsec','nvhdr','norid','nevid','npts',          &
+!    'internal3','nwfid','nxsize','nysize','unused8','iftype','idep',           &
+!    'iztype','unused9','iinst','istreg','ievreg','ievtyp','iqual','isynth',    &
+!    'imagtyp','imagsrc','unused10','unused11','unused12','unused13',           &
+!    'unused14','unused15','unused16','unused17','leven','lpspol','lovrok',     &
+!    'lcalda','unused18','kstnm','kevnm','khole','ko','ka','kt0','kt1','kt2',   &
+!    'kt3','kt4','kt5','kt6','kt7','kt8','kt9','kf','kuser0','kuser1','kuser2', &
+!    'kcmpnm','knetwk','kdatrd','kinst'/
+
+
+!  ** setup the header array
+      headers(001)='delta'    ;  headers(068)='unused5'  ;
+      headers(002)='depmin'   ;  headers(069)='unused6'  ;
+      headers(003)='depmax'   ;  headers(070)='unused7'  ;
+      headers(004)='scale'    ;  headers(071)='nzyear'   ;
+      headers(005)='odelta'   ;  headers(072)='nzjday'   ;
+      headers(006)='b'        ;  headers(073)='nzhour'   ;
+      headers(007)='e'        ;  headers(074)='nzmin'    ;
+      headers(008)='o'        ;  headers(075)='nzsec'    ;
+      headers(009)='a'        ;  headers(076)='nzmsec'   ;
+      headers(010)='internal0';  headers(077)='nvhdr'    ;
+      headers(011)='t0'       ;  headers(078)='norid'    ;
+      headers(012)='t1'       ;  headers(079)='nevid'    ;
+      headers(013)='t2'       ;  headers(080)='npts'     ;
+      headers(014)='t3'       ;  headers(081)='internal3';
+      headers(015)='t4'       ;  headers(082)='nwfid'    ;
+      headers(016)='t5'       ;  headers(083)='nxsize'   ;
+      headers(017)='t6'       ;  headers(084)='nysize'   ;
+      headers(018)='t7'       ;  headers(085)='unused8'  ;
+      headers(019)='t8'       ;  headers(086)='iftype'   ;
+      headers(020)='t9'       ;  headers(087)='idep'     ;
+      headers(021)='f'        ;  headers(088)='iztype'   ;
+      headers(022)='resp0'    ;  headers(089)='unused9'  ;
+      headers(023)='resp1'    ;  headers(090)='iinst'    ;
+      headers(024)='resp2'    ;  headers(091)='istreg'   ;
+      headers(025)='resp3'    ;  headers(092)='ievreg'   ;
+      headers(026)='resp4'    ;  headers(093)='ievtyp'   ;
+      headers(027)='resp5'    ;  headers(094)='iqual'    ;
+      headers(028)='resp6'    ;  headers(095)='isynth'   ;
+      headers(029)='resp7'    ;  headers(096)='imagtyp'  ;
+      headers(030)='resp8'    ;  headers(097)='imagsrc'  ;
+      headers(031)='resp9'    ;  headers(098)='unused10' ;
+      headers(032)='stla'     ;  headers(099)='unused11' ;
+      headers(033)='stlo'     ;  headers(100)='unused12' ;
+      headers(034)='stel'     ;  headers(101)='unused13' ;
+      headers(035)='stdp'     ;  headers(102)='unused14' ;
+      headers(036)='evla'     ;  headers(103)='unused15' ;
+      headers(037)='evlo'     ;  headers(104)='unused16' ;
+      headers(038)='evel'     ;  headers(105)='unused17' ;
+      headers(039)='evdp'     ;  headers(106)='leven'    ;
+      headers(040)='mag'      ;  headers(107)='lpspol'   ;
+      headers(041)='user0'    ;  headers(108)='lovrok'   ;
+      headers(042)='user1'    ;  headers(109)='lcalda'   ;
+      headers(043)='user2'    ;  headers(110)='unused18' ;
+      headers(044)='user3'    ;  headers(111)='kstnm'    ;
+      headers(045)='user4'    ;  headers(112)='kevnm'    ;
+      headers(046)='user5'    ;  headers(113)='khole'    ;
+      headers(047)='user6'    ;  headers(114)='ko'       ;
+      headers(048)='user7'    ;  headers(115)='ka'       ;
+      headers(049)='user8'    ;  headers(116)='kt0'      ;
+      headers(050)='user9'    ;  headers(117)='kt1'      ;
+      headers(051)='dist'     ;  headers(118)='kt2'      ;
+      headers(052)='az'       ;  headers(119)='kt3'      ;
+      headers(053)='baz'      ;  headers(120)='kt4'      ;
+      headers(054)='gcarc'    ;  headers(121)='kt5'      ;
+      headers(055)='internal1';  headers(122)='kt6'      ;
+      headers(056)='internal2';  headers(123)='kt7'      ;
+      headers(057)='depmen'   ;  headers(124)='kt8'      ;
+      headers(058)='cmpaz'    ;  headers(125)='kt9'      ;
+      headers(059)='cmpinc'   ;  headers(126)='kf'       ;
+      headers(060)='xminimum' ;  headers(127)='kuser0'   ;
+      headers(061)='xmaximum' ;  headers(128)='kuser1'   ;
+      headers(062)='yminimum' ;  headers(129)='kuser2'   ;
+      headers(063)='ymaximum' ;  headers(130)='kcmpnm'   ;
+      headers(064)='unused1'  ;  headers(131)='knetwk'   ;
+      headers(065)='unused2'  ;  headers(132)='kdatrd'   ;
+      headers(066)='unused3'  ;  headers(133)='kinst'    ;
+      headers(067)='unused4'  ;
 
 !  ** search for the specified header
-      
-!      ifound = 0 
       do id_hdr = 1,133
          if (trim(hdrstr) == trim(headers(id_hdr))) then
             return ! the do loop
