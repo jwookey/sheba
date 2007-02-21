@@ -7,7 +7,7 @@
 !===============================================================================
 !
 !  James Wookey, School of Earth Sciences, University of Bristol
-!  CVS: $Revision: 1.3 $ $Date: 2007/02/21 13:23:06 $
+!  CVS: $Revision: 1.4 $ $Date: 2007/02/21 16:16:22 $
 !
 
 !=======================================================================
@@ -29,7 +29,6 @@
       integer, parameter :: int4 = selected_int_kind(9) ;
       integer, parameter :: real4 = selected_real_kind(6,37) ;
       
-      
       character (len=4) :: tmp_char1,tmp_char2,tmp_char3,tmp_char4
       character (len=50):: fname
       integer :: i, istatus
@@ -50,8 +49,8 @@
       t1 % xmaximum = maxval(t1%trace(1:t1 % npts))
       t1 % xminimum = minval(t1%trace(1:t1 % npts))
 
-      t1 % ymaximum = maxval(t2%trace(1:t1 % npts))
-      t1 % yminimum = minval(t2%trace(1:t1 % npts))
+      t1 % ymaximum = maxval(t2%trace(1:t2 % npts))
+      t1 % yminimum = minval(t2%trace(1:t2 % npts))
 
 !
 !     * WRITE OUT THE SAC HEADER
@@ -131,6 +130,11 @@
          call f90sac_real32_byteswap(sacrh,70)
       endif
 
+      do i=1,70
+         write(lu,rec=i) sacrh(i)
+      enddo
+      
+
       sacih(001) =t1%nzyear
       sacih(002) =t1%nzjday
       sacih(003) =t1%nzhour
@@ -179,7 +183,6 @@
       do i=1,40
          write(lu,rec=i+70) sacih(i)
       enddo
-
       
       write(lu,rec=111) t1%kstnm(1:4)
       write(lu,rec=112) t1%kstnm(5:8)
@@ -248,7 +251,7 @@
 
 !  ** Output the first trace   
        do i=1,t2 % npts
-            write(lu,rec=158+i) t2%trace(i)
+            write(lu,rec=158+i+t2 % npts) t2%trace(i)
       enddo
 
 
