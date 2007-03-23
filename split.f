@@ -7,7 +7,7 @@
 !=======================================================================
 !
 !  James Wookey, School of Earth Sciences, University of Bristol
-!  CVS: $Revision: 1.2 $ $Date: 2007/02/06 14:03:49 $
+!  CVS: $Revision: 1.3 $ $Date: 2007/03/23 12:38:44 $
 !
 !-----------------------------------------------------------------------
 !
@@ -257,7 +257,7 @@ c  **  first time lag
      >               hxlag1,hylag1,noverlap)
 
 c  ** ScS correction - JW 2004
-      call scscorr(xlag1,ylag1,hxlag1,hylag1,nwindow,fast,itlag)
+c      call scscorr(xlag1,ylag1,hxlag1,hylag1,nwindow,fast,itlag)
 
 c  **  second time lag
       call zlag(xlag1,ylag1,nwindow,np,itlag2,iwextra,

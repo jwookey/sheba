@@ -4,7 +4,7 @@
 *-------------------------------------------------------------------------------
 *   (c) James Wookey 2004-2006
 *-------------------------------------------------------------------------------
-*	 CVS: $Revision: 1.3 $ $Date: 2007/02/27 10:55:21 $
+*	 CVS: $Revision: 1.4 $ $Date: 2007/03/23 12:38:44 $
 *
 * This is a SAC macro to run to run the shear-wave splitting analysis code, 
 * SHEBA. It basically inserts the correct picks into the data files to be 
@@ -231,10 +231,17 @@ endif
 ** PANEL 2 - original versus corrected waveforms
 sgf number 2
 if off ne $corr
-   plabel 3 "Receiver phi, dt: $corr$" p 0.7 0.05 size tiny
+   plabel 3 "Receiver phi, dt: $corr$" p 0.6 0.05 size tiny
 else
    plabel 3 off
 endif   
+
+if off ne $src_corr
+   plabel 4 "Source phi, dt: $src_corr$" p 0.6 0.02 size tiny
+else
+   plabel 4 off
+endif   
+
 
 r %hfiles_corr%
 rotate to %SPOL%
@@ -398,7 +405,7 @@ endif
 **--------------------------------------------------------------------------- **
 xvport 0.1 0.9; yvport 0.1 0.9; vspace full
 line on solid increment off; fileid on; picks on
-plabel 1 off; plabel 2 off; plabel 3 off; xlabel off; ylabel off; symbol off
+plabel 1 off; plabel 2 off; plabel 3 off; plabel 4 off; xlabel off; ylabel off; symbol off
 unsetbb beg end vmax vmin hfiles zfile log i id pick
 unsetbb files_corr hfiles_corr zfile_corr srcaz t_srcaz pause
 unsetbb corr1 corr2 polarity
