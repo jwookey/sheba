@@ -6,9 +6,9 @@
 !-------------------------------------------------------------------------------
 !===============================================================================
 !
-!  PROGRAM : f90sac_distrib
-!  VERSION : 3.2 (Distrib. version)
-!  CVS: $Revision: 1.2 $ $Date: 2007/02/21 15:55:32 $
+!  PROGRAM : f90sac
+!  VERSION : 3.41 (Distribution version)
+!  CVS: $Revision: 1.3 $ $Date: 2007/08/03 12:32:51 $
 !
 !  (C) James Wookey
 !  Department of Earth Sciences, University of Bristol
@@ -32,23 +32,40 @@
 !
 !-------------------------------------------------------------------------------
 !
-!   This program is free software; you can redistribute it and/or modify
-!   it under the terms of the GNU General Public License as published by
-!   the Free Software Foundation; either version 2 of the License, or
-!   (at your option) any later version.
+!  This software is distributed under the term of the BSD free software license.
 !
-!   This program is distributed in the hope that it will be useful,
-!   but WITHOUT ANY WARRANTY; without even the implied warranty of
-!   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-!   GNU General Public License for more details.
+!  Copyright:
+!     (c) 2003-2007, James Wookey
 !
-!   You should have received a copy of the GNU General Public License
-!   along with this program; if not, write to: 
+!  All rights reserved.
 !
-!   Free Software Foundation, Inc., 59 Temple Place, Suite 330, 
-!   Boston, MA  02111-1307  USA
+!   * Redistribution and use in source and binary forms, with or without
+!     modification, are permitted provided that the following conditions are
+!     met:
+!        
+!   * Redistributions of source code must retain the above copyright notice,
+!     this list of conditions and the following disclaimer.
+!        
+!   * Redistributions in binary form must reproduce the above copyright
+!     notice, this list of conditions and the following disclaimer in the
+!     documentation and/or other materials provided with the distribution.
+!     
+!   * Neither the name of the copyright holder nor the names of its
+!     contributors may be used to endorse or promote products derived from
+!     this software without specific prior written permission.
 !
-!   See http://www.gnu.org/licenses/gpl.txt for full GPL terms.
+!
+!   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+!   "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+!   LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+!   A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT
+!   OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+!   SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+!   LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+!   DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+!   THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+!   (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+!   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 !
 !===============================================================================
 
@@ -81,7 +98,6 @@
       public :: f90sac_setdate
       public :: f90sac_ymd2jd
       public :: f90sac_window
-      public :: f90sac_destroytrace
       public :: f90sac_setstation
       public :: f90sac_setevent
       public :: f90sac_cattraces
@@ -106,9 +122,6 @@
 
 !  ** set whether automatic byteswapping is done
       logical, parameter :: f90sac_force_byteswap = .false. ;
-
-!  ** define the 'active' value for the iTraceActive header
-      integer, parameter :: TraceIsActive = 11075 ;
       
 !  ** noise generator seed value
       integer, private :: f90sac_random_seed ;      
@@ -149,11 +162,8 @@
          character (len = 8) :: kf,kuser0,kuser1,kuser2
          character (len = 8) :: kcmpnm,knetwk,kdatrd,kinst
 !     ** the trace
-         real, pointer :: trace(:)
-         
-!     ** ACTIVE flag, do not alter.
-         integer :: iTraceActive
-         
+         real(real4), allocatable :: trace(:)
+                  
       end type SACtrace      
 
 !=============================================================================== 
@@ -193,8 +203,8 @@
          character (len = 8) :: kcmpnm,knetwk,kdatrd,kinst
 !     ** The trace
 
-         real, pointer :: x(:)
-         real, pointer :: y(:)
+         real(real4), allocatable :: x(:)
+         real(real4), allocatable :: y(:)
       end type SACxy      
 
 !  ** tolerance for the comparison of angles      
@@ -500,7 +510,7 @@
 !===============================================================================
 
 !===============================================================================
-      function f90sac_orth2d(t1,t2)
+   function f90sac_orth2d(t1,t2)
 !===============================================================================
 !
 !     Check for the (azimuthal) orthogonality between two traces
@@ -718,7 +728,6 @@
    end subroutine f90sac_unwind
 !===============================================================================
 
-
 !===============================================================================
    subroutine f90sac_tshift(trace,dt)
 !===============================================================================
@@ -755,164 +764,6 @@
    end subroutine f90sac_tshift
 !===============================================================================
 
-
-!===============================================================================
-   subroutine f90sac_destroytrace(tr)
-!===============================================================================
-!
-!     Destroy an existing SAC trace. i.e. null all its header values and
-!     deallocate its trace memory
-!
-      implicit none
-      type (SACtrace) :: tr
-      integer :: istatus ! number of samples for trace 
-
-      tr%delta     = SAC_rnull
-      tr%depmin    = SAC_rnull
-      tr%depmax    = SAC_rnull
-      tr%scale     = SAC_rnull
-      tr%odelta    = SAC_rnull
-      tr%b         = SAC_rnull
-      tr%e         = SAC_rnull
-      tr%o         = SAC_rnull
-      tr%a         = SAC_rnull
-      tr%internal0 = SAC_rnull
-      tr%t0        = SAC_rnull
-      tr%t1        = SAC_rnull
-      tr%t2        = SAC_rnull
-      tr%t3        = SAC_rnull
-      tr%t4        = SAC_rnull
-      tr%t5        = SAC_rnull
-      tr%t6        = SAC_rnull
-      tr%t7        = SAC_rnull
-      tr%t8        = SAC_rnull
-      tr%t9        = SAC_rnull
-      tr%f         = SAC_rnull
-      tr%resp0     = SAC_rnull
-      tr%resp1     = SAC_rnull
-      tr%resp2     = SAC_rnull
-      tr%resp3     = SAC_rnull
-      tr%resp4     = SAC_rnull
-      tr%resp5     = SAC_rnull
-      tr%resp6     = SAC_rnull
-      tr%resp7     = SAC_rnull
-      tr%resp8     = SAC_rnull
-      tr%resp9     = SAC_rnull
-      tr%stla      = SAC_rnull
-      tr%stlo      = SAC_rnull
-      tr%stel      = SAC_rnull
-      tr%stdp      = SAC_rnull
-
-      tr%evla      = SAC_rnull
-      tr%evlo      = SAC_rnull
-      tr%evel      = SAC_rnull
-      tr%evdp      = SAC_rnull
-      tr%mag       = SAC_rnull
-      tr%user0     = SAC_rnull
-      tr%user1     = SAC_rnull
-      tr%user2     = SAC_rnull
-      tr%user3     = SAC_rnull
-      tr%user4     = SAC_rnull
-      tr%user5     = SAC_rnull
-      tr%user6     = SAC_rnull
-      tr%user7     = SAC_rnull
-      tr%user8     = SAC_rnull
-      tr%user9     = SAC_rnull
-      tr%dist      = SAC_rnull
-      tr%az        = SAC_rnull
-      tr%baz       = SAC_rnull
-      tr%gcarc     = SAC_rnull
-      tr%internal1 = SAC_rnull
-      tr%internal2 = SAC_rnull
-      tr%depmen    = SAC_rnull
-      tr%cmpaz     = SAC_rnull
-      tr%cmpinc    = SAC_rnull
-      tr%xminimum  = SAC_rnull
-      tr%xmaximum  = SAC_rnull
-      tr%yminimum  = SAC_rnull
-      tr%ymaximum  = SAC_rnull
-      tr%unused1   = SAC_rnull
-      tr%unused2   = SAC_rnull
-      tr%unused3   = SAC_rnull
-      tr%unused4   = SAC_rnull
-      tr%unused5   = SAC_rnull
-      tr%unused6   = SAC_rnull
-      tr%unused7   = SAC_rnull
-
-      tr%nzyear    = SAC_inull
-      tr%nzjday    = SAC_inull
-      tr%nzhour    = SAC_inull
-      tr%nzmin     = SAC_inull
-      tr%nzsec     = SAC_inull
-      tr%nzmsec    = SAC_inull
-      tr%nvhdr     = SAC_inull
-      tr%norid     = SAC_inull
-      tr%nevid     = SAC_inull
-      tr%npts      = SAC_inull
-      tr%internal3 = SAC_inull
-      tr%nwfid     = SAC_inull
-      tr%nxsize    = SAC_inull
-      tr%nysize    = SAC_inull
-      tr%unused8   = SAC_inull
-      tr%iftype    = SAC_inull
-      tr%idep      = SAC_inull
-      tr%iztype    = SAC_inull
-      tr%unused9   = SAC_inull
-      tr%iinst     = SAC_inull
-      tr%istreg    = SAC_inull
-      tr%ievreg    = SAC_inull
-      tr%ievtyp    = SAC_inull
-      tr%iqual     = SAC_inull
-      tr%isynth    = SAC_inull
-      tr%imagtyp   = SAC_inull
-      tr%imagsrc   = SAC_inull
-      tr%unused10  = SAC_inull
-      tr%unused11  = SAC_inull
-      tr%unused12  = SAC_inull
-      tr%unused13  = SAC_inull
-      tr%unused14  = SAC_inull
-      tr%unused15  = SAC_inull
-      tr%unused16  = SAC_inull
-      tr%unused17  = SAC_inull
-      tr%leven     = SAC_lnull
-      tr%lpspol    = SAC_lnull
-      tr%lovrok    = SAC_lnull
-      tr%lcalda    = SAC_lnull
-      tr%unused18  = SAC_lnull
-
-      tr%kstnm     = SAC_cnull
-      tr%kevnm     = SAC_cnull
-      tr%khole     = SAC_cnull
-      tr%ko        = SAC_cnull
-      tr%ka        = SAC_cnull
-      tr%kt0       = SAC_cnull
-      tr%kt1       = SAC_cnull
-      tr%kt2       = SAC_cnull
-      tr%kt3       = SAC_cnull
-      tr%kt4       = SAC_cnull
-      tr%kt5       = SAC_cnull
-      tr%kt6       = SAC_cnull
-      tr%kt7       = SAC_cnull
-      tr%kt8       = SAC_cnull
-      tr%kt9       = SAC_cnull
-      tr%kf        = SAC_cnull
-      tr%kuser0    = SAC_cnull
-      tr%kuser1    = SAC_cnull
-      tr%kuser2    = SAC_cnull
-      tr%kcmpnm    = SAC_cnull
-      tr%knetwk    = SAC_cnull
-      tr%kdatrd    = SAC_cnull
-      tr%kinst     = SAC_cnull
- 
-      deallocate (tr%trace, stat = istatus)
-
-!  ** flag the trace as inactive      
-      tr%iTraceActive = 0 
-
-   end subroutine f90sac_destroytrace
-!===============================================================================
-
-
 !===============================================================================
    subroutine f90sac_newtrace(nsamp,delta,out)
 !===============================================================================
@@ -920,11 +771,6 @@
       type (SACtrace) :: out
       integer :: nsamp ! number of samples for trace 
       real :: delta
-
-!  ** destroy any pre-existing trace
-      if (out%iTraceActive == TraceIsActive) then
-         call f90sac_destroytrace(out)
-      endif
       
       out%delta     = delta
       out%depmin    = SAC_rnull
@@ -1062,16 +908,39 @@
       out%kdatrd  = SAC_cnull
       out%kinst   = SAC_cnull
  
-!  ** allocate memory for the trace *
-      allocate (out%trace(out%npts))
+!  ** allocate memory for the trace
+      call f90sac_malloc(out%trace,out%npts)
    
       out % trace(1:out % npts) = 0.0
       
-      out % iTraceActive = TraceIsActive ;
 
    end subroutine f90sac_newtrace
 !===============================================================================
+   
+!===============================================================================
+   subroutine f90sac_malloc(x,n)
+!===============================================================================
+!
+!     Allocate memory to an array, if required
+!
+      implicit none
+      real(real4),allocatable :: x(:)
+      integer :: n
 
+      if (allocated(x)) then
+         if (size(x)<n) then
+!        ** reallocation required
+            print*,'reallocating memory'
+            deallocate(x)
+            allocate(x(n))
+         endif   
+      else
+            allocate(x(n))
+      endif   
+      
+   end subroutine f90sac_malloc
+!===============================================================================
+      
 !===============================================================================
    subroutine f90sac_clonetrace(target,clone)
 !===============================================================================
@@ -1262,12 +1131,7 @@
 
       type (SACtrace) :: out
       logical UNITOK, UNITOP
-            
-!  ** destroy any pre-existing trace
-      if (out%iTraceActive == TraceIsActive) then
-         call f90sac_destroytrace(out)
-      endif
-            
+                        
 !  ** Open the file for reading
       open (unit=f90sac_iounit, file=fname,form='unformatted', &
             access='direct',recl=f90sac_32bit_record_length, &
@@ -1511,9 +1375,9 @@
          stop
       endif 
 
-!  ** allocate memory for the trace *
-      allocate (out%trace(out%npts))
-   
+!  ** allocate memory for the trace
+      call f90sac_malloc(out%trace,out%npts)
+
       do i=1,out % npts
             read(lu,rec=158+i) out%trace(i)
       enddo
@@ -1523,11 +1387,6 @@
       if (f90sac_force_byteswap) then
          call f90sac_real32_byteswap(out%trace,out%npts)
       endif
-
-
-!  ** set the trace as active      
-      out%iTraceActive = TraceIsActive
-
       
       return
 900   write(0,'(a,a)') 'F90SAC_READTRACE: Error: File does not exist: ', &
@@ -1537,6 +1396,37 @@
          trim(fname)
       stop     
    end subroutine f90sac_readtrace
+!===============================================================================
+
+!===============================================================================
+   function f90sac_isBigEndian()
+!===============================================================================
+!
+!  Check whether machine is big-endian or little-endian
+!
+      implicit none
+      integer(int4) int, i0, i1, i2, i3
+      parameter(i0 = 48, i1 = 49, i2 = 50, i3 = 51)
+      character(4) ch
+      equivalence (int,ch)
+      logical f90sac_isBigEndian
+      
+      int = i0 + i1*256 + i2*(256**2) + i3*(256**3)
+      
+      if (ch == '0123') then
+!     ** it's little-endian
+         f90sac_isBigEndian = .false.
+      elseif (ch == '3210') then
+!     ** it's big-endian
+         f90sac_isBigEndian = .true.
+      else
+!     ** it's neither, so we're doomed
+         write(0,'(a)') &
+            'F90SAC_ISBIGENDIAN: Error: Machine seems to be middle-endian!'
+         stop
+      endif 
+      return     
+   end function f90sac_isBigEndian
 !===============================================================================
 
 !===============================================================================
@@ -1606,12 +1496,7 @@
             
       real(real4) :: sacrh(70) ! SAC floating point header
       integer(int4) :: sacih(40) ! SAC floating point header
-            
-!  ** destroy any pre-existing trace
-      if (out%iTraceActive == TraceIsActive) then
-         call f90sac_destroytrace(out)
-      endif
-            
+                        
 !  ** Open the file for reading
       open (unit=f90sac_iounit, file=fname,form='unformatted', &
             access='direct',recl=f90sac_32bit_record_length, &
@@ -1855,17 +1740,12 @@
          stop
       endif 
 
- 
-!  ** allocate memory for the trace *
-      allocate (out%trace(1))
+!  ** allocate memory for the trace
+      call f90sac_malloc(out%trace,1)
    
       out%trace(1) = SAC_rnull ;
 
       close(lu)
-
-!  ** set the trace as active      
-      out%iTraceActive = TraceIsActive
-
       
       return
 900   write(0,'(a,a)') 'F90SAC_READTRACE: Error: File does not exist: ', &
@@ -1876,7 +1756,6 @@
       stop     
    end subroutine f90sac_readheader
 !===============================================================================
-
 
 !===============================================================================
    subroutine f90sac_writetrace(fname,out)
@@ -1899,7 +1778,7 @@
 !  ** Open the file for writing
       open (unit=f90sac_iounit, file=fname,form='unformatted', &
             access='direct',recl=f90sac_32bit_record_length, &
-            status='unknown')
+            status='replace')
 
       lu = f90sac_iounit
 
@@ -2307,7 +2186,6 @@
       close(lu)
    end subroutine f90sac_writeheader
 !===============================================================================
-
 
 !===============================================================================
    subroutine f90sac_getfhdr(tr,id_hdr,val)
@@ -2774,7 +2652,6 @@
       return
    end subroutine f90sac_setkhdr
 !===============================================================================
-
 
 !===============================================================================
    subroutine f90sac_enumhdr(hdrstr,id_hdr)
