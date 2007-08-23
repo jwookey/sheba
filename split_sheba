@@ -2,9 +2,9 @@
 *-------------------------------------------------------------------------------
 *   SPLIT_SHEBA macro
 *-------------------------------------------------------------------------------
-*   (c) James Wookey 2004-2006
+*   (c) James Wookey 2004-2007
 *-------------------------------------------------------------------------------
-*	 CVS: $Revision: 1.4 $ $Date: 2007/03/23 12:38:44 $
+*	 CVS: $Revision: 1.5 $ $Date: 2007/08/23 10:24:37 $
 *
 * This is a SAC macro to run to run the shear-wave splitting analysis code, 
 * SHEBA. It basically inserts the correct picks into the data files to be 
@@ -24,7 +24,7 @@
 *  pick [(maybe)|yes]   - (re)pick analysis window limits
 *  corr [(no)|phi t]    - remove a given phi/dt before analysis
 *  src_corr [(no)|phi t]- remove a given phi/dt AFTER analysis (at each node) 
-*
+*                         (see Wookey, Kendall and Rumpker, GJI, 2005)
 *  nwind [(one)|n1 n2]  - number of starting and ending windows, these
 *                         are analysed using N. Teanby's cluster analysis
 *                         algorithm. If 'one' is entered, a single window
@@ -361,9 +361,10 @@ xlim %vmin %vmax ; ylim %vmin %vmax
 p1
 xlim off; ylim off
 
-
-
 endframe ; 
+if no ne $src_corr
+   message "Warning, wavelet plots may be incorrect for source-corrected results"
+endif
 
 %pause " -> Particle motion "
 
