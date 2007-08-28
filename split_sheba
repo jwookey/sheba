@@ -4,7 +4,7 @@
 *-------------------------------------------------------------------------------
 *   (c) James Wookey 2004-2007
 *-------------------------------------------------------------------------------
-*	 CVS: $Revision: 1.5 $ $Date: 2007/08/23 10:24:37 $
+*	 CVS: $Revision: 1.6 $ $Date: 2007/08/28 08:26:46 $
 *
 * This is a SAC macro to run to run the shear-wave splitting analysis code, 
 * SHEBA. It basically inserts the correct picks into the data files to be 
@@ -38,13 +38,14 @@
 *  psviewer [(gv)|prog] - Program called to display postscript files.
 *  batch [(no)|yes]     - Suppress all plotting in plot yes mode:
 *                         useful in running in batch mode
+*  wdev [(x)|mac]       - Windowing device
 *
 *-------------------------------------------------------------------------------
 * This software is distributed in the hope that it will be useful,
 * but WITHOUT ANY WARRANTY; without even the implied warranty of
 * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 *-------------------------------------------------------------------------------
-$keys file comps plot xlim pick corr src_corr rz_rotate scs nwind max_tlag option srcpol psviewer batch
+$keys file comps plot xlim pick corr src_corr rz_rotate scs nwind max_tlag option srcpol psviewer batch wdev
 $default comps BHE BHN BHZ
 $default plot no
 $default xlim off
@@ -59,6 +60,7 @@ $default option e
 $default srcpol baz
 $default psviewer gv
 $default batch no
+$default wdev mac
 *
 message "---------------------------------------------"
 message "-         S H E B A - Version 0.991         -"
@@ -112,7 +114,7 @@ message "Input files: %files%"
 ** repick window ranges
 **----------------------------------------------------------------------------**
 if %pick% eq yes
-      bd x
+      bd $wdev
       if 'one' eq $nwind$
          message "Pick single analysis window - A begins window, F ends it."
          r %files% ; plotpk zero markall on bell off
@@ -198,7 +200,7 @@ sc /usr/local/sac/macros/sheba
 if no ne $plot
    setbb pause "message 'Generating plot...'"
    if $batch$ eq no
-      bd x sgf
+      bd $wdev  sgf
    else
       bd sgf
    endif
@@ -262,12 +264,12 @@ endif
 sgf number 3
 if no ne $plot
    if $batch$ eq no
-      bd x sgf
+      bd $wdev  sgf
    else
       bd sgf
    endif
 else      
-      bg x
+      bg $wdev
 endif 
 vspace 1.0
 
@@ -411,6 +413,5 @@ unsetbb beg end vmax vmin hfiles zfile log i id pick
 unsetbb files_corr hfiles_corr zfile_corr srcaz t_srcaz pause
 unsetbb corr1 corr2 polarity
 if $batch$ eq no
-     bd x 
-
+     bd $wdev  
 endif
