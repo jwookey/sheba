@@ -7,7 +7,7 @@
 !===============================================================================
 !
 !  James Wookey, School of Earth Sciences, University of Bristol
-!  CVS: $Revision: 1.6 $ $Date: 2007/02/06 16:32:30 $
+!  CVS: $Revision: 1.7 $ $Date: 2008/02/05 11:46:40 $
 !
 
 !===============================================================================
@@ -51,7 +51,8 @@
 
 !  **  orient the traces to NE reference frame
       call f90sac_orient2d(h1,h2)
-      
+
+     
 !  ** copy the traces before UMA correction
       call f90sac_clonetrace(h1,h1_proc)
       call f90sac_clonetrace(h2,h2_proc)

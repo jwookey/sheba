@@ -7,7 +7,7 @@
 !===============================================================================
 !
 !  James Wookey, School of Earth Sciences, University of Bristol
-!  CVS: $Revision: 1.4 $ $Date: 2007/02/21 16:13:41 $
+!  CVS: $Revision: 1.5 $ $Date: 2008/02/05 11:46:40 $
 !
 
 !=======================================================================
@@ -111,7 +111,7 @@
          print*,'<!> ERROR IN SHEBA: cmpinc header not set in one or more files'
          STOP
       endif   
-
+      
 !  ** check that traces are the same length, delta and origin time
       if ( traces(1)%npts /= traces(2)%npts .or.  &
            traces(1)%npts /= traces(3)%npts ) then
@@ -129,7 +129,6 @@
          print*,'<!> ERROR IN SHEBA: Traces have different origin times'
          STOP
       endif   
-
 
 !  ** determine ordering and check inclinations
       ii = 1
@@ -150,7 +149,7 @@
             ii = ii + 1
          endif     
       enddo ! do i = 1,3
-
+   
 !  ** make h1 the smallest azimuth
       if (traces(iorder(1)) % cmpaz > traces(iorder(2)) % cmpaz) then
          i=iorder(1)
@@ -167,6 +166,7 @@
       event % dist = v % dist
       event % az = v % az
       event % baz = v % baz
+
 !  ** check that the horizontal traces are orthogonal
       if (f90sac_orth2d(h1,h2) == 0) then
          print*,'<!> ERROR IN SHEBA: input horizontals are ', & 

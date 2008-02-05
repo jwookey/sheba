@@ -18,7 +18,7 @@
 #   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
 #
 #-------------------------------------------------------------------------------
-#   CVS: $Revision: 1.8 $ $Date: 2007/03/23 12:38:43 $
+#   CVS: $Revision: 1.9 $ $Date: 2008/02/05 11:46:40 $
 #-------------------------------------------------------------------------------
 #
 #   SHEBA requires a FORTRAN 90 compiler. Compilers known to work are:    
@@ -30,11 +30,11 @@
 #-------------------------------------------------------------------------------
 # Set compiler and options here:
 
-# -- flags which work for ifort (version>8) on Linux
-#FC= ifort 
-#OPT77 = -w95 -cm 
-#OPT90 =
-#OPT =  -tpp7 -axW -Vaxlib -assume byterecl -static     
+# -- flags which work for ifort (version>8) on MacOSX
+FC= ifort 
+OPT77 = -w95 -cm 
+OPT90 =
+OPT =  -axT -Vaxlib -assume byterecl    
 
 # -- flags which work for f90 on Solaris
 #FC = f90
@@ -43,10 +43,10 @@
 #OPT = 
 
 # -- flags which work for gfortran on Mac (and probably Linux)
-FC = gfortran -O2
-OPT90 =
-OPT77 = -w
-OPT = 
+#FC = gfortran -O2
+#OPT90 =
+#OPT77 = -w
+#OPT = 
 
 EXECDIR=../
 
@@ -70,8 +70,6 @@ SUBROUTINES = sheba.o misc.o input.o desplit.o output.o teanby.o \
 all:$(EXECDIR)/sheba \
       $(EXECDIR)/sheba_plot_errclu.gmt \
       $(EXECDIR)/sheba_plot_error.gmt \
-      $(EXECDIR)/sheba_plot_clusters.gmt \
-      $(EXECDIR)/sheba_plot_wind.gmt \
       $(EXECDIR)/sheba_combine_plots.csh \
       $(EXECDIR)/cleansheba \
       $(EXECDIR)/split_sheba\
@@ -94,12 +92,6 @@ $(EXECDIR)/sheba_plot_errclu.gmt:sheba_plot_errclu.gmt
 
 $(EXECDIR)/sheba_plot_error.gmt:sheba_plot_error.gmt
 	chmod +x sheba_plot_error.gmt; \cp sheba_plot_error.gmt $(EXECDIR)
-
-$(EXECDIR)/sheba_plot_clusters.gmt:sheba_plot_clusters.gmt
-	chmod +x sheba_plot_clusters.gmt; \cp sheba_plot_clusters.gmt $(EXECDIR)
-
-$(EXECDIR)/sheba_plot_wind.gmt:sheba_plot_wind.gmt
-	chmod +x sheba_plot_wind.gmt; \cp sheba_plot_wind.gmt $(EXECDIR)
 
 $(EXECDIR)/sheba_combine_plots.csh:sheba_combine_plots.csh
 	chmod +x sheba_combine_plots.csh; \cp sheba_combine_plots.csh $(EXECDIR)

@@ -1,5 +1,5 @@
 #!/bin/csh
-#
+# CVS: $Revision: 1.2 $ $Date: 2008/02/05 11:46:40 $
 # $1 = event name
 # $2 = log file extensition ='ilog.ass' or 'ilog_nt'
 \rm -f .gmtdefaults
@@ -32,6 +32,12 @@ pstext -JX3/7 -R0/3/0/7 -X3 -Y0 -O -K <<END>> $1_errclu.eps
 #0.2  4.2  14 0 0 5 no. of windows = $NWINDOWS
 END
 #
+
+set NWIND = `cat $1.clustxy | wc -l`
+
+if ($NWIND == 1) then
+      echo "Cluster plots suppressed"
+else
 awk '{print $6,$4,$7,$5}' $1.clustxy > xy.sheba_tmp
 #
 #psxy xy.sheba_tmp -JX3/3 -R0/"$TLAG_SCALE"/-90/90 -B"$TLAG_MINORTICK"a"$TLAG_MAJORTICK":"@~\144@~t (s)":/15a30:"@~\146@~ (@~\260@~)":::WSne -Sc0.05 -G0 -X3.5 -Y0 -K -O >> $1_errclu.eps
@@ -50,11 +56,6 @@ awk '{print $1,$6,$7}' $1.clustxy > tlag.sheba_tmp
 echo $IBEST $FAST > fast_soln.sheba_tmp
 echo $IBEST $TLAG > tlag_soln.sheba_tmp
 \cp tlag_limit.sheba_tmp tlag_limit.jwo
-set NWIND = `cat $1.clustxy | wc -l`
-
-if ($NWIND == 1) then
-      echo "Window plot suppressed"
-else
 #psxy tlag.sheba_tmp -JX6/3 `minmax -I1 tlag_limit.sheba_tmp` -B5a20:"Window number":/"$TLAG_MINORTICK"a"$TLAG_MAJORTICK":"@~\144@~t"::".":WSne -Sc0.05 -Ey0.1 -G0 -X1 -Y1 -K -P > $1_errclu.eps
 psxy tlag.sheba_tmp -JX3/1.5 -R1/$NWIND/0/$TLAG_SCALE -B5a20:"window":/${TLAG_MINORTICK}a${TLAG_MAJORTICK}:""::".":WSne -Sc0.05 -Ey0.1 -G0 -X0 -Y3.75 -K -O -P >> $1_errclu.eps
 psxy tlag_soln.sheba_tmp -JX -R -Sx0.2 -W10/0/0/255 -G0/0/255 -K -O >> $1_errclu.eps
@@ -66,5 +67,5 @@ endif
 #\rm *.sheba_tmp
 #echo "Done"
 
-\rm *.sheba_tmp
-\rm data.grd
+\rm -f *.sheba_tmp
+\rm -f data.grd

@@ -7,7 +7,7 @@
 !===============================================================================
 !
 !  James Wookey, School of Earth Sciences, University of Bristol
-!  CVS: $Revision: 1.3 $ $Date: 2007/02/21 16:29:52 $
+!  CVS: $Revision: 1.4 $ $Date: 2008/02/05 11:46:40 $
 !
 
 !=======================================================================
@@ -195,18 +195,26 @@
 !-----------------------------------------------------------------------
       implicit none
       real scale, major,minor
-            
-      if (scale <= 0.2) then
-         major=0.04 ; minor = 0.008
+
+      if (scale <= 0.01) then
+         major=0.0025 ; minor = 0.0005
+      elseif (scale <= 0.02) then
+         major=0.005 ; minor = 0.001
+      elseif (scale <= 0.05) then
+         major=0.01 ; minor = 0.002
+      elseif (scale <= 0.1) then
+         major=0.025 ; minor = 0.005            
+      elseif (scale <= 0.2) then
+         major=0.05 ; minor = 0.01
       elseif (scale <= 0.5) then
          major=0.1 ; minor = 0.02
       elseif (scale <= 1.0) then
          major=0.25 ; minor = 0.05
       elseif (scale <= 2.0) then
          major=0.5 ; minor = 0.10
-      elseif (scale <= 4.0) then
+      elseif (scale <= 5.0) then
          major=1.0 ; minor = 0.2
-      elseif (scale <= 8.0) then
+      elseif (scale <= 10.0) then
          major=2.0 ; minor = 0.4
       else
          major=0.25 ; minor = 0.05      

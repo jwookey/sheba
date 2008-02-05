@@ -1,5 +1,5 @@
 #!/bin/csh
-#
+# CVS: $Revision: 1.2 $ $Date: 2008/02/05 11:46:40 $
 # gather the sub-plots into one summary plot
 #
 # Requires: ghostscript and psutils. 

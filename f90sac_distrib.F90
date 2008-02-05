@@ -8,7 +8,7 @@
 !
 !  PROGRAM : f90sac
 !  VERSION : 3.41 (Distribution version)
-!  CVS: $Revision: 1.3 $ $Date: 2007/08/03 12:32:51 $
+!  CVS: $Revision: 1.4 $ $Date: 2008/02/05 11:46:40 $
 !
 !  (C) James Wookey
 !  Department of Earth Sciences, University of Bristol
@@ -121,7 +121,7 @@
 
 
 !  ** set whether automatic byteswapping is done
-      logical, parameter :: f90sac_force_byteswap = .false. ;
+      logical, parameter :: f90sac_force_byteswap = .true. ;
       
 !  ** noise generator seed value
       integer, private :: f90sac_random_seed ;      

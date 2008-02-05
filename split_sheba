@@ -4,7 +4,7 @@
 *-------------------------------------------------------------------------------
 *   (c) James Wookey 2004-2007
 *-------------------------------------------------------------------------------
-*	 CVS: $Revision: 1.6 $ $Date: 2007/08/28 08:26:46 $
+*	 CVS: $Revision: 1.7 $ $Date: 2008/02/05 11:46:40 $
 *
 * This is a SAC macro to run to run the shear-wave splitting analysis code, 
 * SHEBA. It basically inserts the correct picks into the data files to be 
@@ -19,7 +19,7 @@
 *  comps [BHE BHN BHZ]  - suffix to file names 
 *                         (so files are xxxx.e xxxx.n xxxx.z)
 *  plot [(yes)|no]      - produce postscript versions of the reult plots
-*                         NOTE: this option calls the SU program merge4      
+*                               
 *  xlim [(off)|t1 t2]   - *plot* window limits, defaults to whole trace
 *  pick [(maybe)|yes]   - (re)pick analysis window limits
 *  corr [(no)|phi t]    - remove a given phi/dt before analysis
@@ -39,17 +39,31 @@
 *  batch [(no)|yes]     - Suppress all plotting in plot yes mode:
 *                         useful in running in batch mode
 *  wdev [(x)|mac]       - Windowing device
+*  usett [(yes)|no]     - disable ttsac as plotting script. This is useful
+*                         in situations where non-teleseismic data is being
+*                         used, trace headers requires for ttsac are missing, or
+*                         systems where ttsac is unavailable
+*
+*  NOTE: Orientation of input data. The input data must *appear* to form an 
+*        orthogonal set, with two horizontals (cmpinc both 90, cmpaz 90 degrees
+*        apart), and one vertical (cmpinc=0, cmpaz=0). Whether this is, in fact, 
+*        the case is immaterial - the code will assume that it is so. So, if
+*        you need to measure splitting in a non-vertical orientation, simply
+*        fake the headers in the input data. The meaning of the resulting fast
+*        direction is complicated, but will basically the be clockwise angle 
+*        from the direction of the component with CMPAZ=0 (the pseudo-North) 
+*        when looking along the vertical towards the origin.  
 *
 *-------------------------------------------------------------------------------
 * This software is distributed in the hope that it will be useful,
 * but WITHOUT ANY WARRANTY; without even the implied warranty of
 * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 *-------------------------------------------------------------------------------
-$keys file comps plot xlim pick corr src_corr rz_rotate scs nwind max_tlag option srcpol psviewer batch wdev
+$keys file comps plot xlim pick corr src_corr rz_rotate scs nwind max_tlag option srcpol psviewer batch wdev usett orcheck
 $default comps BHE BHN BHZ
 $default plot no
 $default xlim off
-$default pick maybe
+$default pick yes
 $default corr no
 $default src_corr no
 $default rz_rotate no
@@ -60,12 +74,14 @@ $default option e
 $default srcpol baz
 $default psviewer gv
 $default batch no
-$default wdev mac
+$default wdev x
+$default usett yes
+
 *
 message "---------------------------------------------"
-message "-         S H E B A - Version 0.991         -"
+message "-         S H E B A - Version 0.995         -"
 message "---------------------------------------------"
-message "-            James Wookey, 2005             -"
+message "-            James Wookey, 2008             -"
 message "---------------------------------------------"
 
 vspace full
@@ -95,21 +111,6 @@ do sfx list $comps
    endif
 enddo
 message "Input files: %files%"
-**----------------------------------------------------------------------------**
-** check whether we need to pick window ranges
-**----------------------------------------------------------------------------**
-*if &1,user0& eq UNDEFINED
-*   setbb pick yes
-*endif
-*if &1,user1& eq UNDEFINED
-*   setbb pick yes
-*endif
-*if &1,user2& eq UNDEFINED
-*   setbb pick yes
-*endif
-*if &1,user3& eq UNDEFINED
-*   setbb pick yes
-*endif
 **----------------------------------------------------------------------------**
 ** repick window ranges
 **----------------------------------------------------------------------------**
@@ -223,11 +224,21 @@ sgf number 1
 picks on
 r %files% ; 
 chnhdr a %WBEG f %WEND
-if 'off' eq $xlim$
-   ylim all; m ttsac
+if 'no' eq $usett$
+   if 'off' eq $xlim$
+      ylim all; ticks only left bottom;border off; p1
+   else
+      ylim all; ticks only left bottom;border off; xlim $xlim$; p1
+   endif   
 else
-   ylim all; m ttsac xlim $xlim$
-endif
+   if 'off' eq $xlim$
+      ylim all; m ttsac
+   else
+      ylim all; m ttsac xlim $xlim$
+   endif
+endif   
+
+
 %pause " -> Input traces in input orientation "
 
 ** PANEL 2 - original versus corrected waveforms
@@ -252,11 +263,21 @@ r %hfiles%
 rotate to %SPOL%
 r more tmp.r tmp.t
 chnhdr a %WBEG% f %WEND%
-if 'off' eq $xlim$
-   ylim all; m ttsac
+if 'no' eq $usett$
+   if 'off' eq $xlim$
+      ylim all; ticks only left bottom;border off; p1
+   else
+      ylim all; xlim $xlim$; ticks only left bottom; border off; p1
+   endif   
 else
-   ylim all; m ttsac xlim $xlim$
-endif
+   if 'off' eq $xlim$
+      ylim all; m ttsac
+   else
+      ylim all; m ttsac xlim $xlim$
+   endif
+endif   
+
+
 %pause " -> Original and linearised traces in source radial-transverse "
 
 ** PANEL 3 - particle motion and wavelet comparison **
@@ -412,6 +433,10 @@ plabel 1 off; plabel 2 off; plabel 3 off; plabel 4 off; xlabel off; ylabel off; 
 unsetbb beg end vmax vmin hfiles zfile log i id pick
 unsetbb files_corr hfiles_corr zfile_corr srcaz t_srcaz pause
 unsetbb corr1 corr2 polarity
+ticks on all;border on;gt s si small;
 if $batch$ eq no
      bd $wdev  
+endif
+if 'off' ne xlim
+   xlim off
 endif

@@ -7,7 +7,7 @@
 !===============================================================================
 !
 !  James Wookey, School of Earth Sciences, University of Bristol
-!  CVS: $Revision: 1.4 $ $Date: 2007/02/13 10:16:25 $
+!  CVS: $Revision: 1.5 $ $Date: 2008/02/05 11:46:40 $
 !
 
 !=======================================================================
@@ -51,7 +51,7 @@
             integer :: i_rotate_to_ABC
             real :: slw
 
-!           * Cluster analysis parameters, hardwired
+!         * Cluster analysis parameters, hardwired
             real :: dtlag_max 
             real :: dfast_max 
             real :: fast_scale

@@ -1,5 +1,5 @@
 #!/bin/csh
-#
+# CVS: $Revision: 1.2 $ $Date: 2008/02/05 11:46:40 $
 # $1 = event name
 # $2 = log file extensition ='ilog.ass' or 'ilog_nt'
 gmtset PAPER_MEDIA A4+ MEASURE_UNIT inch

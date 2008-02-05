@@ -7,7 +7,7 @@
 !===============================================================================
 !
 !  James Wookey, School of Earth Sciences, University of Bristol
-!  CVS: $Revision: 1.2 $ $Date: 2007/02/06 14:03:49 $
+!  CVS: $Revision: 1.3 $ $Date: 2008/02/05 11:46:40 $
 !
 
 !=======================================================================
@@ -137,25 +137,16 @@
       miss = .false.
       mstr = ''
 
-      if (tr % az == SAC_rnull) then
-         miss = .true.
-         mstr = trim(mstr) // 'az '
-      endif 
-
-      if (tr % baz == SAC_rnull) then
-         miss = .true.
-         mstr = trim(mstr) // 'baz '
-      endif 
-
-      if (tr % cmpaz == SAC_rnull) then
-         miss = .true.
-         mstr = trim(mstr) // 'cmpaz '
-      endif 
-
-      if (tr % cmpinc == SAC_rnull) then
-         miss = .true.
-         mstr = trim(mstr) // 'cmpinc '
-      endif 
+!      if (tr % az == SAC_rnull) then
+!         miss = .true.
+!         mstr = trim(mstr) // 'az '
+!      endif 
+!
+!      if (tr % baz == SAC_rnull) then
+!         miss = .true.
+!         mstr = trim(mstr) // 'baz '
+!      endif 
+      
 
       if (tr % b == SAC_rnull) then
          miss = .true.
