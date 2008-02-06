@@ -18,7 +18,7 @@
 #   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
 #
 #-------------------------------------------------------------------------------
-#   CVS: $Revision: 1.10 $ $Date: 2008/02/06 09:51:48 $
+#   CVS: $Revision: 1.11 $ $Date: 2008/02/06 10:11:19 $
 #-------------------------------------------------------------------------------
 #
 #   SHEBA requires a FORTRAN 90 compiler. Compilers known to work are:    
@@ -27,41 +27,55 @@
 #      Mac (i386) : gfortran, ifort (maybe)
 #      Sun (sparc) : Solaris f90
 #
-#-------------------------------------------------------------------------------
-# Set compiler and options here:
 
-# -- flags which work for ifort (version>8) on MacOSX
+
+#===============================================================================
+# Path options
+#===============================================================================
+
+# Delivery path
+MACRODIR=/usr/local/sac/macros
+EXECDIR=/usr/local/sac/macros
+
+#===============================================================================
+# Compiler and options:
+#===============================================================================
+
+## -- flags which work for ifort (version>8) on MacOSX
 FC= ifort 
 OPT77 = -w95 -cm 
 OPT90 =
 OPT =  -axT -Vaxlib -assume byterecl    
 
-# -- flags which work for f90 on Solaris
+## -- flags which work for f90 on Solaris
 #FC = f90
 #OPT90 =
 #OPT77 =
 #OPT = 
 
-# -- flags which work for gfortran on Mac (and probably Linux)
+## -- flags which work for gfortran on Mac (and probably Linux)
 #FC = gfortran -O2
 #OPT90 =
 #OPT77 = -w
 #OPT = 
 
-#-------------------------------------------------------------------------------
+#===============================================================================
+# SAC compatibility options
+#===============================================================================
+
 ## Uncomment for sac/sac2000 (binaries sac files are native endian)
 #F90SAC_FLAGS = -DDISABLE_C_IO
-#-------------------------------------------------------------------------------
+
 ## Uncomment for MacSAC (binary sac files are always big-endian)
 F90SAC_FLAGS = -DDISABLE_C_IO -DFORCE_BIGENDIAN_SACFILES 
-#-------------------------------------------------------------------------------
+
 # Note: f90sac C routines are disabled for sheba; we don't need them.
 
-EXECDIR=/usr/local/sac/macros
-
-#-------------------------------------------------------------------------------
+#===============================================================================
+#===============================================================================
 # No editing *should* be required below here ...
-#-------------------------------------------------------------------------------
+#===============================================================================
+#===============================================================================
 #
 #	Code Objects
 #
@@ -83,7 +97,7 @@ all:$(EXECDIR)/sheba \
       $(EXECDIR)/sheba_plot_error.gmt \
       $(EXECDIR)/sheba_combine_plots.csh \
       $(EXECDIR)/cleansheba \
-      $(EXECDIR)/split_sheba\
+      $(MACRODIR)/split_sheba\
       $(EXECDIR)/sheba_stack 
       
 #
@@ -117,8 +131,8 @@ $(EXECDIR)/cleansheba:cleansheba
 #
 #     SAC Macro
 #
-$(EXECDIR)/split_sheba:split_sheba
-	cp -f split_sheba $(EXECDIR)
+$(MACRODIR)/split_sheba:split_sheba
+	cp -f split_sheba $(MACRODIR)
 
 distrib:
 	rm -rf ../SHEBA_distrib

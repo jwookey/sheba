@@ -8,6 +8,9 @@ Section 1: Introduction
 
 1.1 Disclaimer and terms of use
 
+This software is distributed under the term of the BSD free software license
+(see end of file for details). Basically:
+
 This program is distributed in the hope that it will be useful, but WITHOUT ANY
 WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
 PARTICULAR PURPOSE.  
@@ -25,14 +28,14 @@ window analysis is described in:
 Teanby, N; Kendall, J-M. and Van Der Baan, M. (2004), "Automation of shear-wave
    splitting measurements using cluster analysis", BSSA, vol 94, pp 453-463
 
-Various other papers are referenced in individual subroutines. 
+Various other academic papers are referenced in individual subroutines. 
 
 --------------------------------------------------------------------------------
 Section 2: Prerequisites
 
 2.1 Operating system
 
-	SHEBA has been compiled on run successfully on several platforms including
+     SHEBA has been compiled on run successfully on several platforms including
       Linux, MacOSX and Solaris. Other UNIX variants are likely to work, but 
       no guarantees! 
 
@@ -40,7 +43,7 @@ Section 2: Prerequisites
       older machines (for example older sparc machines) may struggle. If this
       is the case, use the 'nwind one' option. 	
 
-2.2 SHEBA requires utilities from several packages to compile and run: 
+2.2 SHEBA requires utilities from several packages to compile and run fully: 
 
 	- SAC, SAC2000 or MacSAC (the sac.a library is NOT required however)
 
@@ -56,23 +59,18 @@ Section 2: Prerequisites
         and other Fortran 77 compilers will NOT work. 
 
 --------------------------------------------------------------------------------
-Section 3: Where to install
-	
-	Put the directory SHEBA_distrib in your SAC macros directory (e.g., 
-/usr/local/sac/macros). Make will put scripts and binaries in this parent 
-directory. 
-
---------------------------------------------------------------------------------
 Section 3: Compiling
 
-	- Edit the Makefile to set up your compiler and options. Since the code
-        can be quite intensive, optimisation is recommended. 
+	- Edit the Makefile to set up:
+	    * Compiler and options. Since the code can be quite intensive, 
+	      optimisation is recommended. Some suggested configurations are
+	      given in the Makefile.
+	    * The two path variables (MACRODIR and EXECDIR) to wherever you want 
+	      the macros, scripts and binaries to wind up. Remember that these
+	      must be on the SAC macro path and in your $PATH respectively so
+	      that they can be found.
+	    * SAC compatibility option. (e.g., MacSAC vs. sac2000)  
 
-	- If you are using MacSAC on an intel-based Mac or linux box you will need
-	  to edit the file f90sac_distrib.f90. Change the parameter 
-	  f90sac_force_byteswap to be .true. so the big-endian SAC files will be
-	  properly handled.  
-      
 	- Type 'make'. This will compile all the codes, and install binaries, 
         shell scripts and SAC macros. 'make clean' will remove all object
         files to allow a clean install.   
@@ -81,5 +79,47 @@ Section 3: Compiling
 Section 4: Running the code
 
 	- SHEBA is most easily run from the SAC macro split_sheba. 
-      - Type, e.g.: m split_sheba file MYFILE comps E N Z pick yes 
-	- For other options see the split_sheba macro
+        - Type, e.g.: m split_sheba file MYFILE comps E N Z pick yes 
+	- For (many) other options see the split_sheba macro
+
+================================================================================
+  LICENSE	
+================================================================================
+
+  This software is distributed under the term of the BSD free software license.
+
+  Copyright:
+     (c) 2003-2008, James Wookey
+
+  All rights reserved.
+
+   * Redistribution and use in source and binary forms, with or without
+     modification, are permitted provided that the following conditions are
+     met:
+        
+   * Redistributions of source code must retain the above copyright notice,
+     this list of conditions and the following disclaimer.
+        
+   * Redistributions in binary form must reproduce the above copyright
+     notice, this list of conditions and the following disclaimer in the
+     documentation and/or other materials provided with the distribution.
+     
+   * Neither the name of the copyright holder nor the names of its
+     contributors may be used to endorse or promote products derived from
+     this software without specific prior written permission.
+
+
+   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+   "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+   LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+   A PARTICULAR PURPOSE ARE DISCLAIMED.  IN NO EVENT SHALL THE COPYRIGHT
+   OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+   SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+   LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+   DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+   THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+   (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+   OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+
+-------------------------------------------------------------------------------
+
