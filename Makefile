@@ -6,7 +6,7 @@
 #-------------------------------------------------------------------------------
 #===============================================================================
 #
-#  (C) James Wookey, December 2003 - October 2006
+#  (C) James Wookey, December 2003 - February 2008
 #  Department of Earth Sciences, University of Bristol
 #  Wills Memorial Building, Queen's Road, Bristol, BR8 1RJ, UK
 #  j.wookey@bristol.ac.uk
@@ -18,7 +18,7 @@
 #   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
 #
 #-------------------------------------------------------------------------------
-#   CVS: $Revision: 1.9 $ $Date: 2008/02/05 11:46:40 $
+#   CVS: $Revision: 1.10 $ $Date: 2008/02/06 09:51:48 $
 #-------------------------------------------------------------------------------
 #
 #   SHEBA requires a FORTRAN 90 compiler. Compilers known to work are:    
@@ -48,7 +48,16 @@ OPT =  -axT -Vaxlib -assume byterecl
 #OPT77 = -w
 #OPT = 
 
-EXECDIR=../
+#-------------------------------------------------------------------------------
+## Uncomment for sac/sac2000 (binaries sac files are native endian)
+#F90SAC_FLAGS = -DDISABLE_C_IO
+#-------------------------------------------------------------------------------
+## Uncomment for MacSAC (binary sac files are always big-endian)
+F90SAC_FLAGS = -DDISABLE_C_IO -DFORCE_BIGENDIAN_SACFILES 
+#-------------------------------------------------------------------------------
+# Note: f90sac C routines are disabled for sheba; we don't need them.
+
+EXECDIR=/usr/local/sac/macros
 
 #-------------------------------------------------------------------------------
 # No editing *should* be required below here ...
@@ -56,11 +65,13 @@ EXECDIR=../
 #
 #	Code Objects
 #
-MODULES = f90sac_distrib.o sheba_config.o event_info.o array_sizes.o
+MODULES = sheba_config.o event_info.o array_sizes.o
 SUBROUTINES = sheba.o misc.o input.o desplit.o output.o teanby.o \
                   rumpker.o scs.o cluster.o split.o\
                   traceops.o particle.o hilbert.o scsslow.o\
                   calcsnr.o reorient.o
+
+F90SAC = f90sac_distrib.o 
 #
 #	Executable info
 #
@@ -78,11 +89,15 @@ all:$(EXECDIR)/sheba \
 #
 #     SHEBA EXECUTABLE
 #
-$(EXECDIR)/sheba:${MODULES} sheba_main.o ${SUBROUTINES}
-	$(FC) $(OPT) -o $(EXECDIR)/sheba ${MODULES} sheba_main.o ${SUBROUTINES}
+$(EXECDIR)/sheba:${F90SAC} ${MODULES} sheba_main.o ${SUBROUTINES}
+	$(FC) $(OPT) -o $(EXECDIR)/sheba ${F90SAC} ${MODULES} sheba_main.o ${SUBROUTINES}
 #
-$(EXECDIR)/sheba_stack:${MODULES} sheba_stack.o ${SUBROUTINES}
-	$(FC) $(OPT) -o $(EXECDIR)/sheba_stack ${MODULES} sheba_stack.o ${SUBROUTINES}
+$(EXECDIR)/sheba_stack:${F90SAC} ${MODULES} sheba_stack.o ${SUBROUTINES}
+	$(FC) $(OPT) -o $(EXECDIR)/sheba_stack ${F90SAC} ${MODULES} sheba_stack.o ${SUBROUTINES}
+
+#	F90SAC requires special options to compile ...
+f90sac_distrib.o: f90sac_distrib.F90
+	$(FC) $(OPT) $(OPT90) $(F90SAC_FLAGS) -c $*.F90 
 
 #
 #     GMT PLOTTING SCRIPTS + OTHER SHELL SCRIPTS
@@ -122,6 +137,8 @@ clean:
 # 
 # 	Compile Instuctions
 #
+%.o: %.F90
+	$(FC) $(OPT) $(OPT90) -c $*.F90 
 %.o: %.f90
 	$(FC) $(OPT) $(OPT90) -c $*.f90 
 %.o: %.f
