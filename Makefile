@@ -18,7 +18,7 @@
 #   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
 #
 #-------------------------------------------------------------------------------
-#   CVS: $Revision: 1.11 $ $Date: 2008/02/06 10:11:19 $
+#   CVS: $Revision: 1.12 $ $Date: 2008/03/20 06:27:11 $
 #-------------------------------------------------------------------------------
 #
 #   SHEBA requires a FORTRAN 90 compiler. Compilers known to work are:    
@@ -42,10 +42,10 @@ EXECDIR=/usr/local/sac/macros
 #===============================================================================
 
 ## -- flags which work for ifort (version>8) on MacOSX
-FC= ifort 
-OPT77 = -w95 -cm 
-OPT90 =
-OPT =  -axT -Vaxlib -assume byterecl    
+#FC= ifort 
+#OPT77 = -w95 -cm 
+#OPT90 =
+#OPT =  -axT -Vaxlib -assume byterecl    
 
 ## -- flags which work for f90 on Solaris
 #FC = f90
@@ -54,10 +54,10 @@ OPT =  -axT -Vaxlib -assume byterecl
 #OPT = 
 
 ## -- flags which work for gfortran on Mac (and probably Linux)
-#FC = gfortran -O2
-#OPT90 =
-#OPT77 = -w
-#OPT = 
+FC = gfortran -O2
+OPT90 =
+OPT77 = -w
+OPT = 
 
 #===============================================================================
 # SAC compatibility options
@@ -80,7 +80,7 @@ F90SAC_FLAGS = -DDISABLE_C_IO -DFORCE_BIGENDIAN_SACFILES
 #	Code Objects
 #
 MODULES = sheba_config.o event_info.o array_sizes.o
-SUBROUTINES = sheba.o misc.o input.o desplit.o output.o teanby.o \
+SUBROUTINES = sheba_core.o misc.o input.o desplit.o output.o teanby.o \
                   rumpker.o scs.o cluster.o split.o\
                   traceops.o particle.o hilbert.o scsslow.o\
                   calcsnr.o reorient.o
@@ -92,7 +92,7 @@ F90SAC = f90sac_distrib.o
 # 
 #
 
-all:$(EXECDIR)/sheba \
+all:$(EXECDIR)/sheba_exec \
       $(EXECDIR)/sheba_plot_errclu.gmt \
       $(EXECDIR)/sheba_plot_error.gmt \
       $(EXECDIR)/sheba_combine_plots.csh \
@@ -103,8 +103,8 @@ all:$(EXECDIR)/sheba \
 #
 #     SHEBA EXECUTABLE
 #
-$(EXECDIR)/sheba:${F90SAC} ${MODULES} sheba_main.o ${SUBROUTINES}
-	$(FC) $(OPT) -o $(EXECDIR)/sheba ${F90SAC} ${MODULES} sheba_main.o ${SUBROUTINES}
+$(EXECDIR)/sheba_exec:${F90SAC} ${MODULES} sheba_main.o ${SUBROUTINES}
+	$(FC) $(OPT) -o $(EXECDIR)/sheba_exec ${F90SAC} ${MODULES} sheba_main.o ${SUBROUTINES}
 #
 $(EXECDIR)/sheba_stack:${F90SAC} ${MODULES} sheba_stack.o ${SUBROUTINES}
 	$(FC) $(OPT) -o $(EXECDIR)/sheba_stack ${F90SAC} ${MODULES} sheba_stack.o ${SUBROUTINES}
@@ -131,20 +131,25 @@ $(EXECDIR)/cleansheba:cleansheba
 #
 #     SAC Macro
 #
-$(MACRODIR)/split_sheba:split_sheba
-	cp -f split_sheba $(MACRODIR)
+$(MACRODIR)/split_sheba:sheba
+	cp -f sheba $(MACRODIR)/split_sheba; cp -f sheba $(MACRODIR)
+
+$(MACRODIR)/sheba:sheba
+	cp -f sheba $(MACRODIR)
 
 distrib:
 	rm -rf ../SHEBA_distrib
 	mkdir ../SHEBA_distrib
 	cp -f *.f90 ../SHEBA_distrib
+	cp -f *.F90 ../SHEBA_distrib
 	cp -f *.f ../SHEBA_distrib
 	cp -f *.gmt ../SHEBA_distrib
 	cp -f *.csh ../SHEBA_distrib
-	cp -f split_sheba ../SHEBA_distrib
+	cp -f sheba ../SHEBA_distrib
 	cp -f Makefile ../SHEBA_distrib
 	cp -f INSTALL ../SHEBA_distrib
 	cp -f cleansheba ../SHEBA_distrib	
+
 clean:
 	rm -f *.o *.mod
 

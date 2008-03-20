@@ -7,7 +7,7 @@
 !===============================================================================
 !
 !  James Wookey, School of Earth Sciences, University of Bristol
-!  CVS: $Revision: 1.4 $ $Date: 2008/02/05 11:46:40 $
+!  CVS: $Revision: 1.5 $ $Date: 2008/03/20 06:27:11 $
 !
 
 !=======================================================================
@@ -151,12 +151,12 @@
 !        need to adjust the maximum slightly for the GMT code to work
 
 !         write(99,'(a,f10.6)') 'set TLAG_SCALE =',config % tlag_scale
-         write(99,'(a,f10.6)') 'set TLAG_SCALE =', &
+         write(99,'(a,f14.10)') 'set TLAG_SCALE =', &
             real(np2int-1) * event % error_grid_tlag_int
 
          write(99,'(a,f10.6)') 'set TLAG_MAJORTICK =',tlag_majortick
          write(99,'(a,f10.6)') 'set TLAG_MINORTICK =',tlag_minortick
-         write(99,'(a,f10.6)') 'set ERROR_GRID_TLAG_INT =', &
+         write(99,'(a,f14.10)') 'set ERROR_GRID_TLAG_INT =', &
                      event % error_grid_tlag_int
          write(99,'(a,f10.4)') 'set WBEG =', event % wbeg 
          write(99,'(a,f10.4)') 'set WEND =', event % wend 
@@ -196,7 +196,29 @@
       implicit none
       real scale, major,minor
 
-      if (scale <= 0.01) then
+      if (scale <= 0.00001) then
+         major=0.0000025 ; minor = 0.0000005
+      elseif (scale <= 0.00002) then
+         major=0.00005 ; minor = 0.000001
+      elseif (scale <= 0.00005) then
+         major=0.00001 ; minor = 0.000002
+
+
+      elseif (scale <= 0.0001) then
+         major=0.000025 ; minor = 0.000005
+      elseif (scale <= 0.0002) then
+         major=0.0005 ; minor = 0.00001
+      elseif (scale <= 0.0005) then
+         major=0.0001 ; minor = 0.00002
+
+      elseif (scale <= 0.001) then
+         major=0.00025 ; minor = 0.00005
+      elseif (scale <= 0.002) then
+         major=0.0005 ; minor = 0.0001
+      elseif (scale <= 0.005) then
+         major=0.001 ; minor = 0.0002
+ 
+      elseif (scale <= 0.01) then
          major=0.0025 ; minor = 0.0005
       elseif (scale <= 0.02) then
          major=0.005 ; minor = 0.001
