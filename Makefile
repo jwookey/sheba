@@ -18,7 +18,7 @@
 #   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
 #
 #-------------------------------------------------------------------------------
-#   CVS: $Revision: 1.12 $ $Date: 2008/03/20 06:27:11 $
+#   CVS: $Revision: 1.13 $ $Date: 2008/06/30 08:15:59 $
 #-------------------------------------------------------------------------------
 #
 #   SHEBA requires a FORTRAN 90 compiler. Compilers known to work are:    
@@ -98,6 +98,7 @@ all:$(EXECDIR)/sheba_exec \
       $(EXECDIR)/sheba_combine_plots.csh \
       $(EXECDIR)/cleansheba \
       $(MACRODIR)/split_sheba\
+      $(MACRODIR)/sheba\
       $(EXECDIR)/sheba_stack 
       
 #
