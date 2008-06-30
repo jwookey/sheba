@@ -78,9 +78,11 @@ Section 3: Compiling
 --------------------------------------------------------------------------------
 Section 4: Running the code
 
-	- SHEBA is most easily run from the SAC macro split_sheba. 
-        - Type, e.g.: m split_sheba file MYFILE comps E N Z pick yes 
-	- For (many) other options see the split_sheba macro
+	- SHEBA is most easily run from the SAC macro sheba. 
+        - Type, e.g.: m sheba file MYFILE comps E N Z pick yes 
+          (note that an identical macro called split_sheba is provided
+           for legacy reasons)
+	- For (many) other options see the sheba macro
 
 ================================================================================
   LICENSE	
