@@ -16,9 +16,7 @@ rm -f ${fbase}.lam2
 rm -f ${fbase}.scm
 rm -f ${fbase}.xy1
 rm -f ${fbase}.xy2
-rm -f ${fbase}_corr.BHE
-rm -f ${fbase}_corr.BHN
-rm -f ${fbase}_corr.BHZ
+rm -f ${fbase}_corr.*
 rm -f ${fbase}_errclu.eps
 rm -f ${fbase}_sheba.result
 rm -f ${fbase}_sheba.stats

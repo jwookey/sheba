@@ -4,7 +4,7 @@
 *-------------------------------------------------------------------------------
 *   (c) James Wookey 2004-2008
 *-------------------------------------------------------------------------------
-*	 CVS: $Revision: 1.2 $ $Date: 2008/03/20 06:27:11 $
+*	 CVS: $Revision: 1.3 $ $Date: 2008/09/15 23:28:41 $
 *
 * This is a SAC macro to run to run the shear-wave splitting analysis code, 
 * SHEBA. It basically inserts the correct picks into the data files to be 
@@ -417,7 +417,7 @@ if $plot$ eq yes
       sc sheba_combine_plots.csh $file$
       sc rm -f split_inp.ps split_rot.ps split_wav.ps
       if $batch$ eq no
-            sc $psviewer$ --orientation=landscape --scale=-2 $file$_result.ps
+            sc $psviewer$ --media=A4 --orientation=landscape --scale=-2 $file$_result.ps
       endif
 
 *     backup the results file

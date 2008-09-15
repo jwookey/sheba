@@ -7,7 +7,7 @@
 !===============================================================================
 !
 !  James Wookey, School of Earth Sciences, University of Bristol
-!  CVS: $Revision: 1.5 $ $Date: 2008/02/05 11:46:40 $
+!  CVS: $Revision: 1.6 $ $Date: 2008/09/15 23:28:41 $
 !
 
 !=======================================================================
@@ -127,6 +127,12 @@
       if ( f90sac_compare_origin_time(traces(1),traces(2)) /= 0 .or.  &
            f90sac_compare_origin_time(traces(1),traces(3)) /= 0 ) then
          print*,'<!> ERROR IN SHEBA: Traces have different origin times'
+         print*,traces(1)%nzyear,traces(1)%nzjday,traces(1)%nzhour,&
+                traces(1)%nzmin,traces(1)%nzsec,traces(1)%nzmsec
+         print*,traces(2)%nzyear,traces(2)%nzjday,traces(2)%nzhour,&
+                traces(2)%nzmin,traces(2)%nzsec,traces(2)%nzmsec
+         print*,traces(3)%nzyear,traces(3)%nzjday,traces(3)%nzhour,&
+                traces(3)%nzmin,traces(3)%nzsec,traces(3)%nzmsec
          STOP
       endif   
 
