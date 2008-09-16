@@ -7,7 +7,7 @@
 !=======================================================================
 !
 !  James Wookey, School of Earth Sciences, University of Bristol
-!  CVS: $Revision: 1.2 $ $Date: 2007/02/06 14:03:49 $
+!  CVS: $Revision: 1.3 $ $Date: 2008/09/16 17:05:28 $
 !
 !-----------------------------------------------------------------------
 !
@@ -120,6 +120,8 @@ C-----------------------------------------------------------------------
 		real spol,dspol
 c      real theta,ev_x,ev_y,ev_z,ev_time,phi
 		real lambda2_min,tlag_min,fast_min,dtlag_max,dfast_max
+		real lam2m(npc), min_lam2m ! required for second multiple windowing
+		integer imin_lam2m
 		real error(np1,np2),error_int(np1,np2int)
 		real x0(np),y0(np),tlag_scale,fast_scale
 		real xc0(npc),yc0(npc),vxc0(npc),vyc0(npc)
@@ -243,54 +245,94 @@ c            print*,l,wbeg(l),wend(l),temp_wbeg,temp_wend
 		      call zsplit(x0,y0,n,wbeg(l),wend(l),delta,b,tlag_scale,
      >                  fast(l),dfast(l),tlag(l),dtlag(l),
      >                  spol,dspol,error,error_int,f,
-     >                  lambda2_min,ndf,snr)
-		   write(iulog,99) l,wbeg(l),wend(l),tlag(l),
-     >      dtlag(l),fast(l),dfast(l)
+     >                  lam2m(l),ndf,snr)
+         
+            if (l==1) then
+               min_lam2m = lam2m(l)
+               imin_lam2m = 1
+            else
+               if (lam2m(l)<min_lam2m) then
+                  min_lam2m = lam2m(l)
+                  imin_lam2m = l
+               endif   
+            endif      
+		      write(iulog,99) l,wbeg(l),wend(l),tlag(l),
+     >         dtlag(l),fast(l),dfast(l)
 
-		   write(*,99) l,wbeg(l),wend(l),tlag(l),
-     >      dtlag(l),fast(l),dfast(l)
+		      write(*,99) l,wbeg(l),wend(l),tlag(l),
+     >         dtlag(l),fast(l),dfast(l)
 
-99		   format(i3,2x,f8.3,' -',f8.3,'s  tlag =',f8.5,' +/-',f8.5,
-     >'  fast =',f8.3,' +/-',f8.3)
-
+99		      format(i3,2x,f8.3,' -',f8.3,'s  tlag =',f8.5,' +/-',f8.5,
+     >      '  fast =',f8.3,' +/-',f8.3)
+            
 		   enddo
 		enddo
-		print*,'Done all windows, running cluster analysis'
 
+c-----------------------------------------------------------------------
+      if (config % WindowSelectionMode .eq. 1) then
+c
+c     Select window based on cluster analysis of splitting results 
+c     (ASS method)
+c
+		   print*,'Done all windows, running cluster analysis'
+         
+         
+		   call zpackresults(wbeg,wend,tlag,dtlag,fast,dfast,nwindows,
+     >   npc,dtlag_max,dfast_max)
+         
+c  **    do cluster analysis and find number of clusters **
+		   call zcluster(tlag,dtlag,fast,dfast,nwindows,
+     >   		tlag_scale,fast_scale,tlag_min,fast_min,max_no_clusters,
+     >   		xc0,yc0,vxc0,vyc0,cluster,k)
+         
+         
+c  **    find best cluster **
+		   call zselect_cluster(dtlag,dfast,vxc0,vyc0,nwindows,
+     >   		tlag_scale,fast_scale,cluster,nmin,k,
+     >   		kbest)
+         
+c  **    find best measurement **
+		   call zselect_measurement(dtlag,dfast,nwindows,
+     >   		wbeg,wend,delta,spick,tlag_scale,fast_scale,cluster,k,
+     >   		kbest,ibest)
+         
+c  **    write out measurements to file **
+         file_clustxy = trim(config % fname_base) // '.clustxy'
+		   call zwrite_clustxy(lu,file_clustxy,nwindows,npc,
+     >   		wbeg,wend,fast,dfast,tlag,dtlag)
+         
+c  **    write out clusters to file **
+         file_clusters = trim(config % fname_base) // '.clusters'
+		   call zwrite_clusters(lu,file_clusters,k,npc,
+     >   		xc0,yc0,vxc0,vyc0)
 
-		call zpackresults(wbeg,wend,tlag,dtlag,fast,dfast,nwindows,npc,
-     >dtlag_max,dfast_max)
+      elseif (config % WindowSelectionMode .eq. 2) then
+c
+c     Select window based on best minimisation of lambda2
+c
+c     NOTE, DEVELOPMENT OF THIS OPTION HAS BEEN SUSPENDED. IT MAY BE USEFUL
+c     UNDER CIRCUMSTANCES, BUT NOT THE ONES IT WAS ORIGINALLY INTENDED. THE
+c     FRAMEWORK CODE HAS BEEN LEFT IN IN CASE OF FUTURE DEVELOPMENT OF 
+c     DIFFERENT WINDOW SELECTION ALGORITHMS. 
+c
+c     Therefore WindowSelectionMode is hardwired to 1 in sheba_config.
+c
+		   print*,'Done all windows, selecting on minimum lambda2'
+		   print*,' '
+		   print*,'!!! Warning !!!'
+		   print*,' '
+		   print*,'This algorithm is under development, and should be'
+		   print*,'used only with all due caution.'
+		   
+         ibest = imin_lam2m
+         
+      endif ! of MULTIPLE WINDOW MODE IF
+c-----------------------------------------------------------------------------
 
-c  ** do cluster analysis and find number of clusters **
-		call zcluster(tlag,dtlag,fast,dfast,nwindows,
-     >		tlag_scale,fast_scale,tlag_min,fast_min,max_no_clusters,
-     >		xc0,yc0,vxc0,vyc0,cluster,k)
-
-
-c  ** find best cluster **
-		call zselect_cluster(dtlag,dfast,vxc0,vyc0,nwindows,
-     >		tlag_scale,fast_scale,cluster,nmin,k,
-     >		kbest)
-
-c  ** find best measurement **
-		call zselect_measurement(dtlag,dfast,nwindows,
-     >		wbeg,wend,delta,spick,tlag_scale,fast_scale,cluster,k,kbest,
-     >		ibest)
-
-c  ** write out measurements to file **
-      file_clustxy = trim(config % fname_base) // '.clustxy'
-		call zwrite_clustxy(lu,file_clustxy,nwindows,npc,
-     >		wbeg,wend,fast,dfast,tlag,dtlag)
-      
-c  ** write out clusters to file **
-      file_clusters = trim(config % fname_base) // '.clusters'
-		call zwrite_clusters(lu,file_clusters,k,npc,
-     >		xc0,yc0,vxc0,vyc0)
-
-      endif ! end of IF CLUSTER ANALYSIS
+      endif ! end of IF MULTIPLE WINDOWS
 
 c  ** do splitting and write log file **		
-		if (kbest.eq.0) then
+		if (kbest.eq.0 .and. config % WindowSelectionMode.eq.1) then
 		   ierr = 1
 		   wbeg_best=0.
 		   wend_best=0.

@@ -7,7 +7,7 @@
 !===============================================================================
 !
 !  James Wookey, School of Earth Sciences, University of Bristol
-!  CVS: $Revision: 1.5 $ $Date: 2008/02/05 11:46:40 $
+!  CVS: $Revision: 1.6 $ $Date: 2008/09/16 17:05:28 $
 !
 
 !=======================================================================
@@ -51,7 +51,10 @@
             integer :: i_rotate_to_ABC
             real :: slw
 
-!         * Cluster analysis parameters, hardwired
+!        ** window selection mode (new in SHEBA 2008)
+            integer :: WindowSelectionMode
+            
+!        ** Cluster analysis parameters, hardwired
             real :: dtlag_max 
             real :: dfast_max 
             real :: fast_scale
@@ -89,6 +92,8 @@
       config % fast_scale = 90.0
       config % min_pts_per_cluster = 5
       config % max_no_clusters = 5
+
+      config % WindowSelectionMode = 1 
 
       return
    end subroutine sheba_config_init
