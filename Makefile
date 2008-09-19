@@ -18,7 +18,7 @@
 #   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
 #
 #-------------------------------------------------------------------------------
-#   CVS: $Revision: 1.13 $ $Date: 2008/06/30 08:15:59 $
+#   CVS: $Revision: 1.14 $ $Date: 2008/09/19 00:20:08 $
 #-------------------------------------------------------------------------------
 #
 #   SHEBA requires a FORTRAN 90 compiler. Compilers known to work are:    
@@ -94,7 +94,7 @@ F90SAC = f90sac_distrib.o
 
 all:$(EXECDIR)/sheba_exec \
       $(EXECDIR)/sheba_plot_errclu.gmt \
-      $(EXECDIR)/sheba_plot_error.gmt \
+      $(EXECDIR)/sheba_plot_stackerr.gmt \
       $(EXECDIR)/sheba_combine_plots.csh \
       $(EXECDIR)/cleansheba \
       $(MACRODIR)/split_sheba\
@@ -117,11 +117,11 @@ f90sac_distrib.o: f90sac_distrib.F90
 #
 #     GMT PLOTTING SCRIPTS + OTHER SHELL SCRIPTS
 #
+$(EXECDIR)/sheba_plot_stackerr.gmt:sheba_plot_stackerr.gmt
+	chmod +x sheba_plot_stackerr.gmt; \cp sheba_plot_stackerr.gmt $(EXECDIR)
+
 $(EXECDIR)/sheba_plot_errclu.gmt:sheba_plot_errclu.gmt
 	chmod +x sheba_plot_errclu.gmt; \cp sheba_plot_errclu.gmt $(EXECDIR)
-
-$(EXECDIR)/sheba_plot_error.gmt:sheba_plot_error.gmt
-	chmod +x sheba_plot_error.gmt; \cp sheba_plot_error.gmt $(EXECDIR)
 
 $(EXECDIR)/sheba_combine_plots.csh:sheba_combine_plots.csh
 	chmod +x sheba_combine_plots.csh; \cp sheba_combine_plots.csh $(EXECDIR)

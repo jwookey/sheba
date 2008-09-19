@@ -7,7 +7,7 @@
 !===============================================================================
 !
 !  James Wookey, School of Earth Sciences, University of Bristol
-!  CVS: $Revision: 1.1 $ $Date: 2008/03/11 16:39:59 $
+!  CVS: $Revision: 1.2 $ $Date: 2008/09/19 00:20:08 $
 !
 
 !===============================================================================
@@ -132,6 +132,10 @@
 
 !  ** output result information
       call output_result(h1) 
+      
+!  ** output extra information
+      
+      
 
 !  ** output particle motion files
       fname = trim(config % fname_base) // '.xy1'

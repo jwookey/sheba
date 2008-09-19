@@ -1,0 +1,52 @@
+#!/bin/csh
+# CVS: $Revision: 1.1 $ $Date: 2008/09/19 00:20:08 $
+# $1 = event name
+# $2 = log file extensition ='ilog.ass' or 'ilog_nt'
+gmtset PAPER_MEDIA A4+ MEASURE_UNIT inch
+# script to contour the error surface
+# data is gridded at 0.25 in tlag, and 1 in fast direction
+# get plotting information
+
+set FAST = `tail -1 sheba_stack.sol | awk '{print $1}'`
+set DFAST = `tail -1 sheba_stack.sol | awk '{print $2}'`
+set TLAG = `tail -1 sheba_stack.sol | awk '{print $3}'`
+set DTLAG = `tail -1 sheba_stack.sol | awk '{print $4}'`
+set NSTACKED = `tail -1 sheba_stack.sol | awk '{print $5}'`
+setenv TLAG_STEP `tail -1 sheba_stack.sol | awk '{print $6}'`
+
+# MAKE A little AWK script
+
+#cat <<END > /tmp/tmp.awk.prog
+#for (i = 0; i < NF; i++) 
+#printf("%f\n",$i)
+#END
+
+#cat sheba_stack.err |\
+#   awk '{for (i = 0; i < NF; i++) printf("%f\n",$i) }' 
+
+
+set TLAG_MAX = `head -1 sheba_stack.err | awk '{print (NF-1)*ENVIRON["TLAG_STEP"]}'`
+
+cat sheba_stack.err |\
+   awk '{for (i = 0; i < NF; i++) printf("%f\n",$i) }' |\
+   xyz2grd -Gdata.grd -I"$TLAG_STEP"/1 -R0/"$TLAG_MAX"/-90/90 -ZBLa
+   
+grdcontour data.grd -C5 -L0.9/20 -JX6/6 -R0/"$TLAG_MAX"/-90/90 \
+   -B"0.1"a"0.2":"@~\144@~t (s)":/5a30:"Fast Direction (@~\260@~)"::".$1":WSne \
+   -A -K > sheba_stack_error.eps   
+
+grdcontour data.grd -L0.9/5.1 -C1 -JX -R -W1 -A -O -K >> sheba_stack_error.eps
+grdcontour data.grd -L0.9/1.1 -C1 -JX -R -W10 -A -O -K >> sheba_stack_error.eps
+psxy -JX -R -Sx0.5 -W5/0/0/255 -O -K <<END>> sheba_stack_error.eps
+$TLAG $FAST
+END
+
+pstext -JX6/7 -R0/6/0/7 -X0 -Y0 -O <<END>> sheba_stack_error.eps
+3.2  6.6 14 0 0 5 @~\144@~t = $TLAG +/- $DTLAG (s)
+3.2  6.4 14 0 0 5 fast = $FAST +/- $DFAST (@~\260@~)
+3.2  6.2  14 0 0 5 no. of results stacked = $NSTACKED
+0.2  6.5  16 0 0 5 STACKED  ERROR
+0.2  6.25  16 0 0 5    SURFACES
+END
+
+rm -f data.grd

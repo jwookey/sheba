@@ -7,7 +7,7 @@
 !=======================================================================
 !
 !  James Wookey, School of Earth Sciences, University of Bristol
-!  CVS: $Revision: 1.3 $ $Date: 2007/03/23 12:38:44 $
+!  CVS: $Revision: 1.4 $ $Date: 2008/09/19 00:20:08 $
 !
 !-----------------------------------------------------------------------
 !
@@ -16,7 +16,7 @@
 
 C=======================================================================
       subroutine zsplit(x0,y0,n,wbeg,wend,delta,b,tlag_scale,
-     >fast,dfast,tlag,dtlag,spol,dspol,error,error_int,f,
+     >fast,dfast,tlag,dtlag,spol,dspol,error,error_int,lam1,lam1_int,f,
      >lambda2_min,ndf,snr)
 C=======================================================================
 c
@@ -143,6 +143,7 @@ c-----------------------------------------------------------------------
       integer n,ninterp,norig,noverlap,nwindow
       real wbeg,wend,delta,b,tlag_scale,fast,dfast,tlag,dtlag,spol,dspol
       real error(np1,np2),error_int(np1,np2int),idtlag,idfast
+      real lam1(np1,np2),lam1_int(np1,np2int)
       integer f,iwbeg,iwend,ndf,itlag,ifast,itlag_step
       real x(np),y(np),x0(np),y0(np),xinterp(np),yinterp(np)
       real xnoise(np),ynoise(np)
@@ -207,10 +208,11 @@ c  ** window the data **
 
 c  ** map out the error surface **
       call zgrid_lambda2(xwindow,ywindow,nwindow,iwextra,itlag_step,
-     >                        error,delta)
+     >                        lam1,error,delta)
 
 c  ** interpolate error surface in tlag direction **
       call zerror_interp(error,error_int)
+      call zerror_interp(lam1,lam1_int)
 
 c  ** find the interpolated minimum position **
       call zerror_min(error_int,np1,np2int,ifast,itlag,lambda2_min)
@@ -322,7 +324,7 @@ C=======================================================================
 
 C=======================================================================
       subroutine zgrid_lambda2(x,y,n,iwextra,itlag_step,
-     >                              lambda2grid,delta)
+     >                         lambda1grid,lambda2grid,delta)
 C=======================================================================
 c
 c      calculate the second eigenvalue of the particle motion covaraince 
@@ -356,7 +358,7 @@ c-----------------------------------------------------------------------
 C-----------------------------------------------------------------------
       implicit none
       integer n,i,j,noverlap,k
-      real x(np),y(np),lambda2grid(np1,np2)
+      real x(np),y(np),lambda2grid(np1,np2),lambda1grid(np1,np2)
       real fast
       integer lag,iwextra,itlag_step,lag1,lag2
       real cov(2,2),lambda1,lambda2,vec1(2),vec2(2)
@@ -392,8 +394,8 @@ c  ** initialise all arrays to zero
       enddo ! i=1,np
 
 c  ** calculate the Hilbert transforms
-      call hilbert(x,n,hx)
-      call hilbert(y,n,hy)
+      if (config % iscs_corr == 1) call hilbert(x,n,hx)
+      if (config % iscs_corr == 1) call hilbert(y,n,hy)
 
 c  ** map out the lambda2 surface **
       do 1 i=1,np1
@@ -402,7 +404,8 @@ c         ** set fast direction (range is -90 to 90deg) **
 
 c         ** rotate, lag, calc the covariance and eigenvalues **
          call zrotate2d(x,y,n,np,fast,xrot,yrot)
-         call zrotate2d(hx,hy,n,np,fast,hxrot,hyrot)
+         if (config % iscs_corr == 1) 
+     >       call zrotate2d(hx,hy,n,np,fast,hxrot,hyrot)
          
          do 2 j = 1,np2
 
@@ -411,7 +414,8 @@ c         ** JW do lag in two stages for ScS-correction
             lag1 = nint(real(lag)/2.)
             lag2 = lag-lag1
             call zlag(xrot,yrot,n,np,lag1,iwextra,xlag1,ylag1,noverlap)
-            call zlag(hxrot,hyrot,n,np,lag1,iwextra,
+            if (config % iscs_corr == 1) 
+     >         call zlag(hxrot,hyrot,n,np,lag1,iwextra,
      >                   hxlag1,hylag1,noverlap)
 
 C        ** ScS correction
@@ -435,9 +439,6 @@ C        ** apply a source correction (if specified)
                call zrotate2d(xlag,ylag,n,np,
      >                         -(config % src_fast-fast),xtemp,ytemp)
                xlag(1:n) = xtemp(1:n) ; ylag(1:n) = ytemp(1:n)
-
-
-
             endif 
 
 C           ** calculate the surface point                           
@@ -457,6 +458,8 @@ C           ** SECOND EIGENVALUE MINIMISATION **
                call zcovariance(xlag,ylag,noverlap,np,cov)
                call zeigen2x2(cov,lambda1,lambda2,vec1,vec2)
                lambda2grid(i,j)=lambda2
+               lambda1grid(i,j)=lambda1
+               
             endif
 2         continue ! j = 1,np2
 1      continue ! i=1,np1

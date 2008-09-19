@@ -7,7 +7,7 @@
 !=======================================================================
 !
 !  James Wookey, School of Earth Sciences, University of Bristol
-!  CVS: $Revision: 1.3 $ $Date: 2008/09/16 17:05:28 $
+!  CVS: $Revision: 1.4 $ $Date: 2008/09/19 00:20:08 $
 !
 !-----------------------------------------------------------------------
 !
@@ -123,6 +123,7 @@ c      real theta,ev_x,ev_y,ev_z,ev_time,phi
 		real lam2m(npc), min_lam2m ! required for second multiple windowing
 		integer imin_lam2m
 		real error(np1,np2),error_int(np1,np2int)
+      real lam1(np1,np2),lam1_int(np1,np2int)
 		real x0(np),y0(np),tlag_scale,fast_scale
 		real xc0(npc),yc0(npc),vxc0(npc),vyc0(npc)
 		real fastSTR,dfastSTR,fastDIP,dfastDIP
@@ -244,7 +245,7 @@ C        ** refine window to be relative to 4 header values
 c            print*,l,wbeg(l),wend(l),temp_wbeg,temp_wend
 		      call zsplit(x0,y0,n,wbeg(l),wend(l),delta,b,tlag_scale,
      >                  fast(l),dfast(l),tlag(l),dtlag(l),
-     >                  spol,dspol,error,error_int,f,
+     >                  spol,dspol,error,error_int,lam1,lam1_int,f,
      >                  lam2m(l),ndf,snr)
          
             if (l==1) then
@@ -355,7 +356,7 @@ c  		** do splitting analysis **
 		   call zsplit(x0,y0,n,wbeg_best,wend_best,
      >   		delta,b,tlag_scale,
      >   		fast_best,dfast_best,tlag_best,dtlag_best,
-     >   		spol_best,dspol_best,error,error_int,f,
+     >   		spol_best,dspol_best,error,error_int,lam1,lam1_int,f,
      >   		lambda2_min,ndf,snr)
 
       if (nwbeg==1 .and. nwend==1) then
@@ -418,12 +419,25 @@ c  ** it must be an integer greater than 1 **
       write(lu,'(f12.4,a)') snr,'   % SNR'
       
       write(fmt,'(a1,i5.5,a)') '(',np2int,'f12.4)'
-      print*,fmt
 		do i=1,np1
 		     write(lu,fmt) (error_int(i,j),j=1,np2int) 
 		enddo
 		close(lu)
 
+
+c      file_error = trim(config % fname_base) // '.lam1'
+c		open(lu,file=file_error)
+c      write(lu,'(2i5,a)') np1,np2int,'   % NPfast,NPtlag'
+c      write(lu,'(f12.4,a)') event % error_grid_tlag_int,'   % dtlag'
+c      write(lu,'(i5,a)') ndf,'   % NDF'
+c      write(lu,'(f12.4,a)') snr,'   % SNR'
+c      
+c      write(fmt,'(a1,i5.5,a)') '(',np2int,'f12.4)'
+c      print*,fmt
+c		do i=1,np1
+c		     write(lu,fmt) (lam1_int(i,j),j=1,np2int) 
+c		enddo
+c		close(lu)
 
 
 c		** print output message **		   

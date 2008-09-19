@@ -7,15 +7,13 @@
 !=======================================================================
 !
 !  James Wookey, School of Earth Sciences, University of Bristol
-!  CVS: $Revision: 1.3 $ $Date: 2007/02/13 10:16:25 $
+!  CVS: $Revision: 1.4 $ $Date: 2008/09/19 00:20:08 $
 !
 !-----------------------------------------------------------------------
 !
 ! SUBROUTINES IN THIS FILE WERE WRITTEN BY N. TEANBY UNIVERSITY OF LEEDS
 ! BASED ON TEANBY AND KENDALL (2003) (?)
-! 
-
-
+!
 
 c-----------------------------------------------------------------------
       subroutine zabs_max(a,n,np,amax)
@@ -36,12 +34,12 @@ c-----------------------------------------------------------------------
       implicit none
       integer n,np,i
       real a(np),amax
-      
+
       amax=0.
       do 1 i=1,n
          amax = max(amax,abs(a(i)))
 1      continue
-            
+
       return
       end
 
@@ -50,7 +48,7 @@ c-----------------------------------------------------------------------
 c-----------------------------------------------------------------------
 c
 c      subroutine to perform agglomerative/hierarchical clustering on a
-c      2D data set (x,y). Initially we have n clusters, at each step the 
+c      2D data set (x,y). Initially we have n clusters, at each step the
 c      nearest two clusters are combined to give one less cluster. This
 c      is continued until there is only one cluster, composed of the entire
 c      dataset.
@@ -76,13 +74,13 @@ c                              first index is cluster number (1-k)
 c                              second index is number of clusters (=k=1-n)
 c      vxc/vyc(npc,npc)      real      within cluster variance
 c      cluster(npc,npc)      int      assignment of datapoints. eg cluster(3,17) is the
-c                              number of the cluster that the 3rd datapoint 
+c                              number of the cluster that the 3rd datapoint
 c                              is in for 17 clusters
 c
 c    other:
 c      k                  int      number of clusters
 c      d(npc,npc)            real      distance between i and jth cluster
-c      
+c
 c      NB. matricies with two indicies are upper triangular. first index is
 c      cluster number (1-k), second index is number of clusters (=k=1-n)
 c
@@ -109,7 +107,7 @@ c  ** assign the k clusters **
       enddo
 
 c  ** reduce the number of clusters from n to 1 **
-c  ** by grouping the nearest neigbours **      
+c  ** by grouping the nearest neigbours **
       do k=n-1,1,-1
 c     ** calc the distance matrix between the k+1 clusters **
          call zdiss_euclid(xc,yc,k+1,k+1,npc,d)
@@ -128,7 +126,7 @@ c     ** renumber clusters from 1-k (i.e. remove gaps in the cluster nos) **
 c     ** find the average cluster positions **
          call zcluster_loc(x,y,cluster,k,n,npc,xc,yc,vxc,vyc,nc)
       enddo
-      
+
       return
       end
 
@@ -138,14 +136,14 @@ c-----------------------------------------------------------------------
 c
 c      renumber an array of k +ve integers so that they number from 1-k
 c
-c      uses a collapsing algorithm where the excess differences between 
+c      uses a collapsing algorithm where the excess differences between
 c      elements are incrementally removed
 c
 c      cluster(np,np)      int      cluster numbers
 c      n                  int      number of data
 c      np                  int      array dimension
 c      k                  int      number of distinct clusters
-c      
+c
 c-----------------------------------------------------------------------
 c      n.teanby      9-8-02      original code
 c-----------------------------------------------------------------------
@@ -161,7 +159,7 @@ c  ** find maximum cluster number **
             imax=cluster(i,k)
          endif
       enddo
-            
+
 c  ** renumber the clusters from 1 to k **
 c  ** for every cluster **
       do i=1,k
@@ -203,10 +201,10 @@ c      n                  int      number of data
 c      np                  int      array dimension
 c      d(np,np)            int      distance between i and j th point
 c
-c      NB. d is only defined for elements i=2,n and j=1,i-1 (ie lower 
-c      triangular matrix). diagonal is undefined as it reperesents the 
+c      NB. d is only defined for elements i=2,n and j=1,i-1 (ie lower
+c      triangular matrix). diagonal is undefined as it reperesents the
 c      distance between the same point (=0)
-c      
+c
 c-----------------------------------------------------------------------
 c      n.teanby      9-8-02      original code
 c-----------------------------------------------------------------------
@@ -214,7 +212,7 @@ c-----------------------------------------------------------------------
       integer n,np,k
       real x(np,np),y(np,np),d(np,np)
       integer i,j
-      
+
       do i=2,n
          do j=1,i-1
             d(i,j)=sqrt((x(i,k)-x(j,k))**2+(y(i,k)-y(j,k))**2)
@@ -222,7 +220,6 @@ c-----------------------------------------------------------------------
       enddo
       return
       end
-
 
 c-----------------------------------------------------------------------
       subroutine zdiss_min(d,n,np,imin,jmin,dmin)
@@ -237,7 +234,7 @@ c      imin                  int      i location of minimum dissimalarity
 c      jmin                  int      j location of minimum dissimalarity
 c      dmin                  real      minimum dissimalarity =d(imin,jmin)
 c
-c      NB. d is only defined for elements i=2,n and j=1,i-1 (ie lower 
+c      NB. d is only defined for elements i=2,n and j=1,i-1 (ie lower
 c      triangular matrix)
 c      jmin < imin (because j < i)
 c-----------------------------------------------------------------------
@@ -262,7 +259,7 @@ c  ** find minimum distance **
                endif
          enddo
       enddo
-      
+
       return
       end
 
@@ -278,12 +275,12 @@ c      cluster(np,np)      int      k th column gives cluster number of i th dat
 c      k                  int      number of cluster (column to use in calculation)
 c      n                  int      number of data
 c      np                  int      array dimension
-c      xc/yc(np,np)      real      mean location of i th cluster when there 
+c      xc/yc(np,np)      real      mean location of i th cluster when there
 c                              are a total ofk clusters
 c      vxc/vyc(np,np)      real      variance in location of i th cluster
 c      nc(np)            int      number of data in i th cluster
 c
-c      NB. (v)x/yc is only defined for elements i=2,n and j=1,i-1 (ie lower 
+c      NB. (v)x/yc is only defined for elements i=2,n and j=1,i-1 (ie lower
 c      triangular matrix)
 c-----------------------------------------------------------------------
 c      n.teanby      9-8-02      original code
@@ -329,8 +326,6 @@ c  ** calc the within cluster variance for each cluster **
       return
       end
 
-
-
 c-----------------------------------------------------------------------
       subroutine zwrite_clustxy(lu,file_clustxy,n,np,
      >      wbeg,wend,fast,dfast,tlag,dtlag)
@@ -351,7 +346,7 @@ c  ** write file **
       write(lu,100) i,wbeg(i),wend(i),fast(i),dfast(i),tlag(i),dtlag(i)
       enddo
       close(lu)
-100   format(i6,2f12.4,f8.3,f7.3,2f10.6)   
+100   format(i6,2f12.4,f8.3,f7.3,2f10.6)
       return
       end
 
@@ -400,7 +395,7 @@ c      dt_beg      real            increment for start of window (in seconds)
 c      dt_end      real            increment for end of window (in seconds)
 c      t_off_beg      real            maximum window beginning (relative to spick)
 c      t_off_end      real            minimum window end (relative to spick)
-c      dtlag_max      real            max allowable error in lag time for inclusion 
+c      dtlag_max      real            max allowable error in lag time for inclusion
 c                              in clustering
 c      dfast_max      real            " fast direction "
 c      tlag_scale      real            range of tlag scale in seconds
@@ -413,7 +408,7 @@ c
 c-----------------------------------------------------------------------
 c      n.teanby      12-5-03      original code
 c-----------------------------------------------------------------------
-      
+
       implicit none
       integer nwbeg,nwend,lu
       integer nmin,max_no_clusters
@@ -425,7 +420,7 @@ c-----------------------------------------------------------------------
       open(lu,file=inifile,status='old')
       read(lu,*) ext1
       read(lu,*) ext2
-      read(lu,*) nwbeg 
+      read(lu,*) nwbeg
       read(lu,*) nwend
       read(lu,*) dt_beg
       read(lu,*) dt_end
@@ -440,7 +435,6 @@ c-----------------------------------------------------------------------
       read(lu,*) OPT_verbose
       read(lu,*) OPT_outfiles
       close(lu)
-
 
       return
       end
@@ -482,7 +476,7 @@ c-----------------------------------------------------------------------
       character*50 file
       integer i,j
 
-c  ** open file as direct access **            
+c  ** open file as direct access **
       open(unit=lu,file=file,form='unformatted',access='direct',recl=4,
      >status='old')
 
@@ -562,11 +556,11 @@ c                              first index is cluster number (1-k)
 c                              second index is number of clusters (=k=1-n)
 c      x/ymin            real      grid spacing of x/y data
 c      cluster(npc,npc)      int      assignment of datapoints. eg cluster(3,17) is the
-c                              number of the cluster that the 3rd datapoint 
+c                              number of the cluster that the 3rd datapoint
 c                              is in for 17 clusters
 c      max_no_cluster      int      max number of clusters
 c    out:
-c      c(npc)            real      clustering criteria to determine optimum 
+c      c(npc)            real      clustering criteria to determine optimum
 c                              number of clusters
 c      kopt                  int      optimum number of clusters
 c
@@ -586,7 +580,7 @@ C-----------------------------------------------------------------------
       kopt=0
       c(n)=0.
       c_critical=3.20
-      
+
 c  ** for all numbers of clusters **
       do k=1,n-1
 c      ** for each cluster **
@@ -603,7 +597,7 @@ c         ** search each data point to find a single cluster which is two sepera
                   else if (cluster(i,k+1).ne.cluster1) then
                      cluster2=cluster(i,k+1)
                      goto 99
-                  endif                  
+                  endif
                endif
             enddo
          enddo
@@ -614,7 +608,7 @@ c  ** cluster12 = number of the combined cluster when there are k clusters **
          nc=0
          do i=1,n
             if (cluster(i,k).eq.cluster12) then
-                  je1 = je1 + max(xmin,x(i)-xc(cluster12,k))**2 + 
+                  je1 = je1 + max(xmin,x(i)-xc(cluster12,k))**2 +
      >                     max(ymin,y(i)-yc(cluster12,k))**2
                nc=nc+1
             endif
@@ -625,18 +619,18 @@ c      are k+1 clusters **
          je2=0.
          do i=1,n
             if (cluster(i,k+1).eq.cluster1) then
-                  je2 = je2 + max(xmin,x(i)-xc(cluster1,k+1))**2 + 
+                  je2 = je2 + max(xmin,x(i)-xc(cluster1,k+1))**2 +
      >                     max(ymin,y(i)-yc(cluster1,k+1))**2
             endif
             if (cluster(i,k+1).eq.cluster2) then
-                  je2 = je2 + max(xmin,x(i)-xc(cluster2,k+1))**2 + 
+                  je2 = je2 + max(xmin,x(i)-xc(cluster2,k+1))**2 +
      >                     max(ymin,y(i)-yc(cluster2,k+1))**2
             endif
          enddo
 c      ** this is the special case for 2 parameters **
          c(k)=(0.681690113 - je2/je1)*sqrt(real(nc)/0.18943053)
       enddo
-      
+
 c  ** search for the optimum number of clusters **
 c  ** if c(k) exceeds c_critical then the cluster should be subdivided,
 c      giving kopt = k + 1 as the optimum number of clusters **
@@ -645,7 +639,7 @@ c      giving kopt = k + 1 as the optimum number of clusters **
             kopt = max(kopt,k+1)
          endif
       enddo
-                        
+
       return
       end
 c-----------------------------------------------------------------------
@@ -669,7 +663,7 @@ c
 c      this rule is for continuous data and we have discrete data so
 c      the minimum errors are set to xmin/ymin, corresponding to the grid
 c      spacing. this also avoids division by zero issues
-c      
+c
 c      variables
 c      ---------
 c    in:
@@ -680,11 +674,11 @@ c                              first index is cluster number (1-k)
 c                              second index is number of clusters (=k=1-n)
 c      x/ymin            real      grid spacing of x/y data
 c      cluster(npc,npc)      int      assignment of datapoints. eg cluster(3,17) is the
-c                              number of the cluster that the 3rd datapoint 
+c                              number of the cluster that the 3rd datapoint
 c                              is in for 17 clusters
 c      max_no_cluster      int      max number of clusters
 c    out:
-c      c(npc)            real      clustering criteria to determine optimum 
+c      c(npc)            real      clustering criteria to determine optimum
 c                              number of clusters
 c      kopt                  int      optimum number of clusters
 c
@@ -702,7 +696,7 @@ C-----------------------------------------------------------------------
 
 c  ** calc x/ybar **
       xbar=0.
-      ybar=0.      
+      ybar=0.
       do i=1,n
          xbar=xbar+x(i)
          ybar=ybar+y(i)
@@ -719,7 +713,7 @@ c  ** calc c for each number of clusters **
             nc=0
             do i=1,n
                if (cluster(i,k).eq.j) then
-                  tracew=tracew+(max(xmin,x(i)-xc(j,k)))**2 
+                  tracew=tracew+(max(xmin,x(i)-xc(j,k)))**2
      >                        + (max(ymin,y(i)-yc(j,k)))**2
                   nc=nc+1
                endif
@@ -729,7 +723,7 @@ c  ** calc c for each number of clusters **
          c(k)=traceb*real(n-k)/(real(k-1)*tracew)
 c         print*,'74calhar',k,traceb,tracew,c(k)
       enddo
-      
+
 c  ** find optimum number of clusters **
       c_max=c(1)
       kopt=1
@@ -739,7 +733,7 @@ c  ** find optimum number of clusters **
             kopt = k
          endif
       enddo
-      
+
       return
       end
 c-----------------------------------------------------------------------
@@ -769,9 +763,9 @@ c      x/y/dx/dy(npc)      real      scaled data and standard deviation
 c      xc/yc(npc,npc)      real      scaled cluster means of ith cluster when k=j
 c                               [indecies are (i,j)]
 c      vxc/vyc(npc,npc)      real      scaled cluster variance of ith cluster when k=j
-c                              number of the cluster that the 3rd datapoint 
+c                              number of the cluster that the 3rd datapoint
 c                              is in for 17 clusters
-c      c(npc)            real      clustering criteria to determine optimum 
+c      c(npc)            real      clustering criteria to determine optimum
 c                              number of clusters
 c      k1                  int      optimnum cluster no. from Calinski and Harabasz
 c                              1974 method
@@ -810,7 +804,7 @@ c  ** calc k using Calinski and Harabasz (1974) method **
 c  ** calc k using Duda and Hart (1973) method **
       call zc_73dudhar(x,y,n,xc,yc,xmin,ymin,
      >cluster,max_no_clusters,c,k2)
-      
+
 c  ** set number of clusters to max of k1 and k2 **
       k=max(k1,k2)
 
@@ -821,7 +815,7 @@ c  ** unscale the cluster possitions and variances **
          vxc0(j) = xscale**2 * vxc(j,k)
          vyc0(j) = yscale**2 * vyc(j,k)
       enddo
-      
+
       return
       end
 c-----------------------------------------------------------------------
@@ -864,8 +858,6 @@ ccc      cov(2,2) = cov(2,2)/real(n)
       return
       end
 
-
-
 c-----------------------------------------------------------------------
       subroutine zdetrend(y,n,np,ydetrend)
 c-----------------------------------------------------------------------
@@ -893,11 +885,11 @@ c-----------------------------------------------------------------------
       real y(np),ydetrend(np)
       real xmean,ymean,sumy,sum1,sum2,trend,m,c,TINY
       parameter (TINY=1.e-10)
-      
+
       sum1=0.
       sum2=0.
       sumy=0.
-      
+
 c  ** calc mean of x, which goes from 1 to n, so mean is **
       xmean=real(n+1)/2.
 c  ** calc the mean of y **
@@ -905,11 +897,11 @@ c  ** calc the mean of y **
          sumy = sumy + y(i)
 1      continue
       ymean=sumy/real(n)
-      
+
 c  ** calc grad of line according to formulat in squires **
       do 2 i=1,n
          sum1 = sum1 + (real(i)-xmean)*y(i)
-         sum2 = sum2 + (real(i)-xmean)**2      
+         sum2 = sum2 + (real(i)-xmean)**2
 2      continue
 
 c  ** calc grad and intercept **
@@ -920,13 +912,12 @@ c  ** calc grad and intercept **
         m = sum1/sum2
         c = ymean - m*xmean
       endif
-      
+
 c  ** dtrend the data **
       do 3 i=1,n
          trend = m*real(i) + c
          ydetrend(i) = y(i) - trend
 3      continue
-
 
       return
       end
@@ -959,7 +950,7 @@ c  ** eigenvalue are the solution of a quadratic eqn with c.f.s **
 
       lambda1 = 0.5*( -b + sqrt(b**2 - 4*a*c))
       lambda2 = 0.5*( -b - sqrt(b**2 - 4*a*c))
-      
+
 c  ** order the eigenvalues so that lambda2 is the smallest **
       if (lambda2.gt.lambda1) then
          temp    = lambda1
@@ -973,13 +964,13 @@ C  ** EIGENVECTORS (normalised) **
       norm = sqrt(vec1(1)**2 + vec1(2)**2)
       vec1(1)=vec1(1)/norm
       vec1(2)=vec1(2)/norm
-      
+
       vec2(1)=1.
       vec2(2)=(lambda2-matrix(1,1))/matrix(1,2)
       norm = sqrt(vec2(1)**2 + vec2(2)**2)
       vec2(1)=vec2(1)/norm
       vec2(2)=vec2(2)/norm
-      
+
       return
       end
 c-----------------------------------------------------------------------
@@ -1035,11 +1026,11 @@ C-----------------------------------------------------------------------
       real error(np1,np2int),lambda2_min,fftable,lambda_max
       external fftable
 
-c  ** check that npc is beg enough **      
+c  ** check that npc is beg enough **
       if (npc.lt.np1) then
          pause 'ERROR: zerror95: npc < np1'
       endif
-      
+
 c  ** calc value of lambda at 95% confidence limit from tabulated values **
       if (ndf.ge.3) then
          lambda_max = lambda2_min*( 1. + 2.*fftable(ndf-2)/real(ndf-2))
@@ -1047,7 +1038,7 @@ c  ** calc value of lambda at 95% confidence limit from tabulated values **
          print*,'WARNING: zerror95: ndf <=2, set to 3)'
          lambda_max = lambda2_min*( 1. + 2.*fftable(1))
       endif
-      
+
 c  ** normalise errors by lambda_max, so that and error of 1 = 95% confidence **
       do i=1,np1
          do j=1,np2int
@@ -1112,12 +1103,12 @@ c  ** search all line length and starting points to find irange **
         enddo
       enddo
 11      continue
-      
-c  ** one standard deviation = 0.5*95% error half width 
+
+c  ** one standard deviation = 0.5*95% error half width
 c      (so x full width of 95% contour by 0.25 to get 1s.d.)**
       ierror = 0.25*real(irange)
       jerror = 0.25*real(jrange)
-            
+
       return
       end
 c-----------------------------------------------------------------------
@@ -1148,7 +1139,7 @@ C-----------------------------------------------------------------------
       real error(np1,np2),error_int(np1,np2int)
       real error_row(np),error_row_int(np)
       integer f,i,j,n_int
-      
+
 c  ** check that np is big enough **
       if (np.lt.np2int) then
          pause 'ERROR: zerror_interp: np not big enough'
@@ -1170,7 +1161,7 @@ c      ** copy ech row to a dummy array **
 11         continue
 c      ** interpolate the row data **
          call zsplint(error_row,np2,f,error_row_int,n_int)
-c     ** check that n_int = np2int 
+c     ** check that n_int = np2int
 c         (this should not be possible but check anyway)**
          if (np2int.ne.n_int) then
             pause 'ERROR: zerror_interp: np2int.ne.n_int'
@@ -1207,7 +1198,7 @@ c-----------------------------------------------------------------------
       integer np1,np2
       real error(np1,np2),lambda2_min
       integer i,j,itlag,ifast
-      
+
 c  ** find the minimum lambda2 position **
       lambda2_min=error(1,1)
       itlag=1
@@ -1220,7 +1211,7 @@ c  ** find the minimum lambda2 position **
               ifast= i
            endif
 2         continue
-1      continue      
+1      continue
 
       return
       end
@@ -1308,7 +1299,6 @@ c  -- this bit unchanged from NR routine --
       goto 2
       endif
 
-
       return
       END
 C  (C) Copr. 1986-92 Numerical Recipes Software *%&&,1{.
@@ -1319,14 +1309,14 @@ c-----------------------------------------------------------------------
 c-----------------------------------------------------------------------
 c
 c      subroutine to find m clusters in a set of n pixels defined by x0 and y0. The x0 and y0 data are scaled by x/yscale. This is necessary because x0 and y0 may have very different ranges. For example if x is 0-0.0001 and y is 0-100 then the clustering will be dominated by the y axis. The algorithm is:
-c      -set m trail cluster locations, equally spaced along the data 
+c      -set m trail cluster locations, equally spaced along the data
 c      range diagonal
 c      -asign each data point to it's nearest cluster
-c      -calc the location of the cluster from the mean position of the 
+c      -calc the location of the cluster from the mean position of the
 c      data points in that cluster
 c      -re-asign the datapoints to the updated cluster locations
 c      -continue until the asignment of points remains unchanged number
-c       of itereations exceeds MAXITER 
+c       of itereations exceeds MAXITER
 c    in:
 c      x0(np)      real            x data
 c      y0(np)      real            y data
@@ -1340,7 +1330,7 @@ c      xc/yc(np)      real            cluster positions (means)
 c      vxc/vyc(np)      real            variance in x and y directions
 c
 c      Algorithm from:
-c      Richards and Jia. Remote sensing digital image analysis, 1999, 
+c      Richards and Jia. Remote sensing digital image analysis, 1999,
 c      springer (99RJ)
 c
 c-----------------------------------------------------------------------
@@ -1391,7 +1381,7 @@ c      ** calculate the distance between the ith datapoint and the jth cluster *
 c      ** assign each datapoint to the cluster which is closest **
          do 10 i=1,n
             distmin=sqrt((xmax-x(i))**2+(ymax-y(i))**2)
-            do 20 j=1,m 
+            do 20 j=1,m
                dist=sqrt((x(i)-xc(j))**2+(y(i)-yc(j))**2)
                if (dist.lt.distmin) then
                   distmin=dist
@@ -1441,7 +1431,7 @@ c      ** copy cluster allocations **
       print*,'ERROR: zmigrating-means:'
       pause 'maximum nuber of itererations reached, clusters not stable'
 99      continue
-      
+
 c  ** remove the effect of scaling on the cluster centres **
       do 100 j=1,m
          xc(j)=xc(j)*xscale
@@ -1471,13 +1461,13 @@ c  ** calculate the variance of each cluster in the x and y directions **
 
 c  ** calc Baysian Information Criterion **
       nc=0
-      do 500 j=1,m      
+      do 500 j=1,m
          if (nclust(j).ne.0) then
             nc=nc+1
          endif
 500      continue
       bic=0.
-      do 400 j=1,m      
+      do 400 j=1,m
          if (nclust(j).ne.0) then
             term1=(vxc(j)/xscale + vyc(j)/yscale)/real(nclust(j))
             term2=nc*log(real(nclust(j)))/real(nclust(j))
@@ -1534,7 +1524,7 @@ c  ** calc max number of overlapping points **
       noverlap_max = n - iwextra
       noverlap=0
 
-c  ** lag the time series by lag, new time series are noverlap long 
+c  ** lag the time series by lag, new time series are noverlap long
 c      and the extra points have been omitted **
       if (lag.eq.0) then
          do i=1,noverlap_max
@@ -1584,7 +1574,7 @@ c-----------------------------------------------------------------------
 c  ** assume spacing of orignal series (y) = 1 **
 c  ** spacing of interpolated series is then dx, where **
       dx = (n-1.)/(ninterp-1.)
-      
+
 c  ** interpolation **
       do 1 i=1,ninterp
 c         print*,i
@@ -1603,7 +1593,7 @@ c      ** interpolate **
 
       return
       end
-      
+
 c-----------------------------------------------------------------------
       subroutine zmultiply(a,n,np,scalar,axscalar)
 c-----------------------------------------------------------------------
@@ -1626,11 +1616,11 @@ c-----------------------------------------------------------------------
       implicit none
       integer n,np,i
       real a(np),scalar,axscalar(np)
-      
+
       do 1 i=1,n
          axscalar(i) = a(i) * scalar
 1      continue
-            
+
       return
       end
 c-----------------------------------------------------------------------
@@ -1638,7 +1628,7 @@ c-----------------------------------------------------------------------
 c-----------------------------------------------------------------------
 c
 c      subroutine to calculate number of degrees of freedom (ndf) of a time
-c      series y, with length n, and physical dimension np. If y has been 
+c      series y, with length n, and physical dimension np. If y has been
 c      interpolated then norig is the original number of points in the shear
 c      wave window
 c
@@ -1679,7 +1669,7 @@ C-----------------------------------------------------------------------
       real y(np),yint(np),yfft(np*2),yfft_amp(np)
       real f2,f4
       integer i
-      
+
 c  -- calc the fft of y --
 c  ** calc n2, the next power of 2 from n (or n if n=power of 2) **
       n2 = 2**(int(log(real(n)-0.1)/log(2.0)) + 1)
@@ -1707,7 +1697,7 @@ c
           f4 = f4 - 0.5*yfft_amp(i)**4
         endif
 7       continue
- 
+
       ndf = nint( 2.0 * (2.0*f2**2./f4 - 1.) )
 
       return
@@ -1717,7 +1707,7 @@ c-----------------------------------------------------------------------
       subroutine zpackresults(wbeg,wend,tlag,dtlag,fast,dfast,n,npc,
      >dtlag_max,dfast_max)
 c-----------------------------------------------------------------------
-c      
+c
 c      remove results which have errors over dtlag_max and dfast_max and
 c      compress the arrays. results which only fail one of the criteria
 c      are still accepted.
@@ -1738,14 +1728,14 @@ c
 c-----------------------------------------------------------------------
 c      n.teanby      20-8-02      original code
 c-----------------------------------------------------------------------
-      
+
       implicit none
       integer n,npc
       real wbeg(npc),wend(npc),fast(npc),dfast(npc)
       real tlag(npc),dtlag(npc)
       real dtlag_max,dfast_max
       integer i,j
-      
+
 c  ** remove bad results and compress arrays **
       j=0
       do i=1,n
@@ -1760,7 +1750,7 @@ c  ** remove bad results and compress arrays **
          endif
       enddo
       n=j
-      
+
 c  ** clean up end of array **
       do i=j+1,npc
          wbeg(i)  = 0.
@@ -1770,7 +1760,7 @@ c  ** clean up end of array **
          fast(i)  = 0.
          dfast(i) = 0.
       enddo
-      
+
       return
       end
 c-----------------------------------------------------------------------
@@ -1799,8 +1789,8 @@ c      theta            real      rotation angle of frame (angle between z and z
 c      ev_x/y/z      real      x/y/z position of event read from sac header in metres
 c                        (stored in RESP4/5/6, not ideal but no x y z loc in
 c                        SAC header)
-c      ev_time      real      time of event in days 
-c       
+c      ev_time      real      time of event in days
+c
 c-----------------------------------------------------------------------
 c      N. Teanby      20-8-02      original code
 c-----------------------------------------------------------------------
@@ -1815,7 +1805,7 @@ c  ** header for sac file
       integer h2(8,5)
       character h3a*8, h3b*16
       character*8 h4(7,3)
-c  ** 
+c  **
       character*50 file1,file2
 
 c  ** read in data (SAC binary file) **
@@ -1836,14 +1826,14 @@ c  ** extract header info **
       ev_z   = h1(6,3)
       ev_time= real(h2(1,2)) + real(h2(1,3))/24. + real(h2(1,4))/1440. +
      > real(h2(1,5))/86400. + real(h2(2,1))/86400000.
-      
+
 c  ** make sure the essential quantities are defined **
-      if (delta.lt.0.) pause 'ERROR: zreaddataSAC: delta= -ve'      
+      if (delta.lt.0.) pause 'ERROR: zreaddataSAC: delta= -ve'
       if (b    .lt.0.) pause 'ERROR: zreaddataSAC: b    = -ve'
-      if (force_spick) then      
+      if (force_spick) then
         if (spick.lt.0.) pause 'ERROR: zreaddataSAC: spick= -ve'
       endif
-      
+
 c  ** check other non-essential quantities are defined **
       if (nint(phi).eq.-12345) then
          phi=0.
@@ -1873,7 +1863,7 @@ c  ** check other non-essential quantities are defined **
          ev_z=0.
          print*,'WARNING: zreaddataSAC: ev_x/y/z undefined, set to 0'
       endif
-         
+
       return
       end
 
@@ -1902,7 +1892,7 @@ c-----------------------------------------------------------------------
 c  modifications:
 c      11-07-01      N. Teanby      Original code
 c-----------------------------------------------------------------------
-      
+
       implicit none
       integer lu,np
       real h1(14,5)
@@ -1913,7 +1903,7 @@ c-----------------------------------------------------------------------
       integer i,npts
       character*50 file
 
-c  ** open data file **      
+c  ** open data file **
       open(lu,file=file,status='old')
 
 c  ** read header info **
@@ -1939,7 +1929,7 @@ c  ** check npts does not exceed array dimension **
          print*,'WARNING:zsacread'
          print*,'WARNING:  npts.gt.np, data missed out'
       endif
-      
+
 c  ** read in data **
       do 100 i=1,5*int(npts/5),5
          read(lu,1010) d1(i),d1(i+1),d1(i+2),d1(i+3),d1(i+4)
@@ -1993,11 +1983,11 @@ c-----------------------------------------------------------------------
 
 c  ** number of resampled points **
       nr = int(real(n-1)/real(f))+1
-      
+
       do 1 i=1,nr
          ar(i) = a(1+(i-1)*f)
 1      continue
-            
+
       return
       end
 c-----------------------------------------------------------------------
@@ -2006,22 +1996,22 @@ c-----------------------------------------------------------------------
      >angle_strike_enz,dangle_strike_enz,angle_dip_enz,dangle_dip_enz)
 c-----------------------------------------------------------------------
 c
-c      -find strike and dip of a plane 
+c      -find strike and dip of a plane
 c
 c      -the original e n z coords have been rotated into a b c (in frame of ray)
 c      -the angles az and polaz are measured in the a b c frame
 c      -a b c is rotated by phi and theta relative to e n z
 c      -this prog asumes that angle abc defines a plane parralell to c axis
-c      -the normal to this plane rotated into the e n z frame and used 
+c      -the normal to this plane rotated into the e n z frame and used
 c       to define the plane in the enz frame (plane goes through origin in each
 c       case)
-c      -angle enz is the angle, clockwise from north, of the intersection of the 
+c      -angle enz is the angle, clockwise from north, of the intersection of the
 c       plane with the en horizontal plane
 c
 c-----------------------------------------------------------------------
 c      n. teanby      31-08-01      original code
 c-----------------------------------------------------------------------
-      
+
       implicit none
       real deg2rad,fdstr,fddip
       parameter (deg2rad=0.0174533)
@@ -2030,12 +2020,12 @@ c-----------------------------------------------------------------------
       real angle_dip_enz,dangle_dip_enz
       real phi_rad,theta_rad,angle_abc_rad,nx,ny,nz
 
-c  ** convert angles to radians **      
+c  ** convert angles to radians **
       phi_rad       = phi       * deg2rad
       theta_rad     = theta     * deg2rad
       angle_abc_rad = angle_abc * deg2rad
 
-c  ** calculate the normal to the plane in enz coords **      
+c  ** calculate the normal to the plane in enz coords **
       nx =   cos(phi_rad)*cos(angle_abc_rad)
      >     - sin(phi_rad)*cos(theta_rad)*sin(angle_abc_rad)
       ny = - sin(phi_rad)*cos(angle_abc_rad)
@@ -2043,7 +2033,7 @@ c  ** calculate the normal to the plane in enz coords **
       nz =   sin(theta_rad)*sin(angle_abc_rad)
 
 c  ** calc strike and dip **
-      call zstrikedip(nx,ny,nz,angle_strike_enz,angle_dip_enz)      
+      call zstrikedip(nx,ny,nz,angle_strike_enz,angle_dip_enz)
 
 c  ** get strike in range 0-180 degrees (initially -180 to 180)**
       if (angle_strike_enz.lt.0.) then
@@ -2051,7 +2041,7 @@ c  ** get strike in range 0-180 degrees (initially -180 to 180)**
       endif
 
 c  ** error on strike and dip of angle in enz **
-      dangle_strike_enz = 
+      dangle_strike_enz =
      >( fdstr(theta,angle_abc, dangle_abc) +
      >  fdstr(theta,angle_abc,-dangle_abc) )/2.
       dangle_dip_enz   =
@@ -2072,7 +2062,7 @@ c      output strike and dip in degrees
 c-----------------------------------------------------------------------
 c      n. teanby      18-09-01      original code
 c-----------------------------------------------------------------------
-      
+
       implicit none
       real pi
       parameter (pi=3.141592654)
@@ -2087,7 +2077,7 @@ c  ** find strike **
       else
          strike = atan2(ny,-nx)
       endif
-      
+
 c  ** convert to degrees **
       dip    = dip    * 180./pi
       strike = strike * 180./pi
@@ -2096,7 +2086,7 @@ c  ** convert to degrees **
       end
 
 c-----------------------------------------------------------------------
-      function fdstr(theta,az,daz) 
+      function fdstr(theta,az,daz)
 c-----------------------------------------------------------------------
 c
 c      consider a plane in abc frame defined by angle az
@@ -2126,25 +2116,24 @@ c-----------------------------------------------------------------------
       real theta,az,daz,fdstr
       real theta_rad, az_rad, daz_rad
       real dotprod,mod
-      
-      
+
       theta_rad      = theta      *pi/180.
       az_rad      = az            *pi/180.
       daz_rad      = daz            *pi/180.
-      
-      dotprod =       cos(az_rad)*cos(az_rad+daz_rad) + 
+
+      dotprod =       cos(az_rad)*cos(az_rad+daz_rad) +
      >            cos(theta_rad)**2 * sin(az_rad)*sin(az_rad+daz_rad)
 
       mod = sqrt((cos(az_rad)**2 + cos(theta_rad)**2 * sin(az_rad)**2)*
      >(cos(az_rad+daz_rad)**2+cos(theta_rad)**2*sin(az_rad+daz_rad)**2))
 
       fdstr    =      acos(dotprod/mod)*180./pi
-      
+
       return
       end
 
 c-----------------------------------------------------------------------
-      function fddip(theta,az,daz) 
+      function fddip(theta,az,daz)
 c-----------------------------------------------------------------------
 c
 c      consider a plane in abc frame defined by angle az
@@ -2153,7 +2142,7 @@ c
 c      this function find the angle between the dips of the two
 c      planes in the enz frame.
 c
-c      expression calculated by defining the vertical comp of the 
+c      expression calculated by defining the vertical comp of the
 c      plane normals in abcthis  to enz and finding the angle between
 c      the vertical components
 c
@@ -2174,18 +2163,17 @@ c-----------------------------------------------------------------------
       real theta,az,daz,fddip
       real theta_rad, az_rad, daz_rad
       real nz,nz0
-      
-      
+
       theta_rad      = theta      *pi/180.
       az_rad      = az            *pi/180.
       daz_rad      = daz            *pi/180.
-      
+
 c  ** calc vertical comp of plane normal in enz frame **
       nz0 =   sin(theta_rad)*sin(az_rad)
       nz  =   sin(theta_rad)*sin(az_rad + az_rad)
 
       fddip    =      abs(acos(nz0)-acos(nz))*180./pi
-      
+
       return
       end
 c-----------------------------------------------------------------------
@@ -2228,8 +2216,6 @@ c  ** rotate time series x and y by angle **
       return
       end
 
-
-
 c-----------------------------------------------------------------------
       subroutine zselect_cluster(dx0,dy0,vxc0,vyc0,n,
      >xscale,yscale,cluster,nmin,k,
@@ -2246,7 +2232,7 @@ c      vxc0/vyc0(npc)      real      within cluster variance
 c      n                  int      number of data points
 c      x/yscale            real      scale/standardisation factors for x0/y0 data
 c      cluster(npc,npc)      int      assignment of datapoints. eg cluster(3,17) is the
-c                              number of the cluster that the 3rd datapoint 
+c                              number of the cluster that the 3rd datapoint
 c                              is in for 17 clusters
 c      nmin                  int      min no. data points for an acceptable cluster
 c      k                  int      number of clusters
@@ -2275,7 +2261,7 @@ C-----------------------------------------------------------------------
       logical first_pass
 
       kbest=0
-      
+
 c  ** scale the errors on the data **
       call zmultiply(dx0,n,npc,1./xscale,dx)
       call zmultiply(dy0,n,npc,1./yscale,dy)
@@ -2325,7 +2311,7 @@ c                 --------------
 c                 SUM( 1/var_i )
 c
 c      using this definition of the variance (instead of the average
-c      variance) means that the overall variance is dominated by the 
+c      variance) means that the overall variance is dominated by the
 c      smaller individual variances.
 c
 c-----------------------------------------------------------------------
@@ -2401,7 +2387,7 @@ c      delta            real            sampling interval (s) read from sac head
 c      spick            real            s-wave pick read from sac header
 c      x/yscale            real      scale/standardisation factors for x0/y0 data
 c      cluster(npc,npc)      int      assignment of datapoints. eg cluster(3,17) is the
-c                              number of the cluster that the 3rd datapoint 
+c                              number of the cluster that the 3rd datapoint
 c                              is in for 17 clusters
 c      k                  int      optimum number of clusters = max(k1,k2)
 c      kbest                  int      best cluster
@@ -2422,9 +2408,9 @@ C-----------------------------------------------------------------------
       logical first_pass
       integer i
       real err,err_min
-      
+
       ibest=0
-      
+
       if (kbest.ne.0) then
 c        ** scale the data **
          call zmultiply(dx0,n,npc,1./xscale,dx)
@@ -2446,7 +2432,7 @@ c               err=sqrt(dy(i)**2 + dx(i)**2)
             endif
          enddo
       endif
-      
+
       return
       end
 c-----------------------------------------------------------------------
@@ -2560,7 +2546,7 @@ C-----------------------------------------------------------------------
       return
       END
 C  (C) Copr. 1986-92 Numerical Recipes Software *%&&,1{.
-   
+
 c-----------------------------------------------------------------------
 c  ** modified for unit x spacing **
 c   ya = data to interpolate
@@ -2619,7 +2605,7 @@ c-----------------------------------------------------------------------
       real fast_scale,tlag_scale
       logical OPT_outfiles
       character*50 inifile,ext1,ext2
-      
+
       open(lu,file=inifile,status='old')
       read(lu,*) ext1
       read(lu,*) ext2
@@ -2627,7 +2613,7 @@ c-----------------------------------------------------------------------
       read(lu,*) tlag_scale
       read(lu,*) OPT_outfiles
       close(lu)
-      
+
       return
       end
 c-----------------------------------------------------------------------
@@ -2667,8 +2653,6 @@ c  ** window time series **
       return
       end
 
-
-
 c-----------------------------------------------------------------------
       subroutine zwrite1(file,lu,fmt,x,n,np)
 c-----------------------------------------------------------------------
@@ -2676,7 +2660,7 @@ c      write out a 1 column datafile
 c-----------------------------------------------------------------------
 c      n. teanby      22/10/01      original code
 c-----------------------------------------------------------------------
-      
+
       implicit none
       integer n,np,i,lu
       real x(np)
@@ -2688,7 +2672,7 @@ c-----------------------------------------------------------------------
          write(lu,fmt) x(i)
       enddo
       close(lu)
-      
+
       return
       end
 c-----------------------------------------------------------------------
@@ -2698,7 +2682,7 @@ c      write out a 2 column datafile
 c-----------------------------------------------------------------------
 c      n. teanby      22/10/01      original code
 c-----------------------------------------------------------------------
-      
+
       implicit none
       integer n,np,i,lu
       real x(np),y(np)
@@ -2710,7 +2694,7 @@ c-----------------------------------------------------------------------
          write(lu,fmt) x(i),y(i)
       enddo
       close(lu)
-      
+
       return
       end
 c-----------------------------------------------------------------------
@@ -2758,7 +2742,7 @@ c  ** formats **
      >   'fast ',4x,'dfast',7x,'spol',5x,'dspol',3x,
      >   'fastSTR',2x,'dfastSTR',3x,'fastDIP',2x,'dfastDIP',3x,
      >   'spolSTR',2x,'dspolSTR',3x,'spolDIP',2x,'dspolDIP')
-      
+
       return
       end
 c-----------------------------------------------------------------------
@@ -2767,7 +2751,7 @@ c-----------------------------------------------------------------------
      >wbeg,wend,
      >fast,tlag,spol,error_int)
 c-----------------------------------------------------------------------
-c      write output files 
+c      write output files
 c-----------------------------------------------------------------------
 c      N. Teanby      6-8-02      original code
 c-----------------------------------------------------------------------
@@ -2777,7 +2761,7 @@ C-----------------------------------------------------------------------
       integer n,ninterp,noverlap,noverlap_resamp,nw,lu
       real wbeg,wend,delta,b,fast,tlag,spol,ppick,spick
       real error_int(np1,np2int),tlag_scale,fast_scale
-c  ** 
+c  **
       character*50 event
       integer f,iwbeg,iwend,ilag,itlag_step
       real x(np),y(np),x0(np),y0(np)
@@ -2802,8 +2786,7 @@ c  ** other **
       external fstrcat
       integer i,j
 c  ** added by James Wookey + Jen Caddick ***
-      real gmt_trace_start,gmt_trace_end   
-   
+      real gmt_trace_start,gmt_trace_end
 
 c  ** set filenames **
       ext='.sto'
@@ -2831,7 +2814,6 @@ c  ** set filenames **
       ext='.gmt'
       file_gmt   = fstrcat(event,ext)
 
-
 c  ** format for 2 column output **
       fmt2='(e15.7,2x,e15.7)'
 
@@ -2847,7 +2829,7 @@ c  ** calc itlag_step from tlag_scale **
 c  ** itlag_step is the grid spacing in tlag for the grid search **
 c  ** it must be an integer greater than 1 **
       itlag_step = nint( tlag_scale/(real(np2-1)*delta) )
-      
+
 c  ** detrend the data **
       call zdetrend(x0,n,np,x)
       call zdetrend(y0,n,np,y)
@@ -2876,7 +2858,7 @@ c      is required **
 c  ** calc the lag in terms of the interpolated index **
       ilag = 1 + nint(tlag*real(f)/delta)
 c  ** rotate and lag (positive lag means that both time series still begin
-c      at b, however the time series will be tlag shorter than the 
+c      at b, however the time series will be tlag shorter than the
 c      uncorrected ones**
       call zrotate2d(xinterp,yinterp,ninterp,np,fast,xrot,yrot)
       call zlag(xrot,yrot,ninterp,np,ilag,0,xlag,ylag,noverlap)
@@ -2912,8 +2894,8 @@ c*****CALC CORRECTED FAST AND SLOW COMPONENT**
 c  ** WRITE OUT PARTICLE MOTION **
 c  ** rotate corrected fast and slow waves back to original coords **
       call zrotate2d(sscw,sfcw,noverlap,np,-fast,xcw,ycw)
-c  ** the points we required are numbered 1-noverlap ** 
-c  ** find normalising factor for the particle motion and normalise to 
+c  ** the points we required are numbered 1-noverlap **
+c  ** find normalising factor for the particle motion and normalise to
 c      a maximum value of 1**
       call zabs_max(xw,noverlap,np,max_xw)
       call zabs_max(yw,noverlap,np,max_yw)
@@ -2930,7 +2912,7 @@ c  ** particle motion is composed of xwn,ywn in window wbeg-wend **
 c*****CORRECTED PARTICLE MOTION IN S-WAVE WINDOW **
 c  ** particle motion is composed of xcwnw,ycwn in window wbeg-wend **
       call zwrite2(file_pmc,lu,fmt2,xcwn,ycwn,noverlap,np)
-      
+
 c  ** WRITE OUT FAST AND SLOW WAVEFORMS **
 c  ** normalise the S-waves **
       call zabs_max(ssw,noverlap,np,max_ssw)
@@ -2948,7 +2930,7 @@ c      the match of the waveforms is more obvious **
       else
          call zmultiply(ssw,noverlap,np,-1./max_ssw,sswn)
          call zmultiply(sscw,noverlap,np,-1./max_sscw,sscwn)
-      endif      
+      endif
 c*****UNCORRECTED FAST AND SLOW COMPONENTS **
       call zwrite2(file_ss,lu,fmt2,timew,sswn,noverlap,np)
       call zwrite2(file_sf,lu,fmt2,timew,sfwn,noverlap,np)
@@ -2988,15 +2970,15 @@ C     * set up gmt trace plotting window
       gmt_trace_start = wbeg - 0.2
       if (gmt_trace_start.lt.b) gmt_trace_start = b
       gmt_trace_end = wend + 0.2
-      if (gmt_trace_end.gt.(real(n-1)*delta)) 
+      if (gmt_trace_end.gt.(real(n-1)*delta))
      +     gmt_trace_end = real(n-1)*delta
-   
+
       write(lu,*) 'rt_b_x',gmt_trace_start
       write(lu,*) 'rt_e_x',gmt_trace_end
       write(lu,*) 'rt_minortick_x',ftick((real(n-1)*delta)/32.)
       write(lu,*) 'rt_majortick_x',ftick((real(n-1)*delta)/8.)
       close(lu)
-      
+
       return
       end
 
@@ -3056,7 +3038,7 @@ c-----------------------------------------------------------------------
       endif
       return
       end
-      
+
 c-----------------------------------------------------------------------
       subroutine zwritesac(file,lu,np,h1,h2,h3a,h3b,h4,d1,npts)
 c-----------------------------------------------------------------------
@@ -3082,7 +3064,7 @@ c-----------------------------------------------------------------------
 c  modifications:
 c      11-07-01      N. Teanby      Original code
 c-----------------------------------------------------------------------
-      
+
       implicit none
       integer lu,np
       real h1(14,5)
@@ -3093,7 +3075,7 @@ c-----------------------------------------------------------------------
       integer i,npts
       character*50 file
 
-c  ** open data file **      
+c  ** open data file **
       open(lu,file=file,status='unknown')
 
 c  ** write header info **
@@ -3188,25 +3170,25 @@ c-----------------------------------------------------------------------
       real fftable
       integer ndf
       real ftable_data(100)
-      data ftable_data / 199.500, 19.000, 9.552, 6.944, 5.786, 
-     >5.143, 4.737, 4.459, 4.256, 4.103, 
-     >3.982, 3.885, 3.806, 3.739, 3.682, 
-     >3.634, 3.592, 3.555, 3.522, 3.493, 
-     >3.467, 3.443, 3.422, 3.403, 3.385, 
-     >3.369, 3.354, 3.340, 3.328, 3.316, 
-     >3.305, 3.295, 3.285, 3.276, 3.267, 
-     >3.259, 3.252, 3.245, 3.238, 3.232, 
-     >3.226, 3.220, 3.214, 3.209, 3.204, 
-     >3.200, 3.195, 3.191, 3.187, 3.183, 
-     >3.179, 3.175, 3.172, 3.168, 3.165, 
-     >3.162, 3.159, 3.156, 3.153, 3.150, 
-     >3.148, 3.145, 3.143, 3.140, 3.138, 
-     >3.136, 3.134, 3.132, 3.130, 3.128, 
-     >3.126, 3.124, 3.122, 3.120, 3.119, 
-     >3.117, 3.115, 3.114, 3.112, 3.111, 
-     >3.109, 3.108, 3.107, 3.105, 3.104, 
-     >3.103, 3.101, 3.100, 3.099, 3.098, 
-     >3.097, 3.095, 3.094, 3.093, 3.092, 
+      data ftable_data / 199.500, 19.000, 9.552, 6.944, 5.786,
+     >5.143, 4.737, 4.459, 4.256, 4.103,
+     >3.982, 3.885, 3.806, 3.739, 3.682,
+     >3.634, 3.592, 3.555, 3.522, 3.493,
+     >3.467, 3.443, 3.422, 3.403, 3.385,
+     >3.369, 3.354, 3.340, 3.328, 3.316,
+     >3.305, 3.295, 3.285, 3.276, 3.267,
+     >3.259, 3.252, 3.245, 3.238, 3.232,
+     >3.226, 3.220, 3.214, 3.209, 3.204,
+     >3.200, 3.195, 3.191, 3.187, 3.183,
+     >3.179, 3.175, 3.172, 3.168, 3.165,
+     >3.162, 3.159, 3.156, 3.153, 3.150,
+     >3.148, 3.145, 3.143, 3.140, 3.138,
+     >3.136, 3.134, 3.132, 3.130, 3.128,
+     >3.126, 3.124, 3.122, 3.120, 3.119,
+     >3.117, 3.115, 3.114, 3.112, 3.111,
+     >3.109, 3.108, 3.107, 3.105, 3.104,
+     >3.103, 3.101, 3.100, 3.099, 3.098,
+     >3.097, 3.095, 3.094, 3.093, 3.092,
      >3.091, 3.090, 3.089, 3.088, 3.087 /
 
       if (ndf.le.0) then
@@ -3240,9 +3222,9 @@ c-----------------------------------------------------------------------
       implicit none
       real angle1,angle2,pi,fda
       parameter (pi=3.141592654)
-      
+
       fda = acos( abs(cos( (angle1-angle2)*pi/180.) ) )*180./pi
-      
+
       return
       end
 
