@@ -7,7 +7,7 @@
 !=======================================================================
 !
 !  James Wookey, School of Earth Sciences, University of Bristol
-!  CVS: $Revision: 1.4 $ $Date: 2008/09/19 00:20:08 $
+!  CVS: $Revision: 1.5 $ $Date: 2008/09/19 17:40:09 $
 !
 !-----------------------------------------------------------------------
 !
@@ -398,7 +398,7 @@ c  ** itlag_step is the grid spacing in tlag for the grid search **
 c  ** it must be an integer greater than 1 **
 		itlag_step = nint( tlag_scale/(real(np2-1)*delta) )
       
-      print*,f,itlag_step
+c      print*,f,itlag_step
       
       file_error = trim(config % fname_base) // '.error'
 		open(lu,file=file_error)
@@ -448,7 +448,12 @@ c		** print output message **
         if (config % i_rotate_to_ABC == 1) print*,'[Rotated frame]'
 		  print*,'lag      =',tlag_best,'+/-',dtlag_best,' seconds'
 		  print*,'fast     =',fast_best,'+/-',dfast_best,' degrees'
-		  print*,'spol     =',spol_best,'+/-',dspol_best,' degrees'
+        if (config % imode == 0) then
+		     print*,'spol     =',spol_best,'+/-',dspol_best,
+     >            ' degrees (fixed)'
+        else 
+		     print*,'spol     =',spol_best,'+/-',dspol_best,' degrees'
+        endif     
         write(*,198)
 
 199     format(80('='))

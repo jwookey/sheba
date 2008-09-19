@@ -1,5 +1,5 @@
 #!/bin/csh
-# CVS: $Revision: 1.1 $ $Date: 2008/09/19 00:20:08 $
+# CVS: $Revision: 1.2 $ $Date: 2008/09/19 17:40:10 $
 # $1 = event name
 # $2 = log file extensition ='ilog.ass' or 'ilog_nt'
 gmtset PAPER_MEDIA A4+ MEASURE_UNIT inch
@@ -13,7 +13,7 @@ set TLAG = `tail -1 sheba_stack.sol | awk '{print $3}'`
 set DTLAG = `tail -1 sheba_stack.sol | awk '{print $4}'`
 set NSTACKED = `tail -1 sheba_stack.sol | awk '{print $5}'`
 setenv TLAG_STEP `tail -1 sheba_stack.sol | awk '{print $6}'`
-
+ 
 # MAKE A little AWK script
 
 #cat <<END > /tmp/tmp.awk.prog

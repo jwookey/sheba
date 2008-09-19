@@ -4,7 +4,7 @@
 *-------------------------------------------------------------------------------
 *   (c) James Wookey 2004-2008
 *-------------------------------------------------------------------------------
-*	 CVS: $Revision: 1.3 $ $Date: 2008/09/15 23:28:41 $
+*	 CVS: $Revision: 1.4 $ $Date: 2008/09/19 17:40:09 $
 *
 * This is a SAC macro to run to run the shear-wave splitting analysis code, 
 * SHEBA. It basically inserts the correct picks into the data files to be 
@@ -370,7 +370,6 @@ xvport 0.10 0.45
 r $file$.xy1 
 setbb vmax (MAXIMUM &1,xmaximum &1,ymaximum )
 setbb vmin (MINIMUM &1,xminimum &1,yminimum )
-message "%vmin%"
 xlim %vmin %vmax ; ylim %vmin %vmax
 
 p1
@@ -395,7 +394,6 @@ endif
 **--------------------------------------------------------------------------- **
 ** plot GMT results
 **--------------------------------------------------------------------------- **
-
 * error surface and cluster analysis
  message "-> Error surface and cluster analysis, q in window to exit ..."
  sc sheba_plot_errclu.gmt $file$
@@ -424,6 +422,13 @@ if $plot$ eq yes
       sc \cp $file$_sheba.result $file$_sheba.final_result
 endif
 
+**--------------------------------------------------------------------------- **
+** clean up temporary files
+**--------------------------------------------------------------------------- **
+sc rm -f tmp.r tmp.t
+if yes eq $usett
+   sc rm -rf ttsac.pcf ttsac.xlim
+endif
 **--------------------------------------------------------------------------- **
 ** reset SAC plotting defaults
 **--------------------------------------------------------------------------- **

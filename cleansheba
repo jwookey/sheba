@@ -6,9 +6,6 @@ set fbase1 = `ls *.clusters`
 set fbase = `echo ${fbase1:r}`
 echo "Cleaning up after SHEBA, fbase =" $fbase
 rm -f ${fbase}.clusters
-rm -f ${fbase}.clus
-rm -f ${fbase}.clusters
-rm -f ${fbase}.clusters
 rm -f ${fbase}.clustxy
 rm -f ${fbase}.error
 rm -f ${fbase}.gmt
@@ -27,5 +24,3 @@ rm -f sheba.in
 rm -f sheba.log
 rm -f sheba.result
 rm -f tlag_limit.jwo
-rm -f tmp.r
-rm -f tmp.t

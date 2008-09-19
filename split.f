@@ -7,7 +7,7 @@
 !=======================================================================
 !
 !  James Wookey, School of Earth Sciences, University of Bristol
-!  CVS: $Revision: 1.4 $ $Date: 2008/09/19 00:20:08 $
+!  CVS: $Revision: 1.5 $ $Date: 2008/09/19 17:40:10 $
 !
 !-----------------------------------------------------------------------
 !
@@ -187,7 +187,7 @@ c      iwextra = maximum lag = np2*itlag_step **
       iwbegx = iwbeg
       iwendx = iwend + iwextra
       if (iwendx.gt.n) then
-         print*,iwendx,n
+c         print*,iwendx,n
          print*,'wbeg,wend',b,wbeg,wend,itlag_step
          print*,'wbeg,wend',wbeg,wend,iwbeg,iwend
          pause 'ERROR: zsplit: window out of range of data'
@@ -304,8 +304,16 @@ c        xlag(1:n) = xtemp(1:n) ; ylag(1:n) = ytemp(1:n)
 C  **       
       call zcovariance(xlag,ylag,noverlap,np,cov)
       call zeigen2x2(cov,lambda1,lambda2,vec1,vec2)
-      call zsourcepol(fast,lambda1,lambda2,vec1,vec2,spol,dspol)
 
+C  ** change for option T
+      if (config % imode == 0) then
+         spol = config % source_pol
+         dspol = 0.0
+      else   
+         call zsourcepol(fast,lambda1,lambda2,vec1,vec2,spol,dspol)
+      endif
+      
+         
 c  ** calc the number of degrees of freedom **
 c  ** first rotate into spol-fast (so y is signal and x is noise) **
       call zrotate2d(xlag,ylag,noverlap,np,spol-fast,xnoise,ynoise)
