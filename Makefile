@@ -18,7 +18,7 @@
 #   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
 #
 #-------------------------------------------------------------------------------
-#   CVS: $Revision: 1.14 $ $Date: 2008/09/19 00:20:08 $
+#   CVS: $Revision: 1.15 $ $Date: 2008/09/23 21:36:52 $
 #-------------------------------------------------------------------------------
 #
 #   SHEBA requires a FORTRAN 90 compiler. Compilers known to work are:    
@@ -99,7 +99,8 @@ all:$(EXECDIR)/sheba_exec \
       $(EXECDIR)/cleansheba \
       $(MACRODIR)/split_sheba\
       $(MACRODIR)/sheba\
-      $(EXECDIR)/sheba_stack 
+      $(EXECDIR)/sheba_stack\
+		$(EXECDIR)/stack_wgtcalc
       
 #
 #     SHEBA EXECUTABLE
@@ -109,6 +110,9 @@ $(EXECDIR)/sheba_exec:${F90SAC} ${MODULES} sheba_main.o ${SUBROUTINES}
 #
 $(EXECDIR)/sheba_stack:${F90SAC} ${MODULES} sheba_stack.o ${SUBROUTINES}
 	$(FC) $(OPT) -o $(EXECDIR)/sheba_stack ${F90SAC} ${MODULES} sheba_stack.o ${SUBROUTINES}
+
+$(EXECDIR)/stack_wgtcalc:stack_wgtcalc.o 
+	$(FC) $(OPT) -o $(EXECDIR)/stack_wgtcalc stack_wgtcalc.o
 
 #	F90SAC requires special options to compile ...
 f90sac_distrib.o: f90sac_distrib.F90
