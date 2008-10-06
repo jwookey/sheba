@@ -7,7 +7,7 @@
 !===============================================================================
 !
 !  James Wookey, School of Earth Sciences, University of Bristol
-!  CVS: $Revision: 1.1 $ $Date: 2008/09/23 21:36:52 $
+!  CVS: $Revision: 1.2 $ $Date: 2008/10/06 11:04:40 $
 !
 !-------------------------------------------------------------------------------
 !
@@ -78,7 +78,8 @@
             stop   
          endif
 5     continue
-!  ** now read the parameter list
+
+!  ** now read the parameter table
       nf = 0
       do ! forever
          nf = nf + 1
@@ -86,6 +87,7 @@
       enddo   
 100   nf = nf - 1         
       
+!==============================================================================
 !  ** process the list, working over the columns
       do ip=1,np
          if (iwmode(ip)==0) then
@@ -129,6 +131,9 @@
       do ip=1,np
          awgt(1:nf) = awgt(1:nf)*wgts(1:nf,ip)    
       enddo   
+
+!  ** normalise the sum of the weights to 1.0
+      awgt(1:nf) = awgt(1:nf)/sum(awgt(1:nf))
       
 !  ** output         
       do i=1,nf
