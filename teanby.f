@@ -7,7 +7,7 @@
 !=======================================================================
 !
 !  James Wookey, School of Earth Sciences, University of Bristol
-!  CVS: $Revision: 1.4 $ $Date: 2008/09/19 00:20:08 $
+!  CVS: $Revision: 1.5 $ $Date: 2008/10/06 15:31:00 $
 !
 !-----------------------------------------------------------------------
 !
@@ -2452,6 +2452,7 @@ c      dspol                  real      error (MAD angle)
 c
 c-----------------------------------------------------------------------
 c      N. Teanby      31-7-02      Original code
+c      J. Wookey      6-10-08      Modified for sensible angle
 c-----------------------------------------------------------------------
 
       implicit none
@@ -2465,6 +2466,13 @@ c      fast to the angle. **
 
 c  ** calc MAD angle as a measure of the error **
       dspol = atan(lambda2/lambda1)*180./pi
+
+c  ** recast into 0-360
+      do ! forever
+         if (spol.ge.0 .and. spol.lt.360) exit  
+         if (spol.ge.360.) spol = spol - 360.0
+         if (spol.lt.0) spol = spol + 360.0   
+      enddo   
 
       return
       end
