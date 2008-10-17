@@ -7,8 +7,8 @@
 !===============================================================================
 !
 !  PROGRAM : f90sac
-!  VERSION : 4.21
-!  CVS: $Revision: 1.6 $ $Date: 2008/03/19 15:42:50 $
+!  VERSION : 4.41
+!  CVS: $Revision: 1.7 $ $Date: 2008/10/17 10:58:42 $
 !
 !  (C) James Wookey
 !  Department of Earth Sciences, University of Bristol
@@ -21,11 +21,6 @@
 !   writing and handling SAC files in Fortran 90/95.
 !
 !   Please report bugs/problems to email address above
-!
-!   This has been successfully compiled using Solaris f90 and IFC versions
-!   6-8.1. NOTE: Check parameter f90sac_32bit_record_length is set to the
-!   correct value for your compiler. UPDATE the free compilers g95 and 
-!   gfortran also work. Ditto xlf.
 !
 !   NOTE: This version of the code assumes IO filestream 99 is available 
 !         for reading and writing. 
@@ -124,6 +119,14 @@
 !                          added some tagging to allow easy removal of
 !                          non-distribution routines
 !     2008-02-15  v4.21  * Added a C based writeheader, completing the set. 
+!     2008-03-31  v4.22  * Added an optional force parameter to rotation 
+!                          routines 
+!     2008-03-31  v4.3   * Added two routines to generate covariance matrices 
+!     2008-08-26  v4.4   * Added a routine to suggest filenames for SAC data
+!                          structures, based on header values. Also added a 
+!                          parameter to standardise filename lengths.
+!     2008-10-17  v4.41  * Changed to allow variable length strings as filenames
+!                          (with a maximum length, set by f90sac_fnlength)
 !===============================================================================
 
    module f90sac ! Utility module for F90/95 for SAC files
@@ -132,6 +135,7 @@
    implicit none
 
 !  ** DECLARE CONTAINED FUNCTIONS
+      public :: f90sac_filename
       public :: f90sac_compare_origin_time
       public :: f90sac_orient2d
       public :: f90sac_rotate2d
@@ -164,16 +168,15 @@
 !  ** One might want to consider these if one has access to a fireball F90
 !     compiler which won't link to C. These are considerably slower than
 !     the new C-based routines. 
-!      public :: f90sac_readtrace_no_c
-!      public :: f90sac_readheader_no_c
 !     THESE HAVE BEEN INCLUDED IN A PREPROCESSOR DIRECTIVE - DISABLE_C_ROUTINES
 
                 
 !  ** define a long (32 bit) integer and 32 bit real      
       integer, parameter, private :: int4 = selected_int_kind(9) ;
       integer, parameter, private :: real4 = selected_real_kind(6,37) ;
+      integer, parameter, private :: real8 = selected_real_kind(15,307) ; 
 
-!  ** define the record length in a sequential access file for a 32 bit number
+!  ** define the Tt5 length in a sequential access file for a 32 bit number
 !  ** this is compiler dependent: 
 !        IFORT/IFC Version >= 8.0 = 1 (or set flag -assume byterecl) 
 !        IFC Version < v8.0 = 4
@@ -199,6 +202,10 @@
       
 !  ** noise generator seed value
       integer, private :: f90sac_random_seed ;      
+
+!  ** standard filename length
+      integer, parameter :: f90sac_fnlength = 256 ;      
+
 
 !=============================================================================== 
 !  ** Define a specialised data structure for containing SAC files
@@ -301,7 +308,6 @@
 
    CONTAINS
 
-
 !===============================================================================
    subroutine f90sac_io_init()
 !===============================================================================
@@ -330,6 +336,150 @@
 
 
 !===============================================================================
+   subroutine f90sac_filename(tr,iformat,fn)
+!===============================================================================
+!
+!     Suggest a filename for a SAC file based on specified format of the 
+!     header values. 
+!
+!     Available formats are:
+!
+!     iformat=1 : STNM.NW.CMP
+!            =2 : YYYYDDD.STNM.NW.CMP (*reference* time)
+!            =3 : YYYYDDD.HHMMSS.STNM.NW.CMP (*reference* time)
+!
+!     Names (such as station or network name) which are longer than the fields 
+!     above are truncated. Only the time information is checked.
+!     Note that the date/time used is the reference time which might be the
+!     zero, event or neither, depending on the values of the b and o headers. 
+!
+      implicit none
+      type (SACtrace) :: tr
+      character (len=f90sac_fnlength) :: fn
+      character (len=7) :: yyyyddd
+      character (len=6) :: hhmmss
+      character (len=4) :: stnm
+      character (len=3) :: cmp
+      character (len=2) :: nw
+      integer :: iformat
+      
+!  ** blank out the string
+      fn(1:256) = ''
+      
+!  ** construct all of the possible string parts first
+      stnm(1:4) = tr%kstnm(1:4)
+      nw(1:2) = tr%knetwk(1:2)
+      cmp(1:3) = tr%kcmpnm(1:3)
+      
+      if (tr % nzyear == SAC_inull .or. tr % nzjday== SAC_inull) then
+         yyyyddd = '_______'
+      else
+         write(yyyyddd,'(i4.4,i3.3)') tr % nzyear, tr % nzjday   
+      endif   
+
+      if (tr % nzhour == SAC_inull .or. &
+          tr % nzmin == SAC_inull .or. & 
+          tr % nzsec == SAC_inull) then
+         yyyyddd = '______'
+      else
+         write(hhmmss,'(3i2.2)') tr % nzhour, tr % nzmin, tr % nzsec    
+      endif   
+
+      if (iformat==0) then
+         fn = trim(stnm) // '.' // trim(cmp)
+      elseif (iformat==1) then
+         fn = trim(stnm) // '.' // trim(nw) // '.' // trim(cmp)
+      elseif (iformat==2) then
+         fn = trim(yyyyddd) // '.' 
+         fn = trim(fn) // trim(stnm) // '.' // trim(nw) // '.' // trim(cmp)
+      elseif (iformat==3) then
+         fn = trim(yyyyddd) // '.' // trim(hhmmss) // '.'
+         fn = trim(fn) // trim(stnm) // '.' // trim(nw) // '.' // trim(cmp)
+      else   
+         write(0,'(a)') &
+         'F90SAC_FILENAME: Error: Unsupported format code'
+         STOP
+      endif           
+         
+      return
+      end subroutine f90sac_filename
+!===============================================================================
+
+
+!===============================================================================
+   subroutine f90sac_covar2(t1,t2,cov)
+!===============================================================================
+!
+!     Generate the covariance matrix for 2 traces
+!
+      implicit none
+      type (SACtrace) :: t1,t2
+      real :: cov(2,2)
+      
+      integer :: i
+
+!  ** check that traces are the same length
+      if (t1 % npts /= t2 % npts) then
+         write(0,'(a)') &
+         'F90SAC_COVAR2: Error: Input traces are different lengths'
+         STOP
+      endif  
+
+!  ** calculate covariance matrix
+      cov(:,:) = 0.0
+      do i=1,t1 % npts
+         cov(1,1) = cov(1,1) + t1%trace(i)**2.
+         cov(2,2) = cov(2,2) + t2%trace(i)**2
+         cov(1,2) = cov(1,2) + t1%trace(i)*t2%trace(i)         
+      enddo   
+      cov(2,1) = cov(1,2)
+      
+      return
+      end subroutine f90sac_covar2
+!===============================================================================
+
+!===============================================================================
+   subroutine f90sac_covar3(t1,t2,t3,cov)
+!===============================================================================
+!
+!     Generate the covariance matrix for 3 traces
+!
+      implicit none
+
+      type (SACtrace) :: t1,t2,t3
+      real :: cov(3,3)
+      
+      real, allocatable :: m1(:,:),m2(:,:)
+      integer :: i
+
+!  ** check that traces are the same length
+      if (t1 % npts /= t2 % npts .or. &
+          t1 % npts /= t3 % npts .or. & 
+          t2 % npts /= t3 % npts ) then
+         write(0,'(a)') &
+         'F90SAC_COVAR2: Error: Input traces are different lengths'
+         STOP
+      endif  
+
+      allocate(m1(t1%npts,3))
+      allocate(m2(3,t1%npts))
+      
+      m1(:,1) = t1%trace(:)
+      m1(:,2) = t2%trace(:)
+      m1(:,3) = t3%trace(:)
+      
+      m2 = transpose(m1)
+      
+      cov = matmul(m2,m1)
+      
+      deallocate(m1)
+      deallocate(m2)
+      
+      return
+      end subroutine f90sac_covar3
+!===============================================================================
+
+!===============================================================================
    function f90sac_compare_origin_time(t1,t2)
 !===============================================================================
 !
@@ -341,7 +491,7 @@
 !
       implicit none
       type (SACtrace) :: t1,t2
-      integer f90sac_compare_origin_time
+      integer :: f90sac_compare_origin_time
       
 !
       f90sac_compare_origin_time = 0
@@ -721,41 +871,56 @@
 !===============================================================================
 
 !===============================================================================
-   subroutine f90sac_rotate2d(t1,t2,theta)
+   subroutine f90sac_rotate2d(t1,t2,theta,iforce)
 !===============================================================================
 !
 !     rotate 2 SAC traces in azimuth
 !
 !     t1,t2 :  (I/O) SAC traces
 !     theta : (I) angle to rotate by (clockwise)
+!     iforce : set to 1 to circumvent checking (except trace length) 
 !
       implicit none
       integer :: isamp
       type (SACtrace) :: t1,t2
-      
-      real theta, rotmat(2,2), sample(2,1), rsample(2,1),temp1,temp2
+      real :: theta
+      integer, optional :: iforce
+
+!  ** locals      
+      integer :: iforceV
+      real rotmat(2,2), sample(2,1), rsample(2,1),temp1,temp2
       real,parameter :: pi = 3.1415927410125732421875
       real :: cmpazdiff
 
-!   ** check that cmpaz is set
-      if (t1 % cmpaz == SAC_rnull .or. t2 % cmpaz == SAC_rnull) then
-        if (f90sac_suppress_warnings /= 1) then
-            write(0,'(a)') &
-            'F90SAC_ROTATE2D: Warning: CMPAZ Header is not set'
-            write(0,'(a)') &
-            'F90SAC_ROTATE2D: Warning: Setting CMPAZ to 0,90'
-         endif
-         t1 % cmpaz = 0.
-         t2 % cmpaz = 90.0         
+      if (present(iforce)) then
+         iforceV = iforce
+      else
+         iforceV = 0
       endif
-
-!  ** check for orthogonality
-      cmpazdiff = abs(t1 % cmpaz - t2 % cmpaz)
-      if ( .not.((abs(cmpazdiff-90.0) <= f90sac_angle_tolerance) &
-            .or. (abs(cmpazdiff-270.0) <= f90sac_angle_tolerance))) then
-         write(0,'(a)') &
-         'F90SAC_ROTATE2D: Error: Input components are not orthogonal'
-         STOP
+      
+      if (iforceV==0) then
+         
+!      ** check that cmpaz is set
+         if (t1 % cmpaz == SAC_rnull .or. t2 % cmpaz == SAC_rnull) then
+           if (f90sac_suppress_warnings /= 1) then
+               write(0,'(a)') &
+               'F90SAC_ROTATE2D: Warning: CMPAZ Header is not set'
+               write(0,'(a)') &
+               'F90SAC_ROTATE2D: Warning: Setting CMPAZ to 0,90'
+            endif
+            t1 % cmpaz = 0.
+            t2 % cmpaz = 90.0         
+         endif
+    
+!     ** check for orthogonality
+         cmpazdiff = abs(t1 % cmpaz - t2 % cmpaz)
+         if ( .not.((abs(cmpazdiff-90.0) <= f90sac_angle_tolerance) &
+               .or. (abs(cmpazdiff-270.0) <= f90sac_angle_tolerance))) then
+            write(0,'(a)') &
+            'F90SAC_ROTATE2D: Error: Input components are not orthogonal'
+            STOP
+         endif
+      
       endif
             
 !  ** check that traces are the same length
@@ -2022,7 +2187,7 @@
       implicit none
       integer :: lu
       character (len=4) :: tmp_char1,tmp_char2,tmp_char3,tmp_char4
-      character (len=50):: fname
+      character (len=*):: fname
       integer :: i, istatus
       type (SACtrace) :: out
       logical UNITOK, UNITOP
@@ -2032,7 +2197,7 @@
       call f90sac_io_init() 
 
 !  ** Open the file for writing
-      open (unit=f90sac_iounit, file=fname,form='unformatted', &
+      open (unit=f90sac_iounit, file=trim(fname),form='unformatted', &
             access='direct',recl=f90sac_32bit_record_length, &
             status='unknown')
 
@@ -2232,7 +2397,7 @@
       implicit none
       integer :: lu
       character (len=4) :: tmp_char1,tmp_char2,tmp_char3,tmp_char4
-      character (len=50):: fname
+      character (len=*):: fname
       integer :: i, istatus
       type (SACtrace) :: out
       logical UNITOK, UNITOP
@@ -2244,7 +2409,7 @@
 
 
 !  ** Open the file for writing
-      open (unit=f90sac_iounit, file=fname,form='unformatted', &
+      open (unit=f90sac_iounit, file=trim(fname),form='unformatted', &
             access='direct',recl=f90sac_32bit_record_length, &
             status='replace')
 
@@ -2456,7 +2621,7 @@
       implicit none
       integer :: lu
       character (len=4) :: tmp_char1,tmp_char2,tmp_char3,tmp_char4
-      character (len=50) :: fname
+      character (len=*) :: fname
       integer :: i, istatus
       type (SACtrace) :: out
       logical UNITOK, UNITOP
@@ -2467,7 +2632,7 @@
       call f90sac_io_init() 
                         
 !  ** Open the file for reading
-      open (unit=f90sac_iounit, file=fname,form='unformatted', &
+      open (unit=f90sac_iounit, file=trim(fname),form='unformatted', &
             access='direct',recl=f90sac_32bit_record_length, &
             status='old',err=900)
       
@@ -2735,7 +2900,7 @@
       implicit none
       integer :: lu
       character (len=4) :: tmp_char1,tmp_char2,tmp_char3,tmp_char4
-      character (len=50) :: fname
+      character (len=*) :: fname
       integer :: i, istatus
       
       real(real4) :: sacrh(70) ! SAC floating point header
@@ -2747,7 +2912,7 @@
       call f90sac_io_init() 
                         
 !  ** Open the file for reading
-      open (unit=f90sac_iounit, file=fname,form='unformatted', &
+      open (unit=f90sac_iounit, file=trim(fname),form='unformatted', &
             access='direct',recl=f90sac_32bit_record_length, &
             status='old',err=900)
       
@@ -3022,7 +3187,6 @@
 !
       implicit none
       character (len=4) :: tmp_char1,tmp_char2,tmp_char3,tmp_char4
-      character (len=50) :: fname
       integer :: i, istatus
       type (SACtrace) :: out
 
@@ -3031,6 +3195,10 @@
       character :: sacch*192     ! SAC character header
                         
       real(real4),allocatable :: trace(:) ! temporary storage                  
+!  ** filename handling (C-compatibility)
+      character (len=*) :: fname 
+      character (len=f90sac_fnlength) :: fn ! internal name
+      call f90sac_fnfix(fname,fn)
                         
       call f90sac_io_init() 
 
@@ -3099,7 +3267,7 @@ sacch(097:104) = out%kt6(1:8)    ;
       endif
 
 !  ** open the file
-      call f90sac_c_openrw(fname)
+      call f90sac_c_openrw(fn)
 
 !  ** write the header
       call f90sac_c_whd(sacrh,sacih,sacch) 
@@ -3121,18 +3289,22 @@ sacch(097:104) = out%kt6(1:8)    ;
 !
       implicit none
       character (len=4) :: tmp_char1,tmp_char2,tmp_char3,tmp_char4
-      character (len=50) :: fname
       integer :: i, istatus
       type (SACtrace) :: out
 
       real(real4) :: sacrh(70) ! SAC floating point header
       integer(int4) :: sacih(40) ! SAC floating point header
       character :: sacch*192     ! SAC character header
+
+!  ** filename handling (C-compatibility)
+      character (len=*) :: fname 
+      character (len=f90sac_fnlength) :: fn ! internal name
+      call f90sac_fnfix(fname,fn)
  
       call f90sac_io_init() 
       
 !  ** open the file
-      call f90sac_c_openr(fname)
+      call f90sac_c_openr(fn)
                         
       sacch = ' '
             
@@ -3228,18 +3400,21 @@ out%kt6    = sacch(097:104) ;
 !
       implicit none
       character (len=4) :: tmp_char1,tmp_char2,tmp_char3,tmp_char4
-      character (len=50) :: fname
       integer :: i, istatus
       type (SACtrace) :: out
 
       real(real4) :: sacrh(70) ! SAC floating point header
       integer(int4) :: sacih(40) ! SAC floating point header
       character :: sacch*192     ! SAC character header
+!  ** filename handling (C-compatibility)
+      character (len=*) :: fname 
+      character (len=f90sac_fnlength) :: fn ! internal name
+      call f90sac_fnfix(fname,fn)
 
       call f90sac_io_init() 
                         
 !  ** open the file
-      call f90sac_c_openr(fname)
+      call f90sac_c_openr(fn)
                         
       sacch = ' '
             
@@ -3343,15 +3518,19 @@ out%kt6    = sacch(097:104) ;
 !
       implicit none
       character (len=4) :: tmp_char1,tmp_char2,tmp_char3,tmp_char4
-      character (len=50) :: fname
+
       integer :: i, istatus
       type (SACtrace) :: out
-
       real(real4) :: sacrh(70) ! SAC floating point header
       integer(int4) :: sacih(40) ! SAC floating point header
       character :: sacch*192     ! SAC character header
                         
       real(real4),allocatable :: trace(:) ! temporary storage                  
+
+!  ** filename handling (C-compatibility)
+      character (len=*) :: fname 
+      character (len=f90sac_fnlength) :: fn ! internal name
+      call f90sac_fnfix(fname,fn)
                         
       call f90sac_io_init() 
 
@@ -3420,7 +3599,7 @@ sacch(097:104) = out%kt6(1:8)    ;
       endif
 
 !  ** open the file
-      call f90sac_c_openw(fname)
+      call f90sac_c_openw(fn)
 
 !  ** write the header
       call f90sac_c_whd(sacrh,sacih,sacch) 
@@ -3446,9 +3625,39 @@ sacch(097:104) = out%kt6(1:8)    ;
    end subroutine f90sac_writetrace
 !===============================================================================
 
+!===============================================================================
+   subroutine f90sac_fnfix(fn,fnfixed)
+!===============================================================================
+!
+!  Transfer a free length filename to fixed, abort if too long
+!
+   implicit none
+
+!  ** filename handling (C-compatibility)
+      character (len=*) :: fn
+      character (len=f90sac_fnlength) :: fnfixed ! internal name
+      
+!  ** check the string
+      if (len(fn)>f90sac_fnlength) then
+         write(0,'(a,i5,a)') &
+          'F90SAC_FNFIX: Error: Filename string is too long (>',&
+            f90sac_fnlength,') chars.'
+         stop
+      endif 
+
+!  ** transfer
+      fnfixed(1:f90sac_fnlength) = ''
+      fnfixed(1:len(fn)) = fn(1:len(fn)) 
+      fnfixed = trim(fnfixed)
+      
+      return
+   end subroutine f90sac_fnfix
+!===============================================================================
+
 
 #endif      
 ! of DISABLE_C_IO
+
 
 
 !===============================================================================
