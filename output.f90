@@ -7,7 +7,7 @@
 !===============================================================================
 !
 !  James Wookey, School of Earth Sciences, University of Bristol
-!  CVS: $Revision: 1.5 $ $Date: 2008/03/20 06:27:11 $
+!  CVS: $Revision: 1.6 $ $Date: 2009/02/09 11:27:43 $
 !
 
 !=======================================================================
@@ -25,6 +25,7 @@
       implicit none
       type (SACTrace) :: t1
       character*50 fname
+      integer :: j
 
       open(99,file='sheba.result')
 
@@ -79,6 +80,28 @@
 
        
       close(99) 
+
+!  ** Output a chunk of XML for MATISSE
+      fname = trim(config % fname_base) // '.mts'
+      
+      open(99,file=fname)
+      
+      write(99,'(a)') '         <data>'
+!  ** trace names      
+      do j=1,3
+         write(99,120) j,trim(config % fname_base), &
+                         trim(config % comp(config % iorder(j))),j
+      enddo
+120   format('            <file',i1,'>',a,'.',a,'</file',i1,'>')
+!  ** window
+      write(99,'(a,e12.4,a)') '            <wbeg>', event % wbeg,'</wbeg>'
+      write(99,'(a,e12.4,a)') '            <wend>', event % wend,'</wend>'
+!  ** SNR
+      write(99,'(a,f7.2,a)') '            <snr>', event % snr,'</snr>'
+!  ** NDF      
+      write(99,'(a,i4.4,a)') '            <ndf>', event % ndf,'</ndf>'
+      write(99,'(a)') '         </data>'
+      close(99)
 
       return           
 100   format(i4.4,i3.3,1x,2i2.2,14f8.2,2f8.2,'  % ',a)      
@@ -249,7 +272,7 @@
 
 
 !=======================================================================
-      subroutine output_traces(h1,h2,v,str,iorder)
+      subroutine output_traces(h1,h2,v,str)
 !=======================================================================
 !  
 !     Output 3 traces
@@ -267,7 +290,7 @@
 !     * make the filenames
       do i = 1,3
          fn(i) = trim(config % fname_base) // trim(str)  &
-                     // '.' // config % comp(iorder(i))
+                     // '.' // config % comp(config % iorder(i))
       enddo ! do i = 1,3
       call f90sac_writetrace(fn(1),h1)
       call f90sac_writetrace(fn(2),h2)

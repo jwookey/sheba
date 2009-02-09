@@ -7,7 +7,7 @@
 !===============================================================================
 !
 !  James Wookey, School of Earth Sciences, University of Bristol
-!  CVS: $Revision: 1.6 $ $Date: 2008/09/16 17:05:28 $
+!  CVS: $Revision: 1.7 $ $Date: 2009/02/09 11:27:44 $
 !
 
 !=======================================================================
@@ -61,6 +61,9 @@
             integer :: min_pts_per_cluster
             integer :: max_no_clusters
  
+!        ** ordering 
+            integer :: iorder(3)
+            
          end type sheba_config_type     
 
 !        * data structure for various config flags

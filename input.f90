@@ -7,7 +7,7 @@
 !===============================================================================
 !
 !  James Wookey, School of Earth Sciences, University of Bristol
-!  CVS: $Revision: 1.6 $ $Date: 2008/09/15 23:28:41 $
+!  CVS: $Revision: 1.7 $ $Date: 2009/02/09 11:27:43 $
 !
 
 !=======================================================================
@@ -75,7 +75,7 @@
 !=======================================================================
 
 !=======================================================================
-      subroutine get_traces(h1,h2,v,iorder)
+      subroutine get_traces(h1,h2,v)
 !=======================================================================
 !  
 !     Read the input traces and determine the h1,h2,v ordering
@@ -89,7 +89,8 @@
       type (SACTrace) :: h1,h2,v ! the re-ordered traces for analysis
       type (SACTrace) :: traces(3) ! the input traces
       character (len=80) :: fn ! filename
-      integer :: iorder(3) ! index to re-order the traces
+!      integer :: iorder(3) ! index to re-order the traces
+!                 now in config
       integer :: i,ii
       
 !  ** read the three files
@@ -149,24 +150,24 @@
          endif
                 
          if (abs(traces(i) % cmpinc) < angtol) then
-            iorder(3) = i
+            config % iorder(3) = i
          else 
-            iorder(ii) = i
+            config % iorder(ii) = i
             ii = ii + 1
          endif     
       enddo ! do i = 1,3
    
 !  ** make h1 the smallest azimuth
-      if (traces(iorder(1)) % cmpaz > traces(iorder(2)) % cmpaz) then
-         i=iorder(1)
-         iorder(1) = iorder(2)
-         iorder(2) = i
+      if (traces(config % iorder(1)) % cmpaz > traces(config % iorder(2)) % cmpaz) then
+         i=config % iorder(1)
+         config % iorder(1) = config % iorder(2)
+         config % iorder(2) = i
       endif   
       
 !  ** assign the traces      
-      h1 = traces(iorder(1))
-      h2 = traces(iorder(2))
-      v = traces(iorder(3))
+      h1 = traces(config % iorder(1))
+      h2 = traces(config % iorder(2))
+      v = traces(config % iorder(3))
       
 !  ** get some useful event information from the vertical header      
       event % dist = v % dist

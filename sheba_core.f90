@@ -7,7 +7,7 @@
 !===============================================================================
 !
 !  James Wookey, School of Earth Sciences, University of Bristol
-!  CVS: $Revision: 1.2 $ $Date: 2008/09/19 00:20:08 $
+!  CVS: $Revision: 1.3 $ $Date: 2009/02/09 11:27:44 $
 !
 
 !===============================================================================
@@ -27,7 +27,6 @@
       type (SACTrace) :: h1_corr,h2_corr ! the corrected traces
       type (SACTrace) :: h1_proc,h2_proc ! traces to run in the analysis
       
-      integer :: iorder(3) ! index to re-order the traces
       real plat
       real lam1,lam2,lam1_corr,lam2_corr,eigrat,eigrat_corr
       character*50 fname
@@ -35,7 +34,7 @@
       open(iulog,file='sheba.log')
 
 !  **  read the input files for analysis
-      call get_traces(h1,h2,v,iorder)      
+      call get_traces(h1,h2,v)      
 
 !  ** check the trace headers to make sure there is 
 !  ** sufficient information to perform the splitting analysis
@@ -145,7 +144,7 @@
       call output_pm_files(h1_corr,h2_corr, fname)
 
 !  ** write out the corrected traces
-      call output_traces(h1_corr,h2_corr,v,'_corr',iorder)      
+      call output_traces(h1_corr,h2_corr,v,'_corr')      
 
       
 
