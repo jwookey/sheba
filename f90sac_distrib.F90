@@ -7,8 +7,8 @@
 !===============================================================================
 !
 !  PROGRAM : f90sac
-!  VERSION : 4.41
-!  CVS: $Revision: 1.7 $ $Date: 2008/10/17 10:58:42 $
+!  VERSION : 4.43
+!  CVS: $Revision: 1.8 $ $Date: 2009/03/06 11:50:14 $
 !
 !  (C) James Wookey
 !  Department of Earth Sciences, University of Bristol
@@ -127,6 +127,8 @@
 !                          parameter to standardise filename lengths.
 !     2008-10-17  v4.41  * Changed to allow variable length strings as filenames
 !                          (with a maximum length, set by f90sac_fnlength)
+!     2009-02-04  v4.42  * Moved warning suppression to a pre-processor flag
+!     2009-02-19  v4.43  * created a deletetrace routine
 !===============================================================================
 
    module f90sac ! Utility module for F90/95 for SAC files
@@ -176,17 +178,17 @@
       integer, parameter, private :: real4 = selected_real_kind(6,37) ;
       integer, parameter, private :: real8 = selected_real_kind(15,307) ; 
 
-!  ** define the Tt5 length in a sequential access file for a 32 bit number
+!  ** define the record length in a sequential access file for a 32 bit number
 !  ** this is compiler dependent: 
 !        IFORT/IFC Version >= 8.0 = 1 (or set flag -assume byterecl) 
 !        IFC Version < v8.0 = 4
 !        Solaris F90 = 4
 !        g95/gfortran = 4
-      integer, parameter :: f90sac_32bit_record_length = 4 ;
+      integer, parameter, private :: f90sac_32bit_record_length = 4 ;
       
 !  ** define the unit number to use for reading and writing (opened and closed
 !  ** within each call)
-      integer, parameter :: f90sac_iounit = 99 ;
+      integer, parameter, private :: f90sac_iounit = 99 ;
 
 !  ** endian configuration
 
@@ -195,6 +197,14 @@
 #else      
       character, parameter :: f90sac_endian_mode = 'n'
 #endif      
+
+!  ** OPTIONAL suppression of warnings, set to 1 to supress      
+#ifdef SUPPRESS_WARNINGS
+      integer, parameter :: f90sac_suppress_warnings = 1
+#else      
+      integer, parameter :: f90sac_suppress_warnings = 0 
+#endif      
+
       
       integer :: f90sac_init_flag ; ! This is set to a value of 51423
                                     ! when the initialisation is done
@@ -205,7 +215,6 @@
 
 !  ** standard filename length
       integer, parameter :: f90sac_fnlength = 256 ;      
-
 
 !=============================================================================== 
 !  ** Define a specialised data structure for containing SAC files
@@ -297,8 +306,6 @@
       integer, parameter :: SAC_lnull = -12345
       character (len = 8) :: SAC_cnull = '-12345'
 
-!  ** OPTIONAL suppression of warnings, set to 1 to supress      
-      integer,public :: f90sac_suppress_warnings
       
 !===============================================================================
 !
@@ -334,6 +341,71 @@
       end subroutine f90sac_io_init
 !===============================================================================
 
+!===============================================================================
+   subroutine f90sac_deletetrace(tr)
+!===============================================================================
+!
+!     Delete a trace: null out headers and deallocate the memory
+!
+      implicit none
+      type (SACtrace) :: tr
+
+tr%delta     = 0.0       ; tr%resp3     = SAC_rnull ; tr%user8     = SAC_rnull
+tr%depmin    = SAC_rnull ; tr%resp4     = SAC_rnull ; tr%user9     = SAC_rnull
+tr%depmax    = SAC_rnull ; tr%resp5     = SAC_rnull ; tr%dist      = SAC_rnull
+tr%scale     = SAC_rnull ; tr%resp6     = SAC_rnull ; tr%az        = SAC_rnull
+tr%odelta    = SAC_rnull ; tr%resp7     = SAC_rnull ; tr%baz       = SAC_rnull
+tr%b         = 0.0       ; tr%resp8     = SAC_rnull ; tr%gcarc     = SAC_rnull
+tr%e         = 0.0       ; tr%resp9     = SAC_rnull ; tr%internal1 = SAC_rnull
+tr%o         = SAC_rnull ; tr%stla      = SAC_rnull ; tr%internal2 = SAC_rnull
+tr%a         = SAC_rnull ; tr%stlo      = SAC_rnull ; tr%depmen    = SAC_rnull
+tr%internal0 = SAC_rnull ; tr%stel      = SAC_rnull ; tr%cmpaz     = SAC_rnull
+tr%t0        = SAC_rnull ; tr%stdp      = SAC_rnull ; tr%cmpinc    = SAC_rnull
+tr%t1        = SAC_rnull ; tr%evla      = SAC_rnull ; tr%xminimum  = SAC_rnull
+tr%t2        = SAC_rnull ; tr%evlo      = SAC_rnull ; tr%xmaximum  = SAC_rnull
+tr%t3        = SAC_rnull ; tr%evel      = SAC_rnull ; tr%yminimum  = SAC_rnull
+tr%t4        = SAC_rnull ; tr%evdp      = SAC_rnull ; tr%ymaximum  = SAC_rnull
+tr%t5        = SAC_rnull ; tr%mag       = SAC_rnull ; tr%unused1   = SAC_rnull
+tr%t6        = SAC_rnull ; tr%user0     = SAC_rnull ; tr%unused2   = SAC_rnull
+tr%t7        = SAC_rnull ; tr%user1     = SAC_rnull ; tr%unused3   = SAC_rnull
+tr%t8        = SAC_rnull ; tr%user2     = SAC_rnull ; tr%unused4   = SAC_rnull
+tr%t9        = SAC_rnull ; tr%user3     = SAC_rnull ; tr%unused5   = SAC_rnull
+tr%f         = SAC_rnull ; tr%user4     = SAC_rnull ; tr%unused6   = SAC_rnull
+tr%resp0     = SAC_rnull ; tr%user5     = SAC_rnull ; tr%unused7   = SAC_rnull
+tr%resp1     = SAC_rnull ; tr%user6     = SAC_rnull ; 
+tr%resp2     = SAC_rnull ; tr%user7     = SAC_rnull ; 
+                           
+tr%nzyear    = SAC_inull ; tr%unused8   = SAC_inull ; tr%unused11  = SAC_inull
+tr%nzjday    = SAC_inull ; tr%iftype    = 1         ; tr%unused12  = SAC_inull
+tr%nzhour    = SAC_inull ; tr%idep      = 5         ; tr%unused13  = SAC_inull
+tr%nzmin     = SAC_inull ; tr%iztype    = 9         ; tr%unused14  = SAC_inull
+tr%nzsec     = SAC_inull ; tr%unused9   = SAC_inull ; tr%unused15  = SAC_inull
+tr%nzmsec    = SAC_inull ; tr%iinst     = SAC_inull ; tr%unused16  = SAC_inull
+tr%nvhdr     = 6         ; tr%istreg    = SAC_inull ; tr%unused17  = SAC_inull
+tr%norid     = SAC_inull ; tr%ievreg    = SAC_inull ; tr%leven     = 1   
+tr%nevid     = SAC_inull ; tr%ievtyp    = 5         ; tr%lpspol    = 0
+tr%npts      = 0         ; tr%iqual     = SAC_inull ; tr%lovrok    = 1
+tr%internal3 = SAC_inull ; tr%isynth    = SAC_inull ; tr%lcalda    = 1
+tr%nwfid     = SAC_inull ; tr%imagtyp   = SAC_inull ; tr%unused18  = 0
+tr%nxsize    = SAC_inull ; tr%imagsrc   = SAC_inull
+tr%nysize    = SAC_inull ; tr%unused10  = SAC_inull
+
+tr%kstnm = SAC_cnull ; tr%kt3 = SAC_cnull ; tr%kuser0  = SAC_cnull
+tr%kevnm = SAC_cnull ; tr%kt4 = SAC_cnull ; tr%kuser1  = SAC_cnull
+tr%khole = SAC_cnull ; tr%kt5 = SAC_cnull ; tr%kuser2  = SAC_cnull
+tr%ko    = SAC_cnull ; tr%kt6 = SAC_cnull ; tr%kcmpnm  = SAC_cnull
+tr%ka    = SAC_cnull ; tr%kt7 = SAC_cnull ; tr%knetwk  = SAC_cnull
+tr%kt0   = SAC_cnull ; tr%kt8 = SAC_cnull ; tr%kdatrd  = SAC_cnull
+tr%kt1   = SAC_cnull ; tr%kt9 = SAC_cnull ; tr%kinst   = SAC_cnull
+tr%kt2   = SAC_cnull ; tr%kf  = SAC_cnull ; 
+      
+      if (allocated(tr%trace)) then
+         deallocate(tr%trace)
+      endif 
+      
+      return
+      end subroutine f90sac_deletetrace
+!===============================================================================
 
 !===============================================================================
    subroutine f90sac_filename(tr,iformat,fn)

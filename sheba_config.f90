@@ -7,7 +7,7 @@
 !===============================================================================
 !
 !  James Wookey, School of Earth Sciences, University of Bristol
-!  CVS: $Revision: 1.7 $ $Date: 2009/02/09 11:27:44 $
+!  CVS: $Revision: 1.8 $ $Date: 2009/03/06 11:50:14 $
 !
 
 !=======================================================================
@@ -78,6 +78,9 @@
          real*8, parameter :: to_deg = 57.2957795130823d0 ;  
          real*4, parameter :: angtol = 0.001 ; ! angle comparison tol.
          real*8, parameter :: to_km = 111.194926644559 ;
+         
+!     ** default mts reference frame setting (affects .mts output only)
+         character (len=3), parameter :: mts_frame = 'geo'
 
    CONTAINS
  

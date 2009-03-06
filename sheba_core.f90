@@ -7,7 +7,7 @@
 !===============================================================================
 !
 !  James Wookey, School of Earth Sciences, University of Bristol
-!  CVS: $Revision: 1.3 $ $Date: 2009/02/09 11:27:44 $
+!  CVS: $Revision: 1.4 $ $Date: 2009/03/06 11:50:14 $
 !
 
 !===============================================================================
@@ -146,7 +146,13 @@
 !  ** write out the corrected traces
       call output_traces(h1_corr,h2_corr,v,'_corr')      
 
-      
+!  ** destroy working traces
+      call f90sac_deletetrace(h1)
+      call f90sac_deletetrace(h2)
+      call f90sac_deletetrace(h1_corr)
+      call f90sac_deletetrace(h2_corr)
+      call f90sac_deletetrace(h1_proc)
+      call f90sac_deletetrace(h2_proc)
 
       return
       end subroutine sheba

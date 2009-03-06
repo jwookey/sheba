@@ -7,7 +7,7 @@
 !===============================================================================
 !
 !  James Wookey, School of Earth Sciences, University of Bristol
-!  CVS: $Revision: 1.6 $ $Date: 2009/02/09 11:27:43 $
+!  CVS: $Revision: 1.7 $ $Date: 2009/03/06 11:50:14 $
 !
 
 !=======================================================================
@@ -93,6 +93,11 @@
                          trim(config % comp(config % iorder(j))),j
       enddo
 120   format('            <file',i1,'>',a,'.',a,'</file',i1,'>')
+
+!  ** data frame. SHEBA doesn't know this from the data
+!     so it is set by the global constant mts_frame
+      write(99,'(3a)') '            <frame>',mts_frame,'</frame>'
+
 !  ** window
       write(99,'(a,e12.4,a)') '            <wbeg>', event % wbeg,'</wbeg>'
       write(99,'(a,e12.4,a)') '            <wend>', event % wend,'</wend>'

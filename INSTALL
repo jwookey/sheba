@@ -83,6 +83,31 @@ Section 4: Running the code
           (note that an identical macro called split_sheba is provided
            for legacy reasons)
 	- For (many) other options see the sheba macro
+	
+--------------------------------------------------------------------------------
+Section 5: Stacking error surfaces
+
+	- SHEBA also has the capacity to stack error surfaces (see Restivo and 
+	  Helffrich, GJI, 1999)
+	- This is done with code sheba_stack. This requires a collection of .lam2
+	  files, which are produced for the best window in any SHEBA run. 
+	  These are the error surfaces to be stacked. When sheba_stack is executed
+	  it reads the file "sheba_stack.in". This should be a list of the .lam2
+	  files to stack. The result is output to stdout, and the files:
+			sheba_stack.sol : the splitting parameters
+			sheba_stack.err : the stacked error surface. This can be visualised
+			with the script "sheba_plot_stackerr.gmt", which produces an EPS file,
+			"sheba_stack_error.eps".
+		
+	Command line "sheba_stack [options]" where options are:
+	  -wgt [one|snr|filename] : set options for weighting surfaces, where:
+			one : all surfaces have equal weighting
+			snr : surfaces are weighted by their signal-to-noise ratio
+			filename : the name of a file containing weights (one per line, one 
+			           line per surface is required). Obviously, the file can't
+			           be called "one" or "snr". The code "sheba_wgtcalc" can
+			           help combine weights of different kinds, see source code
+			           for details
 
 ================================================================================
   LICENSE	
