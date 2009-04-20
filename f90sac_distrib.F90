@@ -8,7 +8,7 @@
 !
 !  PROGRAM : f90sac
 !  VERSION : 4.43
-!  CVS: $Revision: 1.8 $ $Date: 2009/03/06 11:50:14 $
+!  CVS: $Revision: 1.9 $ $Date: 2009/04/20 08:43:32 $
 !
 !  (C) James Wookey
 !  Department of Earth Sciences, University of Bristol
@@ -30,7 +30,7 @@
 !  This software is distributed under the term of the BSD free software license.
 !
 !  Copyright:
-!     (c) 2003-2008, James Wookey
+!     (c) 2003-2009, James Wookey
 !
 !  All rights reserved.
 !
@@ -184,11 +184,11 @@
 !        IFC Version < v8.0 = 4
 !        Solaris F90 = 4
 !        g95/gfortran = 4
-      integer, parameter, private :: f90sac_32bit_record_length = 4 ;
+      integer, parameter :: f90sac_32bit_record_length = 4 ;
       
 !  ** define the unit number to use for reading and writing (opened and closed
 !  ** within each call)
-      integer, parameter, private :: f90sac_iounit = 99 ;
+      integer, parameter :: f90sac_iounit = 99 ;
 
 !  ** endian configuration
 
