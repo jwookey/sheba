@@ -7,7 +7,7 @@
 !===============================================================================
 !
 !  James Wookey, School of Earth Sciences, University of Bristol
-!  CVS: $Revision: 1.2 $ $Date: 2007/02/06 14:03:49 $
+!  CVS: $Revision: 1.3 $ $Date: 2009/11/04 15:51:54 $
 !
    
 !=======================================================================      
@@ -40,7 +40,8 @@
       if (idep.lt.0 .or. idep.gt.70 .or. idis.lt.0 .or. idis.gt.96) then
          print*,'SCS_SLW: Warning, depth/distance out of range'
          print*,'SCS_SLW: IDIS, IDEP',idis,idep
-         pause 
+            write(0,'(a)') ' Hit ^c to abort or return to continue'
+				read(*,*)
       endif
       
       if (idep.lt.0) idep=0

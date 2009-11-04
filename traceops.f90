@@ -7,7 +7,7 @@
 !===============================================================================
 !
 !  James Wookey, School of Earth Sciences, University of Bristol
-!  CVS: $Revision: 1.3 $ $Date: 2008/02/05 11:46:40 $
+!  CVS: $Revision: 1.4 $ $Date: 2009/11/04 15:51:54 $
 !
 
 !=======================================================================
@@ -100,7 +100,8 @@
             write(0,'(a)') '  than MAX_TLAG. This is probably not'
             write(0,'(a)') '  a very good idea ...               '
             write(0,'(a)') '---------------------------------------'
-            pause ' Hit ^c to abort or return to continue'
+            write(0,'(a)') ' Hit ^c to abort or return to continue'
+				read(*,*)
          endif
          
          
