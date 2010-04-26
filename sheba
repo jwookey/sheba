@@ -4,7 +4,7 @@
 *-------------------------------------------------------------------------------
 *   (c) James Wookey 2004-2008
 *-------------------------------------------------------------------------------
-*	 CVS: $Revision: 1.4 $ $Date: 2008/09/19 17:40:09 $
+*	 CVS: $Revision: 1.5 $ $Date: 2010/04/26 09:34:20 $
 *
 * This is a SAC macro to run to run the shear-wave splitting analysis code, 
 * SHEBA. It basically inserts the correct picks into the data files to be 
@@ -59,14 +59,13 @@
 * but WITHOUT ANY WARRANTY; without even the implied warranty of
 * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 *-------------------------------------------------------------------------------
-$keys file comps plot xlim pick corr src_corr rz_rotate scs nwind max_tlag option srcpol psviewer batch wdev usett orcheck
+$keys file comps plot xlim pick corr src_corr scs nwind max_tlag option srcpol psviewer batch wdev usett orcheck
 $default comps BHE BHN BHZ
 $default plot no
 $default xlim off
 $default pick yes
 $default corr no
 $default src_corr no
-$default rz_rotate no
 $default scs no
 $default nwind one
 $default max_tlag 4.0
@@ -79,9 +78,9 @@ $default usett yes
 
 *
 message "---------------------------------------------"
-message "-         S H E B A - Version 0.995         -"
+message "-         S H E B A - Version 0.996         -"
 message "---------------------------------------------"
-message "-            James Wookey, 2008             -"
+message "-            James Wookey, 2010             -"
 message "---------------------------------------------"
 
 vspace full
