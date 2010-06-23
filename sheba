@@ -4,7 +4,7 @@
 *-------------------------------------------------------------------------------
 *   (c) James Wookey 2004-2010
 *-------------------------------------------------------------------------------
-*	 CVS: $Revision: 1.7 $ $Date: 2010/05/28 14:56:07 $
+*	 CVS: $Revision: 1.8 $ $Date: 2010/06/23 10:59:34 $
 *
 * This is a SAC macro to run to run the shear-wave splitting analysis code, 
 * SHEBA. It basically inserts the correct picks into the data files to be 
@@ -202,7 +202,7 @@ endif
 **--------------------------------------------------------------------------- **
 ** run SHEBA
 **--------------------------------------------------------------------------- **
-sc /usr/local/sac/macros/sheba_exec
+sc sheba_exec
 
 **--------------------------------------------------------------------------- **
 ** plot waveform results
