@@ -7,7 +7,7 @@
 !===============================================================================
 !
 !  James Wookey, School of Earth Sciences, University of Bristol
-!  CVS: $Revision: 1.4 $ $Date: 2009/03/06 11:50:14 $
+!  CVS: $Revision: 1.5 $ $Date: 2011/02/11 13:38:11 $
 !
 
 !===============================================================================
@@ -33,7 +33,7 @@
 
       open(iulog,file='sheba.log')
 
-!  **  read the input files for analysis
+!  ** read the input files for analysis
       call get_traces(h1,h2,v)      
 
 !  ** check the trace headers to make sure there is 
@@ -45,10 +45,10 @@
 !  ** check window length
       call check_windows(h1)
 
-!  **  save the input polarisation
+!  ** save the input polarisation
       config % input_h1_pol = h1 % cmpaz
 
-!  **  orient the traces to NE reference frame
+!  ** orient the traces to NE reference frame
       call f90sac_orient2d(h1,h2)
 
      

@@ -4,7 +4,7 @@
 *-------------------------------------------------------------------------------
 *   (c) James Wookey 2004-2010
 *-------------------------------------------------------------------------------
-*	 CVS: $Revision: 1.8 $ $Date: 2010/06/23 10:59:34 $
+*	 CVS: $Revision: 1.9 $ $Date: 2011/02/11 13:38:11 $
 *
 * This is a SAC macro to run to run the shear-wave splitting analysis code, 
 * SHEBA. It basically inserts the correct picks into the data files to be 
@@ -43,8 +43,6 @@
 *                         in situations where non-teleseismic data is being
 *                         used, trace headers requires for ttsac are missing, or
 *                         systems where ttsac is unavailable
-*  hwtext [(yes)|no]    - use hardware fonts. These look cleaner in PS format 
-*                         and are editable, but may not work on all SAC versions
 *
 *  NOTE: Orientation of input data. The input data must *appear* to form an 
 *        orthogonal set, with two horizontals (cmpinc both 90, cmpaz 90 degrees
@@ -77,21 +75,13 @@ $default psviewer gv
 $default batch no
 $default wdev x
 $default usett yes
-$default hwtext yes
-
 *
 message "---------------------------------------------"
-message "-         S H E B A - Version 0.996         -"
+message "-         S H E B A - Version 0.997         -"
 message "---------------------------------------------"
 message "-            James Wookey, 2010             -"
 message "---------------------------------------------"
 
-
-* set text rendering method. 
-* 'hardware' option may not be available on all systems
-if $hwtext$ eq yes
-	gtext hardware force
-endif
 
 vspace full
 *
