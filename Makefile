@@ -6,7 +6,7 @@
 #-------------------------------------------------------------------------------
 #===============================================================================
 #
-#  (C) James Wookey, December 2003 - February 2008
+#  (C) James Wookey, December 2003 - February 2011
 #  Department of Earth Sciences, University of Bristol
 #  Wills Memorial Building, Queen's Road, Bristol, BR8 1RJ, UK
 #  j.wookey@bristol.ac.uk
@@ -18,7 +18,7 @@
 #   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
 #
 #-------------------------------------------------------------------------------
-#   CVS: $Revision: 1.15 $ $Date: 2008/09/23 21:36:52 $
+#   CVS: $Revision: 1.16 $ $Date: 2011/02/11 16:09:41 $
 #-------------------------------------------------------------------------------
 #
 #   SHEBA requires a FORTRAN 90 compiler. Compilers known to work are:    
@@ -83,7 +83,7 @@ MODULES = sheba_config.o event_info.o array_sizes.o
 SUBROUTINES = sheba_core.o misc.o input.o desplit.o output.o teanby.o \
                   rumpker.o scs.o cluster.o split.o\
                   traceops.o particle.o hilbert.o scsslow.o\
-                  calcsnr.o reorient.o
+                  calcsnr.o reorient.o crosscorr.o
 
 F90SAC = f90sac_distrib.o 
 #

@@ -7,7 +7,7 @@
 !===============================================================================
 !
 !  James Wookey, School of Earth Sciences, University of Bristol
-!  CVS: $Revision: 1.7 $ $Date: 2009/03/06 11:50:14 $
+!  CVS: $Revision: 1.8 $ $Date: 2011/02/11 16:09:41 $
 !
 
 !=======================================================================
@@ -71,11 +71,11 @@
       
       open(99,file=fname)
       
-      write(99,'(3a)') '%  DATE TIME EIGORIG EIGCORR     SNR   NDF   STAT'
+      write(99,'(3a)') '%  DATE TIME EIGORIG EIGCORR      Q     SNR   NDF   STAT'
       write(99,101) t1 % nzyear,t1 % nzjday,  &
                     t1 % nzhour, t1 % nzmin, &
                     event % eigrat_orig, event % eigrat_corr, &
-                    event % snr, event % ndf, &
+                    event % Quality, event % snr, event % ndf, &
                     t1 % kstnm
 
        
@@ -110,7 +110,7 @@
 
       return           
 100   format(i4.4,i3.3,1x,2i2.2,14f8.2,2f8.2,'  % ',a)      
-101   format(i4.4,i3.3,1x,2i2.2,2f8.4,f8.3,x,i5,x,'  % ',a)      
+101   format(i4.4,i3.3,1x,2i2.2,2f8.4,f7.3,f8.3,x,i5,x,'  % ',a)      
       end subroutine output_result
 !=======================================================================
 
@@ -171,6 +171,8 @@
          write(99,'(a,f10.4)') 'set DFAST =', event % dfast 
          write(99,'(a,f10.4)') 'set SPOL =', event % spol 
          write(99,'(a,f10.4)') 'set DSPOL =', event % dspol 
+         write(99,'(a,f10.4)') 'set QUALITY =', event % Quality 
+
 !        * generate tick information
          call tickinfo(config%max_tlag,tlag_majortick,tlag_minortick)
 

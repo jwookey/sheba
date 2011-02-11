@@ -7,7 +7,7 @@
 !===============================================================================
 !
 !  James Wookey, School of Earth Sciences, University of Bristol
-!  CVS: $Revision: 1.5 $ $Date: 2011/02/11 13:38:11 $
+!  CVS: $Revision: 1.6 $ $Date: 2011/02/11 16:09:41 $
 !
 
 !===============================================================================
@@ -55,8 +55,7 @@
 !  ** copy the traces before UMA correction
       call f90sac_clonetrace(h1,h1_proc)
       call f90sac_clonetrace(h2,h2_proc)
-          
-      
+
 !  **  if required pre-correct for UMA
       if (config % iuma_corr == 1) then
          call desplit(h1_proc,h2_proc,config % uma_phi,config % uma_dt)
@@ -122,8 +121,9 @@
       event % eigrat_orig = lam2/lam1
       event % eigrat_corr = lam2_corr/lam1_corr
 
-      write(*,'(a,f6.2,a,f6.2,a,a,f6.2)') &
-         'L2/L1(%) =  ', & 
+      write(*,'(a,f6.3,a,f6.2,a,f6.2,a,a,f6.2)') &
+         ' Q = ', event%Quality, &
+         '  L2/L1(%) =  ', & 
          eigrat,' (pre-corr.) ', & 
          eigrat_corr,' (post-corr.)', &
          '  SNR = ',event%snr                          

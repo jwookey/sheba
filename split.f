@@ -7,7 +7,7 @@
 !=======================================================================
 !
 !  James Wookey, School of Earth Sciences, University of Bristol
-!  CVS: $Revision: 1.5 $ $Date: 2008/09/19 17:40:10 $
+!  CVS: $Revision: 1.6 $ $Date: 2011/02/11 16:09:41 $
 !
 !-----------------------------------------------------------------------
 !
@@ -17,7 +17,8 @@
 C=======================================================================
       subroutine zsplit(x0,y0,n,wbeg,wend,delta,b,tlag_scale,
      >fast,dfast,tlag,dtlag,spol,dspol,error,error_int,lam1,lam1_int,f,
-     >lambda2_min,ndf,snr)
+     >lambda2_min,ndf,snr,xc_grid_int,
+     >fastXC, dfastXC, tlagXC, dtlagXC)
 C=======================================================================
 c
 c      subroutine to perform splitting correction of Silver and Chan 1991
@@ -161,11 +162,18 @@ C     ** Hilbert versions
       
       real snr
 
+!     CROSSCORRELATION VALUES	  
+      real xc_grid(np1, np2XC),xc_grid_int(np1,np2XCint)
+      integer xcitlag,xcifast,xc_max,itlag_stepXC
+      real fastXC,dfastXC, tlagXC,dtlagXC,xcidtlag,xcidfast
+
 c  ** calc itlag_step from tlag_scale **
 c  ** itlag_step is the grid spacing in tlag for the grid search **
 c  ** it must be an integer greater than 1 **
 c  ** use itlag_step to redefine tlag_scale **
       itlag_step = max(1 ,  nint( tlag_scale/(real(np2-1)*delta) )   )
+      itlag_stepXC = max(1 ,  nint( tlag_scale/(real(np2XC-1)*delta) ) )
+
 c  ** redefine tlag_scale **
       tlag_scale = real(itlag_step*(np2-1))*delta
 
@@ -207,19 +215,30 @@ c  ** window the data **
       call zwindow(x,y,n,np,iwbegx,iwendx,xwindow,ywindow,nwindow)
 
 c  ** map out the error surface **
-      call zgrid_lambda2(xwindow,ywindow,nwindow,iwextra,itlag_step,
-     >                        lam1,error,delta)
-
+c      call zgrid_lambda2(xwindow,ywindow,nwindow,iwextra,itlag_step,
+c     >                        lam1,error,delta)
+      call zgrid_lambda2_XC(xwindow,ywindow,nwindow,iwextra,itlag_step,
+     >                        itlag_stepXC,lam1,error,delta,
+     >                        xc_grid)
+     
 c  ** interpolate error surface in tlag direction **
       call zerror_interp(error,error_int)
       call zerror_interp(lam1,lam1_int)
+      call zerror_interp_xc(xc_grid,xc_grid_int)
 
 c  ** find the interpolated minimum position **
       call zerror_min(error_int,np1,np2int,ifast,itlag,lambda2_min)
-
+      
 c  ** convert indices itlag/ifast into tlag and fast **
       tlag  = delta*real(itlag_step*(itlag-1))/real(f)
       fast = -90. + 180.*real(ifast-1)/real(np1-1)
+
+c  ** find the XC maximum
+      call zerror_max(xc_grid_int,np1,np2XCint,xcifast,xcitlag,xc_max)
+      
+c  ** convert indices itlag/ifast into tlag and fast **
+      tlagXC = delta*real(itlag_stepXC*(xcitlag-1))/real(f)
+      fastXC = -90. + 180.*real(xcifast-1)/real(np1-1)
 
 c  ** interpolate the time series to be the same or as high resolution 
 c      as error surface
@@ -318,12 +337,24 @@ c  ** calc the number of degrees of freedom **
 c  ** first rotate into spol-fast (so y is signal and x is noise) **
       call zrotate2d(xlag,ylag,noverlap,np,spol-fast,xnoise,ynoise)
       call zndf(xnoise,noverlap,norig,ndf)
+
 c  ** estimate signal to noise ratio *
       call calcsnr(ynoise,xnoise,noverlap,snr)
+
 c  ** normalise error surface and calc errors in fast and lag**
       call zerror95(error_int,ndf,lambda2_min,idfast,idtlag)
       dtlag = delta * idtlag * itlag_step / real(f)
       dfast = 180.  * idfast / real(np1-1)
+
+c  ** normalise error surface and calc errors in fast and lag (XC version)
+      call zerror95XC(xc_grid_int,ndf,xc_max,xcidfast,xcidtlag)     
+      dtlagXC = delta * xcidtlag * itlag_stepXC / real(f)   
+      dfastXC = 180.  * xcidfast / real(np1-1)
+
+      print*,"AW:",fastXC,tlagXC
+      print*,"AW:",dfastXC,dtlagXC,xcidtlag,xcidfast
+      
+
       
       return
       
@@ -471,6 +502,230 @@ C           ** SECOND EIGENVALUE MINIMISATION **
             endif
 2         continue ! j = 1,np2
 1      continue ! i=1,np1
+
+      return
+      end
+C=======================================================================
+
+C=======================================================================
+      subroutine zgrid_lambda2_XC(x,y,n,iwextra,itlag_step,itlag_stepXC,
+     >                         lambda1grid,lambda2grid,delta,
+     >                         xcorr_grid)
+C=======================================================================
+c
+c      calculate the second eigenvalue of the particle motion covaraince 
+c      matrix over fast direction from -90 - 90 deg (1deg grid spacing) 
+c      and lags of 0 to 40 (1 sample point grid spacing).
+c
+c      variables
+c    in:
+c      x(np)                  real            time series (local east component)
+c      y(np)                  real            time series (local north component)
+c      n                  int            number of points
+c      iwextra            int            number of extra points included in window
+c                                    to allow for the lagging
+c      itlag_step            int            gridding step in for lag time
+c      [np                  int            array dimension
+c                              (read from SIZE_np.h at compile time)]
+c      np1/2                  int            array dimension
+c    out:
+c      lambda2grid(np1,np2)      real      gridded value of lambda2
+c    local:
+c      fast                  real            fast direction in degrees
+c      lag                  int            lag time in sample spacings
+c
+c     MODIFIED BY J.WOOKEY FOR SHEBA ...
+c
+c-----------------------------------------------------------------------
+c      N. Teanby      4-8-02      Original code
+c-----------------------------------------------------------------------
+      use sheba_config ! use the sheba_config module
+      use array_sizes ! use the array_sizes modules
+C-----------------------------------------------------------------------
+      implicit none
+      integer n,i,j,noverlap,k
+      real x(np),y(np),lambda2grid(np1,np2),lambda1grid(np1,np2)
+      real fast
+      integer lag,iwextra,itlag_step,itlag_stepXC,lag1,lag2
+      real cov(2,2),lambda1,lambda2,vec1(2),vec2(2)
+      real xrot(np),yrot(np),xlag1(np),ylag1(np)
+      real xlag2(np),ylag2(np),xlag(np),ylag(np)
+      real xpol(np),ypol(np),spol
+c     CROSSCORRELATION VALUES
+      real ss(np), maxvalue
+      real xcorr_grid_tmp(np1, 2*np2XC+1),xcorr_grid(np1, np2XC)
+      logical left
+      integer zerolag, maxlag, cc , rr,rrr,maxlags
+c  ** temporary arrays
+      real xtemp(np),ytemp(np)
+      real delta
+
+C     ** Hilbert transformed versions
+      real hx(np),hy(np)
+      real hxrot(np),hyrot(np),hxlag1(np),hylag1(np)
+
+	  
+      zerolag = n + 1
+c	  maxlag  = anint(config % max_tlag / delta)
+c  ** initialise all arrays to zero
+      do i=1,np
+         xrot(i) = 0.0
+         yrot(i) = 0.0
+         xlag1(i) = 0.0
+         ylag1(i) = 0.0
+         xlag2(i) = 0.0
+         ylag2(i) = 0.0
+         xlag(i) = 0.0
+         ylag(i) = 0.0
+         xpol(i) = 0.0
+         ypol(i) = 0.0
+         hx(i) = 0.0
+         hy(i) = 0.0
+         hxrot(i) = 0.0
+         hyrot(i) = 0.0
+         hxlag1(i) = 0.0
+         hylag1(i) = 0.0
+      enddo ! i=1,np
+
+c  ** calculate the Hilbert transforms
+      if (config % iscs_corr == 1) call hilbert(x,n,hx)
+      if (config % iscs_corr == 1) call hilbert(y,n,hy)
+
+c  ** map out the lambda2 surface **
+      do 1 i=1,np1
+c         ** set fast direction (range is -90 to 90deg) **
+         fast = -90. + 180.*real(i-1)/real(np1-1)
+
+c         ** rotate, lag, calc the covariance and eigenvalues **
+         call zrotate2d(x,y,n,np,fast,xrot,yrot)
+         if (config % iscs_corr == 1) 
+     >       call zrotate2d(hx,hy,n,np,fast,hxrot,hyrot)
+         
+         do 2 j = 1,np2
+
+c         ** JW do lag in two stages for ScS-correction
+            lag = (j - 1)*itlag_step
+            lag1 = nint(real(lag)/2.)
+            lag2 = lag-lag1
+            call zlag(xrot,yrot,n,np,lag1,iwextra,xlag1,ylag1,noverlap)
+            if (config % iscs_corr == 1) 
+     >         call zlag(hxrot,hyrot,n,np,lag1,iwextra,
+     >                   hxlag1,hylag1,noverlap)
+
+C        ** ScS correction
+            call scscorr(xlag1,ylag1,hxlag1,hylag1,noverlap,fast,j)
+C        ** don't need the Hilbert traces any more ...            
+
+            call zlag(xlag1,ylag1,n,np,lag2,iwextra,
+     >                xlag2,ylag2,noverlap)
+            
+            xlag(1:n) = xlag2(1:n) ; ylag(1:n) = ylag2(1:n)
+
+C        ** apply a source correction (if specified)
+            if (config % i_src_corr == 1) then
+               lag = nint(config % src_tlag / delta) 
+               call zrotate2d(xlag,ylag,n,np,
+     >                         config % src_fast-fast,xtemp,ytemp)
+               xlag(1:n) = xtemp(1:n) ; ylag(1:n) = ytemp(1:n)
+               call zlag(xlag,ylag,n,np,lag,iwextra,
+     >                   xtemp,ytemp,noverlap)
+               xlag(1:n) = xtemp(1:n) ; ylag(1:n) = ytemp(1:n)
+               call zrotate2d(xlag,ylag,n,np,
+     >                         -(config % src_fast-fast),xtemp,ytemp)
+               xlag(1:n) = xtemp(1:n) ; ylag(1:n) = ytemp(1:n)
+            endif 
+
+C           ** calculate the surface point                           
+            if (config % imode == 0) then
+C           ** TRANSVERSE ENERGY MINIMISATION **
+               spol = config % source_pol
+             call zrotate2d(xlag,ylag,noverlap,np,(spol-fast),xpol,ypol)
+               lambda2grid(i,j)=0.0
+               do k=1,n
+                  lambda2grid(i,j)=lambda2grid(i,j)+abs(xpol(k))
+               enddo                
+C           ** do covariance calc. for eigenvalue ratio
+               call zcovariance(xlag,ylag,noverlap,np,cov)
+               call zeigen2x2(cov,lambda1,lambda2,vec1,vec2)
+C           ** SECOND EIGENVALUE MINIMISATION **
+            elseif (config % imode == 1) then
+               call zcovariance(xlag,ylag,noverlap,np,cov)
+               call zeigen2x2(cov,lambda1,lambda2,vec1,vec2)
+               lambda2grid(i,j)=lambda2
+               lambda1grid(i,j)=lambda1
+               
+            endif
+2         continue ! j = 1,np2
+
+c         **************************************************************               
+c         calculate cross correlation, mainly for quality control
+c         see Wuestefeld and Bokelmann, BSSA, 2007
+c         AW 15.10.2008
+	      maxlags = np2XC*itlag_stepXC
+          call crosscorr(xrot,yrot,n, ss, 1 ) 
+c         corrlation "ss" has length 2*maxlags+1
+c         cut only relevant part around zerolag
+          cc = 1
+          do k=(zerolag-maxlags),(zerolag+maxlags),itlag_stepXC
+c           do k=1,2*np2+1
+	           xcorr_grid_tmp(i,cc) = ss(k)
+			   cc = cc + 1
+          enddo	    
+c         ************************************************************** 
+c		 write(47,'(163(f8.4) )') 
+c     >        (ss(k),k=1,2*np2+1)
+c     >      (ss(k), k=(zerolag-np2XC),(zerolag+np2XC))
+
+1      continue ! i=1,np1 	   
+	   
+c       close (47)
+
+c      find in which half of correlation map the maximum lies
+c      flip and cut accordingly
+       maxvalue = xcorr_grid_tmp(1,1) 
+       left = .true.
+       do i=1,np1
+          do k=1,(2*np2XC+1)
+	       if (abs(xcorr_grid_tmp(i,k)) > maxvalue) then
+		    maxvalue = abs(xcorr_grid_tmp(i,k)) 
+		    if (k < np2XC) then
+                   left = .true.
+                else
+                   left = .false.
+                endif 
+             endif
+          enddo
+       enddo
+c      IF THE MAXIMUM is on the left side of the correlation matrix
+c      we must take only this left side and flip the times 
+c      otherwise we take the right side and flip the angles
+
+	  
+       if (left) then
+          rr = 1
+          do i = 1,np1 
+             cc  = 1			 
+             rrr =  mod(rr+nint((np1)/2.),(np1)) + 1	
+             do k=np2XC,1,-1
+                 xcorr_grid(i,cc) = abs(xcorr_grid_tmp(rrr,k))
+                 cc = cc + 1
+             enddo
+             rr = rr +1		 
+          enddo
+	  
+	  
+c		  print *,"LEFT"
+       else
+          do i=1,np1
+             do k=1,np2XC
+                 xcorr_grid(i,k) = abs(xcorr_grid_tmp(i,k+np2XC-1))
+             enddo
+          enddo
+c		  print *,"RIGHT"
+       endif
+	   
+
+
 
       return
       end

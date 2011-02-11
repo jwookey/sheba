@@ -1,7 +1,18 @@
+===============================================================================
+  S H E B A - Shear-wave Birefringence Analysis
+===============================================================================
+  This software is distributed in the hope that it will be useful,
+  but WITHOUT ANY WARRANTY; without even the implied warranty of
+  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+===============================================================================
+
+  James Wookey, School of Earth Sciences, University of Bristol
+  CVS: $Revision: 1.8 $ $Date: 2011/02/11 16:09:41 $
+
 ================================================================================
 INSTRUCTIONS FOR INSTALLING AND RUNNING SHEBA, THE SHEAR-WAVE SPLITTING
 ANALYSIS CODE. 
-================================================================================
+
 
 --------------------------------------------------------------------------------
 Section 1: Introduction
@@ -21,12 +32,25 @@ about any bugs that you find (especially if you have a fix for them).
 
 1.2 References
 
-The code SHEBA was written by James Wookey (University of Bristol) based in part
-on subroutines written by Nick Teanby. The algorithm used by SHEBA for multi-
-window analysis is described in:
+The code SHEBA was mostly written by James Wookey (University of Bristol), 
+incorporating subroutines from a number of places. The primary reference for 
+(the current state of) this code is:
+
+Wüstefeld, A.; Al-Harrasi, O.; Verdon, J.; Wookey, J. and Kendall, J-M. (2010)
+"A strategy for automated analysis of passive microseismic data to image seismic 
+anisotropy and fracture characteristics ", Geophysical Prospecting, vol 58, 
+755–773, DOI:10.1111/j.1365-2478.2010.00891.x
+
+Significant portions of the underlying subroutines were written by Nick Teanby. 
+The algorithm used by SHEBA for multi-window analysis is described in:
 
 Teanby, N; Kendall, J-M. and Van Der Baan, M. (2004), "Automation of shear-wave
    splitting measurements using cluster analysis", BSSA, vol 94, pp 453-463
+
+SHEBA also now incorporates the Quality measure from:
+
+Wüstefeld, A.; and  Bokelmann, G., (2007). "Null Detection in Shear-Wave 
+Splitting Measurements." BSSA, vol 97, 1204 – 1211.
 
 Various other academic papers are referenced in individual subroutines. 
 
@@ -45,7 +69,7 @@ Section 2: Prerequisites
 
 2.2 SHEBA requires utilities from several packages to compile and run fully: 
 
-	- SAC, SAC2000 or MacSAC (the sac.a library is NOT required however)
+	- SAC, SAC2000 or MacSAC (the sacio.a library is NOT required however)
 
 	- GMT (several GMT programs are used for plotting) 
 
@@ -54,10 +78,10 @@ Section 2: Prerequisites
 	- PSUTILS and GHOSTSCRIPT are required for the "plot yes" option, though
         this could potentially be circumvented. 
 
-	- A Fortran 90 compiler. SHEBA is developed on the Gnu compiler gfortran
-	version 4.3 or more recent) is compatible. Other compilers known to have 
-	worked are ifort, xlf, g95 and Solaris f90. G77 and other Fortran 77 
-	compilers will NOT work. 
+	- A Fortran 90 compiler. SHEBA is developed on the Gnu compiler 
+	gfortran (version 4.3 or more recent is compatible). Other compilers 
+	known to have worked at some point are ifort, xlf, g95 and Solaris f90. 
+	G77 and other Fortran 77 compilers will NOT work. 
 
 --------------------------------------------------------------------------------
 Section 3: Compiling
@@ -118,7 +142,7 @@ Section 5: Stacking error surfaces
   This software is distributed under the term of the BSD free software license.
 
   Copyright:
-     (c) 2003-2009, James Wookey
+     (c) 2003-2011, James Wookey
 
   All rights reserved.
 

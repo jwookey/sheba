@@ -7,7 +7,7 @@
 !=======================================================================
 !
 !  James Wookey, School of Earth Sciences, University of Bristol
-!  CVS: $Revision: 1.5 $ $Date: 2008/09/19 17:40:09 $
+!  CVS: $Revision: 1.6 $ $Date: 2011/02/11 16:09:41 $
 !
 !-----------------------------------------------------------------------
 !
@@ -144,6 +144,13 @@ c
       real test_tlag,test_fast
       real snr ! signal to noise ratio
 
+c  ** cross-corr data
+      real xc_grid_int(np1,np2XCint)
+      real fastXC,dfastXC, tlagXC,dtlagXC
+c  ** NULL function (AW)      
+      real Quality
+      real NULLCRITERION ! Null criterion function
+
       write(iulog,*) 'Running multiple window shear-wave splitting' 
       write(*,*) '> Running multiple window shear-wave splitting' 
 
@@ -246,7 +253,8 @@ c            print*,l,wbeg(l),wend(l),temp_wbeg,temp_wend
 		      call zsplit(x0,y0,n,wbeg(l),wend(l),delta,b,tlag_scale,
      >                  fast(l),dfast(l),tlag(l),dtlag(l),
      >                  spol,dspol,error,error_int,lam1,lam1_int,f,
-     >                  lam2m(l),ndf,snr)
+     >                  lam2m(l),ndf,snr,xc_grid_int,
+     >                  fastXC, dfastXC, tlagXC, dtlagXC)
          
             if (l==1) then
                min_lam2m = lam2m(l)
@@ -357,25 +365,32 @@ c  		** do splitting analysis **
      >   		delta,b,tlag_scale,
      >   		fast_best,dfast_best,tlag_best,dtlag_best,
      >   		spol_best,dspol_best,error,error_int,lam1,lam1_int,f,
-     >   		lambda2_min,ndf,snr)
+     >   		lambda2_min,ndf,snr,xc_grid_int,
+     >         fastXC, dfastXC, tlagXC, dtlagXC)
 
-      if (nwbeg==1 .and. nwend==1) then
+c     ** calculate the quality criterion 
+         Quality = NULLCRITERION(fast_best,fastXC,tlag_best,tlagXC,
+     >                            tlag_scale)
+         
+c         print*,'Quality = ', Quality
+
+         if (nwbeg==1 .and. nwend==1) then
  
-c  ** write out empty cluster analysis files ONE WINDOW ONLY
-         file_clustxy = trim(config % fname_base) // '.clustxy'
-         file_clusters = trim(config % fname_base) // '.clusters'
+c        ** write out empty cluster analysis files ONE WINDOW ONLY
+            file_clustxy = trim(config % fname_base) // '.clustxy'
+            file_clusters = trim(config % fname_base) // '.clusters'
       
-         open(99,file=file_clusters)
-         write(99,*) tlag_best,fast_best,0.,0.
-         close(99)
+            open(99,file=file_clusters)
+            write(99,*) tlag_best,fast_best,0.,0.
+            close(99)
 
-         open(99,file=file_clustxy)
-		   write(99,100) 1,wbeg_best,wend_best,fast_best,dfast_best,
+            open(99,file=file_clustxy)
+		      write(99,100) 1,wbeg_best,wend_best,fast_best,dfast_best,
      >                tlag_best,dtlag_best
-100	   format(i6,2f12.4,f8.3,f7.3,2f10.6)	
+100	      format(i6,2f12.4,f8.3,f7.3,2f10.6)	
 
-         close(99)
-      endif
+            close(99)
+         endif
       
 c  ** upload splitting parameters to event_info modules **
       event % tlag = tlag_best
@@ -392,6 +407,7 @@ c  ** upload splitting parameters to event_info modules **
       event % ndf = ndf
 
       event % ibest = ibest
+      event % Quality = Quality
       
 c  ** calc itlag_step from tlag_scale **
 c  ** itlag_step is the grid spacing in tlag for the grid search **

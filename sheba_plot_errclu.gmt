@@ -1,5 +1,5 @@
 #!/bin/csh
-# CVS: $Revision: 1.4 $ $Date: 2011/02/11 13:38:11 $
+# CVS: $Revision: 1.5 $ $Date: 2011/02/11 16:09:41 $
 # $1 = event name
 # $2 = log file extensition ='ilog.ass' or 'ilog_nt'
 unalias rm
@@ -27,9 +27,10 @@ END
 #
 pstext -JX3/7 -R0/3/0/7 -X3 -Y0 -O -K <<END>> $1_errclu.eps
 #0.15 5.8  14 0 0 5 [ENZ frame]
-0.2 6.6 14 0 0 5 @~\144@~t = $TLAG +/- $DTLAG (s)
-0.2  6.4 14 0 0 5 fast = $FAST +/- $DFAST (@~\260@~)
-0.2  6.2  14 0 0 5 spol = $SPOL +/- $DSPOL (@~\260@~)
+0.2 6.8 14 0 0 5 @~\144@~t = $TLAG +/- $DTLAG (s)
+0.2  6.6 14 0 0 5 fast = $FAST +/- $DFAST (@~\260@~)
+0.2  6.4  14 0 0 5 spol = $SPOL +/- $DSPOL (@~\260@~)
+0.2  6.2  14 0 0 5 Qual = $QUALITY
 #0.2  4.2  14 0 0 5 no. of windows = $NWINDOWS
 END
 #

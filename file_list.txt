@@ -1,9 +1,30 @@
-=======
+!===============================================================================
+!  S H E B A - Shear-wave Birefringence Analysis
+!===============================================================================
+!  This software is distributed in the hope that it will be useful,
+!  but WITHOUT ANY WARRANTY; without even the implied warranty of
+!  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+!===============================================================================
+!
+!  James Wookey, School of Earth Sciences, University of Bristol
+!  CVS: $Revision: 1.5 $ $Date: 2011/02/11 16:09:41 $
+!
+
+================================
+ Files used / produced by SHEBA
+================================
+
+!! Inputs
+
 sheba.in          ! configuration file
 syn.e             ! input files (SAC time series files)      
 syn.n             ..
-syn.z          C file_list.txt
-e        ! output (anisotropy corrected) files (SAC time series files)
+syn.z             ..
+
+
+!! Outputs
+
+syn_corr.        ! output (anisotropy corrected) files (SAC time series files)
 syn_corr.n        ..
 syn_corr.z        ..
 
@@ -15,3 +36,14 @@ syn.clusters      ! Cluster analysis results file
 syn.clustxy       ! Cluster analysis results file  
 syn.error         ! Best-window error surface (for plotting)   
 syn.scm           ! SAC macro to set result parameters in SAC
+syn.mts           ! XML for MATISSE SWS tomography code
+syn.lam2 	  ! Lamba2 grid for stacking 
+
+syn_sheba.result  ! Compact results files
+syn_sheba.stats   ! Some error measures
+
+!! if the "plot yes" option is used, the following are also created
+syn_result.ps     ! Combined postscript plot of the 4 plots
+syn_sheba.final_result ! identical copy of the compact results files (for 
+			 rollback purposes)
+

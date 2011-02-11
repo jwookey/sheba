@@ -7,7 +7,7 @@
 !===============================================================================
 !
 !  James Wookey, School of Earth Sciences, University of Bristol
-!  CVS: $Revision: 1.2 $ $Date: 2007/02/06 14:03:49 $
+!  CVS: $Revision: 1.3 $ $Date: 2011/02/11 16:09:41 $
 !
 
 !=======================================================================
@@ -24,6 +24,7 @@
             real*4 :: eigrat_orig,eigrat_corr
             integer :: ndf
             integer :: ibest ! best window number
+            real*4 :: Quality ! AW quality factor (-1 -> 1)
 !        ** other information
             real :: error_grid_tlag_int           
          end type event_info_type     
