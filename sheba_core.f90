@@ -72,11 +72,6 @@
       call upload_splitpar(h2)
       call upload_splitpar(v)
 
-!  ** if required, restore ENZ  radial and transverse
-!      if (config % i_rotate_to_ABC == 1) then
-!         call enz2abc(h1,h2,v,config % slw) ! forward direction
-!      endif
-
 
 !  ** create clone traces to correct
       call f90sac_clonetrace(h1,h1_corr)
@@ -94,14 +89,7 @@
       endif
       
 !  ** correct the traces for the best splitting anisotropy
-      if (config % iscs_corr == 1) then
-         plat = (config % scs_slw / to_km)
-!         print*,plat
-         call desplit_scs(h1_corr,h2_corr,event % fast, event % tlag, & 
-                          plat)
-      else
-         call desplit(h1_corr,h2_corr,event % fast, event % tlag)
-      endif
+      call desplit(h1_corr,h2_corr,event % fast, event % tlag)
 
 !  ** source anisotropy pre-correction
       if (config % i_src_corr == 1) then

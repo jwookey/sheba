@@ -59,11 +59,6 @@
          config % src_fast = 0.0 ; config % src_tlag = 0.0 
       endif
 
-!  ** these options were never properly implemented and have been 
-!     removed from this version of the code
-
-      config % iscs_corr = 0
-      config % i_rotate_to_ABC = 0 ;
          
       return           
 !  ** error handling

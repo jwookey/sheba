@@ -36,10 +36,6 @@
             integer :: iuma_corr
             real :: uma_dt, uma_phi
             
-!           * ScS specific stuff (no longer implemented)
-            integer :: iscs_corr ! scs correct flag
-            real :: scs_slw ! slowness of ScS phase s/deg
-
 !           * Useful?
             real :: input_h1_pol
             

@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>currentDocument</key>
-	<string>sheba</string>
+	<string>split.f</string>
 	<key>documents</key>
 	<array>
 		<dict>
@@ -96,13 +96,15 @@
 					<key>filename</key>
 					<string>split.f</string>
 					<key>lastUsed</key>
-					<date>2010-04-22T12:45:26Z</date>
+					<date>2012-03-06T17:17:34Z</date>
+					<key>selected</key>
+					<true/>
 				</dict>
 				<dict>
 					<key>filename</key>
 					<string>teanby.f</string>
 					<key>lastUsed</key>
-					<date>2010-04-26T09:17:51Z</date>
+					<date>2012-03-06T17:17:34Z</date>
 				</dict>
 				<dict>
 					<key>filename</key>
@@ -165,9 +167,7 @@
 					<key>filename</key>
 					<string>sheba</string>
 					<key>lastUsed</key>
-					<date>2011-02-09T11:31:25Z</date>
-					<key>selected</key>
-					<true/>
+					<date>2012-03-06T17:00:27Z</date>
 				</dict>
 				<dict>
 					<key>filename</key>
@@ -504,12 +504,12 @@
 				<key>column</key>
 				<integer>0</integer>
 				<key>line</key>
-				<integer>215</integer>
+				<integer>254</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>294</integer>
+			<integer>227</integer>
 		</dict>
 		<key>stack_wgtcalc.f90</key>
 		<dict>
@@ -530,29 +530,29 @@
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>23</integer>
+				<integer>22</integer>
 				<key>line</key>
-				<integer>976</integer>
+				<integer>1482</integer>
 			</dict>
 			<key>columnSelection</key>
 			<false/>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>977</integer>
+			<integer>0</integer>
 			<key>selectFrom</key>
 			<dict>
 				<key>column</key>
 				<integer>17</integer>
 				<key>line</key>
-				<integer>976</integer>
+				<integer>1482</integer>
 			</dict>
 			<key>selectTo</key>
 			<dict>
 				<key>column</key>
-				<integer>23</integer>
+				<integer>22</integer>
 				<key>line</key>
-				<integer>976</integer>
+				<integer>1482</integer>
 			</dict>
 		</dict>
 		<key>traceops.f90</key>
@@ -613,6 +613,6 @@
 	<key>showFileHierarchyDrawer</key>
 	<false/>
 	<key>windowFrame</key>
-	<string>{{692, 9}, {1047, 1169}}</string>
+	<string>{{51, 0}, {940, 878}}</string>
 </dict>
 </plist>

@@ -81,8 +81,8 @@ F90SAC_FLAGS = -DDISABLE_C_IO -DFORCE_BIGENDIAN_SACFILES
 #
 MODULES = sheba_config.o event_info.o array_sizes.o
 SUBROUTINES = sheba_core.o misc.o input.o desplit.o output.o teanby.o \
-                  rumpker.o scs.o cluster.o split.o\
-                  traceops.o particle.o hilbert.o scsslow.o\
+                  rumpker.o cluster.o split.o\
+                  traceops.o particle.o hilbert.o \
                   calcsnr.o reorient.o crosscorr.o
 
 F90SAC = f90sac_distrib.o 

@@ -250,8 +250,10 @@ c  ** error surface resolution = delta *  itlag_step / f **
 c  ** time series resolution   = delta *  1 / f **
 c  ** itlag is in terms of error surface index **
 c  ** convert itlag to time series index for use by zlag**
-      itlag = itlag * itlag_step
 
+      itlag = ( itlag - 1 ) * itlag_step
+c      itlag = itlag * itlag_step
+      
 c  ** window the interpolated data **
       iwbegx=f*(iwbegx-1)+1
       iwendx=f*(iwendx-1)+1
@@ -259,33 +261,13 @@ c  ** window the interpolated data **
       call zwindow(xinterp,yinterp,ninterp,np,iwbegx,iwendx,
      >xwindow,ywindow,nwindow)
 
-C  ** Hilbert transforms
-      call hilbert(xwindow,nwindow,hxwindow)
-      call hilbert(ywindow,nwindow,hywindow)
-
 c  ** rotate, lag, calc the covariance and eigenvalues **
       call zrotate2d(xwindow,ywindow,nwindow,np,fast,xrot,yrot)
-      call zrotate2d(hxwindow,hywindow,nwindow,np,fast,hxrot,hyrot)
-
-c  **  split time lag into two stages - JW 2004    
-      itlag1 = nint(real(itlag)/2.0)
-      itlag2 = itlag - itlag1
       
 c  **  first time lag
-      call zlag(xrot,yrot,nwindow,np,itlag1,iwextra,
-     >               xlag1,ylag1,noverlap)
-      call zlag(hxrot,hyrot,nwindow,np,itlag1,iwextra,
-     >               hxlag1,hylag1,noverlap)
+      call zlag(xrot,yrot,nwindow,np,itlag,iwextra,
+     >               xlag,ylag,noverlap)
 
-c  ** ScS correction - JW 2004
-c      call scscorr(xlag1,ylag1,hxlag1,hylag1,nwindow,fast,itlag)
-
-c  **  second time lag
-      call zlag(xlag1,ylag1,nwindow,np,itlag2,iwextra,
-     >               xlag2,ylag2,noverlap)
-C  **
-      xlag(1:nwindow) = xlag2(1:nwindow) 
-      ylag(1:nwindow) = ylag2(1:nwindow)
       
 c  ** perform any required post-correction      
       if (config % i_src_corr == 1) then
@@ -351,10 +333,8 @@ c  ** normalise error surface and calc errors in fast and lag (XC version)
       dtlagXC = delta * xcidtlag * itlag_stepXC / real(f)   
       dfastXC = 180.  * xcidfast / real(np1-1)
 
-      print*,"AW:",fastXC,tlagXC
-      print*,"AW:",dfastXC,dtlagXC,xcidtlag,xcidfast
-      
-
+c      print*,"AW:",fastXC,tlagXC
+c      print*,"AW:",dfastXC,dtlagXC,xcidtlag,xcidfast
       
       return
       
@@ -401,40 +381,22 @@ C-----------------------------------------------------------------------
       real fast
       integer lag,iwextra,itlag_step,lag1,lag2
       real cov(2,2),lambda1,lambda2,vec1(2),vec2(2)
-      real xrot(np),yrot(np),xlag1(np),ylag1(np)
-      real xlag2(np),ylag2(np),xlag(np),ylag(np)
+      real xrot(np),yrot(np)
+      real xlag(np),ylag(np)
       real xpol(np),ypol(np),spol
 c  ** temporary arrays
       real xtemp(np),ytemp(np)
       real delta
 
-C     ** Hilbert transformed versions
-      real hx(np),hy(np)
-      real hxrot(np),hyrot(np),hxlag1(np),hylag1(np)
-
 c  ** initialise all arrays to zero
       do i=1,np
          xrot(i) = 0.0
          yrot(i) = 0.0
-         xlag1(i) = 0.0
-         ylag1(i) = 0.0
-         xlag2(i) = 0.0
-         ylag2(i) = 0.0
          xlag(i) = 0.0
          ylag(i) = 0.0
          xpol(i) = 0.0
          ypol(i) = 0.0
-         hx(i) = 0.0
-         hy(i) = 0.0
-         hxrot(i) = 0.0
-         hyrot(i) = 0.0
-         hxlag1(i) = 0.0
-         hylag1(i) = 0.0
       enddo ! i=1,np
-
-c  ** calculate the Hilbert transforms
-      if (config % iscs_corr == 1) call hilbert(x,n,hx)
-      if (config % iscs_corr == 1) call hilbert(y,n,hy)
 
 c  ** map out the lambda2 surface **
       do 1 i=1,np1
@@ -443,28 +405,13 @@ c         ** set fast direction (range is -90 to 90deg) **
 
 c         ** rotate, lag, calc the covariance and eigenvalues **
          call zrotate2d(x,y,n,np,fast,xrot,yrot)
-         if (config % iscs_corr == 1) 
-     >       call zrotate2d(hx,hy,n,np,fast,hxrot,hyrot)
-         
+ 
          do 2 j = 1,np2
 
 c         ** JW do lag in two stages for ScS-correction
             lag = (j - 1)*itlag_step
-            lag1 = nint(real(lag)/2.)
-            lag2 = lag-lag1
-            call zlag(xrot,yrot,n,np,lag1,iwextra,xlag1,ylag1,noverlap)
-            if (config % iscs_corr == 1) 
-     >         call zlag(hxrot,hyrot,n,np,lag1,iwextra,
-     >                   hxlag1,hylag1,noverlap)
-
-C        ** ScS correction
-            call scscorr(xlag1,ylag1,hxlag1,hylag1,noverlap,fast,j)
-C        ** don't need the Hilbert traces any more ...            
-
-            call zlag(xlag1,ylag1,n,np,lag2,iwextra,
-     >                xlag2,ylag2,noverlap)
+            call zlag(xrot,yrot,n,np,lag,iwextra,xlag,ylag,noverlap)
             
-            xlag(1:n) = xlag2(1:n) ; ylag(1:n) = ylag2(1:n)
 
 C        ** apply a source correction (if specified)
             if (config % i_src_corr == 1) then
@@ -546,10 +493,10 @@ C-----------------------------------------------------------------------
       integer n,i,j,noverlap,k
       real x(np),y(np),lambda2grid(np1,np2),lambda1grid(np1,np2)
       real fast
-      integer lag,iwextra,itlag_step,itlag_stepXC,lag1,lag2
+      integer lag,iwextra,itlag_step,itlag_stepXC
       real cov(2,2),lambda1,lambda2,vec1(2),vec2(2)
-      real xrot(np),yrot(np),xlag1(np),ylag1(np)
-      real xlag2(np),ylag2(np),xlag(np),ylag(np)
+      real xrot(np),yrot(np)
+      real xlag(np),ylag(np)
       real xpol(np),ypol(np),spol
 c     CROSSCORRELATION VALUES
       real ss(np), maxvalue
@@ -560,36 +507,18 @@ c  ** temporary arrays
       real xtemp(np),ytemp(np)
       real delta
 
-C     ** Hilbert transformed versions
-      real hx(np),hy(np)
-      real hxrot(np),hyrot(np),hxlag1(np),hylag1(np)
-
-	  
       zerolag = n + 1
 c	  maxlag  = anint(config % max_tlag / delta)
 c  ** initialise all arrays to zero
       do i=1,np
          xrot(i) = 0.0
          yrot(i) = 0.0
-         xlag1(i) = 0.0
-         ylag1(i) = 0.0
-         xlag2(i) = 0.0
-         ylag2(i) = 0.0
          xlag(i) = 0.0
          ylag(i) = 0.0
          xpol(i) = 0.0
          ypol(i) = 0.0
-         hx(i) = 0.0
-         hy(i) = 0.0
-         hxrot(i) = 0.0
-         hyrot(i) = 0.0
-         hxlag1(i) = 0.0
-         hylag1(i) = 0.0
       enddo ! i=1,np
 
-c  ** calculate the Hilbert transforms
-      if (config % iscs_corr == 1) call hilbert(x,n,hx)
-      if (config % iscs_corr == 1) call hilbert(y,n,hy)
 
 c  ** map out the lambda2 surface **
       do 1 i=1,np1
@@ -598,28 +527,12 @@ c         ** set fast direction (range is -90 to 90deg) **
 
 c         ** rotate, lag, calc the covariance and eigenvalues **
          call zrotate2d(x,y,n,np,fast,xrot,yrot)
-         if (config % iscs_corr == 1) 
-     >       call zrotate2d(hx,hy,n,np,fast,hxrot,hyrot)
          
          do 2 j = 1,np2
 
 c         ** JW do lag in two stages for ScS-correction
             lag = (j - 1)*itlag_step
-            lag1 = nint(real(lag)/2.)
-            lag2 = lag-lag1
-            call zlag(xrot,yrot,n,np,lag1,iwextra,xlag1,ylag1,noverlap)
-            if (config % iscs_corr == 1) 
-     >         call zlag(hxrot,hyrot,n,np,lag1,iwextra,
-     >                   hxlag1,hylag1,noverlap)
-
-C        ** ScS correction
-            call scscorr(xlag1,ylag1,hxlag1,hylag1,noverlap,fast,j)
-C        ** don't need the Hilbert traces any more ...            
-
-            call zlag(xlag1,ylag1,n,np,lag2,iwextra,
-     >                xlag2,ylag2,noverlap)
-            
-            xlag(1:n) = xlag2(1:n) ; ylag(1:n) = ylag2(1:n)
+           call zlag(xrot,yrot,n,np,lag,iwextra,xlag,ylag,noverlap)
 
 C        ** apply a source correction (if specified)
             if (config % i_src_corr == 1) then
