@@ -3,14 +3,14 @@
 <plist version="1.0">
 <dict>
 	<key>currentDocument</key>
-	<string>split.f</string>
+	<string>event_info.f90</string>
 	<key>documents</key>
 	<array>
 		<dict>
 			<key>filename</key>
 			<string>Makefile</string>
 			<key>lastUsed</key>
-			<date>2009-02-09T10:00:55Z</date>
+			<date>2012-03-07T11:45:15Z</date>
 		</dict>
 		<dict>
 			<key>children</key>
@@ -67,38 +67,26 @@
 				<dict>
 					<key>filename</key>
 					<string>rumpker.f</string>
-				</dict>
-				<dict>
-					<key>filename</key>
-					<string>scs.f</string>
 					<key>lastUsed</key>
-					<date>2008-09-18T20:32:32Z</date>
-				</dict>
-				<dict>
-					<key>filename</key>
-					<string>scsslow.f90</string>
-					<key>lastUsed</key>
-					<date>2009-04-20T15:42:12Z</date>
+					<date>2012-03-07T11:44:24Z</date>
 				</dict>
 				<dict>
 					<key>filename</key>
 					<string>sheba_core.f90</string>
 					<key>lastUsed</key>
-					<date>2011-02-09T11:31:25Z</date>
+					<date>2012-03-07T11:44:24Z</date>
 				</dict>
 				<dict>
 					<key>filename</key>
 					<string>sheba_config.f90</string>
 					<key>lastUsed</key>
-					<date>2011-02-09T11:28:02Z</date>
+					<date>2012-03-07T11:43:12Z</date>
 				</dict>
 				<dict>
 					<key>filename</key>
 					<string>split.f</string>
 					<key>lastUsed</key>
-					<date>2012-03-06T17:17:34Z</date>
-					<key>selected</key>
-					<true/>
+					<date>2012-03-07T11:58:06Z</date>
 				</dict>
 				<dict>
 					<key>filename</key>
@@ -134,25 +122,21 @@
 					<key>filename</key>
 					<string>desplit.f90</string>
 					<key>lastUsed</key>
-					<date>2011-02-09T11:29:16Z</date>
+					<date>2012-03-07T12:03:20Z</date>
 				</dict>
 				<dict>
 					<key>filename</key>
 					<string>event_info.f90</string>
 					<key>lastUsed</key>
-					<date>2011-02-09T11:28:59Z</date>
-				</dict>
-				<dict>
-					<key>filename</key>
-					<string>hilbert.f</string>
-					<key>lastUsed</key>
-					<date>2008-03-19T15:38:49Z</date>
+					<date>2012-03-07T12:03:42Z</date>
 				</dict>
 				<dict>
 					<key>filename</key>
 					<string>input.f90</string>
 					<key>lastUsed</key>
-					<date>2009-02-09T10:15:05Z</date>
+					<date>2012-03-07T11:42:46Z</date>
+					<key>selected</key>
+					<true/>
 				</dict>
 			</array>
 			<key>expanded</key>
@@ -167,7 +151,7 @@
 					<key>filename</key>
 					<string>sheba</string>
 					<key>lastUsed</key>
-					<date>2012-03-06T17:00:27Z</date>
+					<date>2012-03-07T11:42:18Z</date>
 				</dict>
 				<dict>
 					<key>filename</key>
@@ -248,30 +232,14 @@
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>0</integer>
+				<integer>50</integer>
 				<key>line</key>
-				<integer>141</integer>
+				<integer>84</integer>
 			</dict>
-			<key>columnSelection</key>
-			<false/>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>112</integer>
-			<key>selectFrom</key>
-			<dict>
-				<key>column</key>
-				<integer>24</integer>
-				<key>line</key>
-				<integer>142</integer>
-			</dict>
-			<key>selectTo</key>
-			<dict>
-				<key>column</key>
-				<integer>0</integer>
-				<key>line</key>
-				<integer>141</integer>
-			</dict>
+			<integer>60</integer>
 		</dict>
 		<key>algorithm.txt</key>
 		<dict>
@@ -336,12 +304,12 @@
 				<key>column</key>
 				<integer>0</integer>
 				<key>line</key>
-				<integer>46</integer>
+				<integer>52</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>5</integer>
+			<integer>0</integer>
 		</dict>
 		<key>event_info.f90</key>
 		<dict>
@@ -362,14 +330,14 @@
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>35</integer>
+				<integer>0</integer>
 				<key>line</key>
-				<integer>77</integer>
+				<integer>60</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>59</integer>
+			<integer>29</integer>
 		</dict>
 		<key>output.f90</key>
 		<dict>
@@ -385,61 +353,77 @@
 			<key>firstVisibleLine</key>
 			<integer>77</integer>
 		</dict>
-		<key>scsslow.f90</key>
+		<key>rumpker.f</key>
 		<dict>
 			<key>caret</key>
 			<dict>
 				<key>column</key>
 				<integer>0</integer>
 				<key>line</key>
-				<integer>44</integer>
+				<integer>0</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>2</integer>
+			<integer>0</integer>
 		</dict>
 		<key>sheba</key>
 		<dict>
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>0</integer>
+				<integer>12</integer>
 				<key>line</key>
-				<integer>45</integer>
+				<integer>68</integer>
 			</dict>
+			<key>columnSelection</key>
+			<false/>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>81</integer>
+			<integer>98</integer>
+			<key>selectFrom</key>
+			<dict>
+				<key>column</key>
+				<integer>9</integer>
+				<key>line</key>
+				<integer>68</integer>
+			</dict>
+			<key>selectTo</key>
+			<dict>
+				<key>column</key>
+				<integer>12</integer>
+				<key>line</key>
+				<integer>68</integer>
+			</dict>
 		</dict>
 		<key>sheba_config.f90</key>
 		<dict>
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>40</integer>
+				<integer>12</integer>
 				<key>line</key>
-				<integer>82</integer>
+				<integer>37</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>15</integer>
+			<integer>30</integer>
 		</dict>
 		<key>sheba_core.f90</key>
 		<dict>
 			<key>caret</key>
 			<dict>
 				<key>column</key>
-				<integer>6</integer>
+				<integer>0</integer>
 				<key>line</key>
-				<integer>111</integer>
+				<integer>92</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>96</integer>
+			<integer>63</integer>
 		</dict>
 		<key>sheba_main.f90</key>
 		<dict>
@@ -504,12 +488,12 @@
 				<key>column</key>
 				<integer>0</integer>
 				<key>line</key>
-				<integer>254</integer>
+				<integer>337</integer>
 			</dict>
 			<key>firstVisibleColumn</key>
 			<integer>0</integer>
 			<key>firstVisibleLine</key>
-			<integer>227</integer>
+			<integer>301</integer>
 		</dict>
 		<key>stack_wgtcalc.f90</key>
 		<dict>
@@ -589,6 +573,7 @@
 	<key>openDocuments</key>
 	<array>
 		<string>sheba_core.f90</string>
+		<string>rumpker.f</string>
 		<string>event_info.f90</string>
 		<string>desplit.f90</string>
 		<string>INSTALL</string>
@@ -601,7 +586,6 @@
 		<string>array_sizes.f90</string>
 		<string>output.f90</string>
 		<string>traceops.f90</string>
-		<string>scsslow.f90</string>
 		<string>input.f90</string>
 		<string>sheba_stack.f90</string>
 		<string>stack_wgtcalc.f90</string>
@@ -613,6 +597,6 @@
 	<key>showFileHierarchyDrawer</key>
 	<false/>
 	<key>windowFrame</key>
-	<string>{{51, 0}, {940, 878}}</string>
+	<string>{{626, 7}, {1261, 1171}}</string>
 </dict>
 </plist>
