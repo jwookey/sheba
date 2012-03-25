@@ -1,0 +1,26 @@
+#!/bin/bash
+#
+#  Run the SHEBA automated test suite. 
+#
+
+echo "Running SHEBA automated test suite."
+
+cat /dev/null > /tmp/sheba_runtests.log
+
+SHEBA_DIR=`pwd`
+
+## Run test1, and capture the output
+rm -f /tmp/sheba_autotest1.stderr /tmp/sheba_autotest1.stdout
+cd tests/test1
+./run_test1.bash 1> /tmp/sheba_autotest1.stdout 2> /tmp/sheba_autotest1.stderr
+
+# if *either* stderr contains anything or stdout contains the word FAILED
+# we can consider it to have failed. 
+
+if [ test -s ]
+
+cd $SHEBA_DIR
+
+# gather statistics on FAILS
+
+#  Done. 
