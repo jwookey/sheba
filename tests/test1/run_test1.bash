@@ -44,7 +44,7 @@ echo "## SHEBA OUTPUT ##" >> sheba_autotest1.log
 echo "##################" >> sheba_autotest1.log
 echo "" >> sheba_autotest1.log
 
-# run the executable
+# run the SHEBA executable
 sheba_exec >> sheba_autotest1.log
 
 echo "##################" > sheba_autotest1.log
