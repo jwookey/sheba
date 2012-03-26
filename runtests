@@ -2,25 +2,61 @@
 #
 #  Run the SHEBA automated test suite. 
 #
+#
 
+###############################################################################
+function check_errors {
+###############################################################################
+# if *either* stderr contains anything or stdout contains the word FAILED
+# we can consider it to have failed. 
+if [ -s $2 ] 
+then
+   echo "Test " $1 ": Failed"
+   echo "Test " $1 ": Failed" >> /tmp/sheba_runtests.log
+   let "nfails += 1"
+else
+   countf=`grep "FAILED" $3 | wc -l`
+   if [ $countf -gt 0 ] 
+   then
+      echo "Test " $1 ": Failed"
+      echo "Test " $1 ": Failed" >> /tmp/sheba_runtests.log
+      let "nfails += 1"
+   else
+      echo "Test " $1 ": Passed"
+      echo "Test " $1 ": Passed" >> /tmp/sheba_runtests.log
+   fi
+fi
+}
+###############################################################################
+
+
+###############################################################################
 echo "Running SHEBA automated test suite."
+###############################################################################
 
 cat /dev/null > /tmp/sheba_runtests.log
 
 SHEBA_DIR=`pwd`
+ntests=1 
+nfails=0 
 
+###############################################################################
 ## Run test1, and capture the output
+###############################################################################
 rm -f /tmp/sheba_autotest1.stderr /tmp/sheba_autotest1.stdout
 cd tests/test1
 ./run_test1.bash 1> /tmp/sheba_autotest1.stdout 2> /tmp/sheba_autotest1.stderr
-
-# if *either* stderr contains anything or stdout contains the word FAILED
-# we can consider it to have failed. 
-
-if [ test -s ]
-
+check_errors 1 /tmp/sheba_autotest1.stderr /tmp/sheba_autotest1.stdout
 cd $SHEBA_DIR
 
-# gather statistics on FAILS
+###############################################################################
+# Report statistics on test failures
+let "nsucc = $ntests - $nfails"
+if [ $nfails -gt 0 ]
+then
+   echo "One or more tests failed. [" $nsucc "/" $ntests "]"
+else
+   echo "All tests passed. [" $nsucc "/" $ntests "]"
+fi
+###############################################################################
 
-#  Done. 
