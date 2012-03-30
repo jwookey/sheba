@@ -99,8 +99,10 @@ all:$(EXECDIR)/sheba_exec \
       $(EXECDIR)/cleansheba \
       $(MACRODIR)/split_sheba\
       $(MACRODIR)/sheba\
-      $(EXECDIR)/sheba_stack\
-		$(EXECDIR)/stack_wgtcalc
+      $(EXECDIR)/sheba_stack \
+		$(EXECDIR)/stack_wgtcalc \
+
+tests:run_unittests
       
 #
 #     SHEBA EXECUTABLE
@@ -113,6 +115,9 @@ $(EXECDIR)/sheba_stack:${F90SAC} ${MODULES} sheba_stack.o ${SUBROUTINES}
 
 $(EXECDIR)/stack_wgtcalc:stack_wgtcalc.o 
 	$(FC) $(OPT) -o $(EXECDIR)/stack_wgtcalc stack_wgtcalc.o
+
+run_unittests:${F90SAC} ${MODULES} fruit_util.o fruit.o sheba_test.o run_unittests.o ${SUBROUTINES}
+	$(FC) $(OPT) -o run_unittests ${F90SAC} ${MODULES} fruit_util.o fruit.o sheba_test.o run_unittests.o ${SUBROUTINES}
 
 #	F90SAC requires special options to compile ...
 f90sac_distrib.o: f90sac_distrib.F90
