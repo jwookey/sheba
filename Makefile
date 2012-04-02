@@ -107,8 +107,8 @@ $(EXECDIR)/sheba_stack:${F90SAC} ${MODULES} sheba_stack.o ${SUBROUTINES}
 $(EXECDIR)/stack_wgtcalc:stack_wgtcalc.o 
 	$(FC) $(FFLAGS) -o $(EXECDIR)/stack_wgtcalc stack_wgtcalc.o
 
-run_unittests:${F90SAC} ${MODULES} fruit_util.o fruit.o sheba_test.o run_unittests.o ${SUBROUTINES}
-	$(FC) $(OPT) -o run_unittests ${F90SAC} ${MODULES} fruit_util.o fruit.o sheba_test.o run_unittests.o ${SUBROUTINES}
+run_unittests:${F90SAC} ${MODULES} fruit.o sheba_test.o run_unittests.o ${SUBROUTINES}
+	$(FC) $(OPT) -o run_unittests ${F90SAC} ${MODULES} fruit.o sheba_test.o run_unittests.o ${SUBROUTINES}
 
 #	F90SAC requires special options to compile ...
 f90sac_distrib.o: f90sac_distrib.F90
