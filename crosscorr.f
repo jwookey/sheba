@@ -121,7 +121,8 @@ c  ** interpolate error surface in tlag direction **
 c  ** do interpolation one row at a time **
       do 1 i=1,np1
 c      ** copy ech row to a dummy array **
-         do 11 j=1,2*np2+1
+!         do 11 j=1,2*np2+1
+          do 11 j=1,np2XC
             error_row(j)=error(i,j)
 11         continue
 c      ** interpolate the row data **
