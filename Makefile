@@ -18,8 +18,6 @@
 #   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
 #
 #-------------------------------------------------------------------------------
-#   CVS: $Revision: 1.16 $ $Date: 2011/02/11 16:09:41 $
-#-------------------------------------------------------------------------------
 #
 #   SHEBA requires a FORTRAN 90 compiler. Compilers known to work are:    
 #      Linux : ifc/ifort, g95, gfortran
@@ -41,23 +39,16 @@ EXECDIR=/usr/local/sac/macros
 # Compiler and options:
 #===============================================================================
 
-## -- flags which work for ifort (version>8) on MacOSX
-#FC= ifort 
-#OPT77 = -w95 -cm 
-#OPT90 =
-#OPT =  -axT -Vaxlib -assume byterecl    
-
-## -- flags which work for f90 on Solaris
-#FC = f90
-#OPT90 =
-#OPT77 =
-#OPT = 
-
 ## -- flags which work for gfortran on Mac (and probably Linux)
-FC = gfortran -O2
-OPT90 =
-OPT77 = -w
-OPT = 
+FC = gfortran 
+# Production
+FFLAGS = -O2
+# Debug
+FFLAGS = -fcheck=bounds -C
+# additional flags for .f/.F files 
+F77FLAGS = -w
+# additional flags for .f90/.F90 files 
+F90FLAGS =
 
 #===============================================================================
 # SAC compatibility options
@@ -108,20 +99,20 @@ tests:run_unittests
 #     SHEBA EXECUTABLE
 #
 $(EXECDIR)/sheba_exec:${F90SAC} ${MODULES} sheba_main.o ${SUBROUTINES}
-	$(FC) $(OPT) -o $(EXECDIR)/sheba_exec ${F90SAC} ${MODULES} sheba_main.o ${SUBROUTINES}
+	$(FC) $(FFLAGS) -o $(EXECDIR)/sheba_exec ${F90SAC} ${MODULES} sheba_main.o ${SUBROUTINES}
 #
 $(EXECDIR)/sheba_stack:${F90SAC} ${MODULES} sheba_stack.o ${SUBROUTINES}
-	$(FC) $(OPT) -o $(EXECDIR)/sheba_stack ${F90SAC} ${MODULES} sheba_stack.o ${SUBROUTINES}
+	$(FC) $(FFLAGS) -o $(EXECDIR)/sheba_stack ${F90SAC} ${MODULES} sheba_stack.o ${SUBROUTINES}
 
 $(EXECDIR)/stack_wgtcalc:stack_wgtcalc.o 
-	$(FC) $(OPT) -o $(EXECDIR)/stack_wgtcalc stack_wgtcalc.o
+	$(FC) $(FFLAGS) -o $(EXECDIR)/stack_wgtcalc stack_wgtcalc.o
 
 run_unittests:${F90SAC} ${MODULES} fruit_util.o fruit.o sheba_test.o run_unittests.o ${SUBROUTINES}
 	$(FC) $(OPT) -o run_unittests ${F90SAC} ${MODULES} fruit_util.o fruit.o sheba_test.o run_unittests.o ${SUBROUTINES}
 
 #	F90SAC requires special options to compile ...
 f90sac_distrib.o: f90sac_distrib.F90
-	$(FC) $(OPT) $(OPT90) $(F90SAC_FLAGS) -c $*.F90 
+	$(FC) $(FFLAGS) $(F90FLAGS) $(F90SAC_FLAGS) -c $*.F90 
 
 #
 #     GMT PLOTTING SCRIPTS + OTHER SHELL SCRIPTS
@@ -167,11 +158,11 @@ clean:
 # 	Compile Instuctions
 #
 %.o: %.F90
-	$(FC) $(OPT) $(OPT90) -c $*.F90 
+	$(FC) $(FFLAGS) $(F90FLAGS) -c $*.F90 
 %.o: %.f90
-	$(FC) $(OPT) $(OPT90) -c $*.f90 
+	$(FC) $(FFLAGS) $(F90FLAGS) -c $*.f90 
 %.o: %.f
-	$(FC) $(OPT) $(OPT77) -c $*.f
+	$(FC) $(FFLAGS) $(F77FLAGS) -c $*.f
 
 #
 #	Dependencies
