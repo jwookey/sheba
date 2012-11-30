@@ -268,7 +268,6 @@ c  **  first time lag
       call zlag(xrot,yrot,nwindow,np,itlag,iwextra,
      >               xlag,ylag,noverlap)
 
-      
 c  ** perform any required post-correction      
       if (config % i_src_corr == 1) then
          print*,'running source correction'
@@ -277,32 +276,22 @@ c         print*,tlag,itlag,delta
          
          itlag = nint(config % src_tlag / (delta*1./real(f)) ) 
          
-c         print*,config % src_tlag,itlag,delta,config % src_tlag
          
-         
-         call zrotate2d(xlag,ylag,n,np,
+         call zrotate2d(xlag,ylag,nwindow,np,
      >                   (config % src_fast-fast),xtemp,ytemp)
-         xlag(1:n) = xtemp(1:n) ; ylag(1:n) = ytemp(1:n)
-         call zlag(xlag,ylag,n,np,itlag,iwextra,xtemp,ytemp,noverlap)
-         xlag(1:n) = xtemp(1:n) ; ylag(1:n) = ytemp(1:n)
+         xlag(1:np) = xtemp(1:np) ; ylag(1:np) = ytemp(1:np)
+         
+         call zlag(xlag,ylag,nwindow,np,itlag,
+     >              iwextra,xtemp,ytemp,noverlap)
+         xlag(1:np) = xtemp(1:np) ; ylag(1:np) = ytemp(1:np)
 
-         call zrotate2d(xlag,ylag,n,np,
+         call zrotate2d(xlag,ylag,nwindow,np,
      >                  -(config % src_fast-fast),xtemp,ytemp)
-         xlag(1:n) = xtemp(1:n) ; ylag(1:n) = ytemp(1:n)
+         xlag(1:np) = xtemp(1:np) ; ylag(1:np) = ytemp(1:np)
          
-         ! new itlag 
-         
-c        lag = nint(config % src_lag / delta) 
-c        call zrotate2d(xlag,ylag,n,np,
-c    >                   config % src_fast,xtemp,ytemp)
-c        xlag(1:n) = xtemp(1:n) ; ylag(1:n) = ytemp(1:n)
-c        call zlag(xlag,ylag,n,np,lag,iwextra,xtemp,ylag,noverlap)
-c        xlag(1:n) = xtemp(1:n) ; ylag(1:n) = ytemp(1:n)
       endif 
-      
-      
-      
-C  **       
+            
+C  ** calculate the covariance in the window.       
       call zcovariance(xlag,ylag,noverlap,np,cov)
       call zeigen2x2(cov,lambda1,lambda2,vec1,vec2)
 
