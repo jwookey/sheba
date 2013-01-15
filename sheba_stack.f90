@@ -230,6 +230,13 @@
             nsurf = nsurf - 1
             goto 50 ! sorry
          endif
+         
+!     ** check whether NSURF has been exceeded. 
+         if (nsurf>nsurfmax) then
+            write(0,'(a)') &
+            'Maximum number of surfaces exceeded. Check the value of NSURFMAX.'
+            stop
+         endif
          open(20,file=filename)
 
          read(20,*) n1, n2
