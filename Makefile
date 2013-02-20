@@ -44,7 +44,7 @@ FC = gfortran
 # Production
 FFLAGS = -O2
 # Debug
-FFLAGS = -fcheck=bounds -C -g
+# FFLAGS = -fcheck=bounds -C -g
 # additional flags for .f/.F files 
 F77FLAGS = -w
 # additional flags for .f90/.F90 files 
