@@ -72,9 +72,9 @@
 
 !  ** find the minimum position
 		call zerror_min(error_stack,np1,np2int,ifast,itlag,lam2min)
-      print*,'Minimum at:', -90.0+real(ifast),0+real(itlag)*dtlag_step
-      fast = -90.0+real(ifast)
-      tlag = 0.0+real(itlag)*dtlag_step
+      print*,'Minimum at:', -90.0+real(ifast-1),0+real(itlag-1)*dtlag_step
+      fast = -90.0+real(ifast-1)
+      tlag = 0.0+real(itlag-1)*dtlag_step
 
 !  ** calculate errors from the 95% confidence interval
       call zerror95(error_stack,ndf,lam2min,idfast,idtlag)
