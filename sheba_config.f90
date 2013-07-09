@@ -75,6 +75,9 @@
          real*4, parameter :: angtol = 0.001 ; ! angle comparison tol.
          real*8, parameter :: to_km = 111.194926644559 ;
          
+         real*8, parameter :: close_to_zero = 1e-6 ;
+         real*8, parameter :: close_to_one = 0.999999 ;
+         
 !     ** default mts reference frame setting (affects .mts output only)
          character (len=3), parameter :: mts_frame = 'geo'
 

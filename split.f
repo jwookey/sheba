@@ -164,8 +164,9 @@ C     ** Hilbert versions
 
 !     CROSSCORRELATION VALUES	  
       real xc_grid(np1, np2XC),xc_grid_int(np1,np2XCint)
-      integer xcitlag,xcifast,xc_max,itlag_stepXC
+      integer xcitlag,xcifast,itlag_stepXC
       real fastXC,dfastXC, tlagXC,dtlagXC,xcidtlag,xcidfast
+      real xc_max
 
 c  ** calc itlag_step from tlag_scale **
 c  ** itlag_step is the grid spacing in tlag for the grid search **
@@ -228,6 +229,12 @@ c  ** interpolate error surface in tlag direction **
 
 c  ** find the interpolated minimum position **
       call zerror_min(error_int,np1,np2int,ifast,itlag,lambda2_min)
+   
+c  ** a second eigenvalue of exactly zero (which can occur in noise free data)
+c     causes problems. So, set this to a very small value. 
+      if (lambda2_min<=0.0) then
+         lambda2_min = close_to_zero
+      endif   
       
 c  ** convert indices itlag/ifast into tlag and fast **
       tlag  = delta*real(itlag_step*(itlag-1))/real(f)
@@ -235,6 +242,12 @@ c  ** convert indices itlag/ifast into tlag and fast **
 
 c  ** find the XC maximum
       call zerror_max(xc_grid_int,np1,np2XCint,xcifast,xcitlag,xc_max)
+      
+c  ** deal with the perfect correlation problem (can occur with noise
+c     free synthetics).      
+      if (xc_max>=1.0) then
+         xc_max = close_to_one
+      endif
       
 c  ** convert indices itlag/ifast into tlag and fast **
       tlagXC = delta*real(itlag_stepXC*(xcitlag-1))/real(f)
@@ -312,10 +325,15 @@ c  ** first rotate into spol-fast (so y is signal and x is noise) **
 c  ** estimate signal to noise ratio *
       call calcsnr(ynoise,xnoise,noverlap,snr)
 
+      print*,'error_int',error_int(1,1)
+
+
 c  ** normalise error surface and calc errors in fast and lag**
       call zerror95(error_int,ndf,lambda2_min,idfast,idtlag)
       dtlag = delta * idtlag * itlag_step / real(f)
       dfast = 180.  * idfast / real(np1-1)
+
+      print*,'error_int',error_int(1,1)
 
 c  ** normalise error surface and calc errors in fast and lag (XC version)
       call zerror95XC(xc_grid_int,ndf,xc_max,xcidfast,xcidtlag)     

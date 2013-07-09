@@ -432,9 +432,9 @@ c      print*,f,itlag_step
       write(lu,'(2i5,a)') np1,np2int,'   % NPfast,NPtlag'
       write(lu,'(f12.4,a)') event % error_grid_tlag_int,'   % dtlag'
       write(lu,'(i5,a)') ndf,'   % NDF'
-      write(lu,'(f12.4,a)') snr,'   % SNR'
+      write(lu,'(f16.4,a)') snr,'   % SNR'
       
-      write(fmt,'(a1,i5.5,a)') '(',np2int,'f12.4)'
+      write(fmt,'(a1,i5.5,a)') '(',np2int,'f14.4)'
 		do i=1,np1
 		     write(lu,fmt) (error_int(i,j),j=1,np2int) 
 		enddo
