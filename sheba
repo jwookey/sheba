@@ -101,7 +101,7 @@ do sfx list $comps
    setbb files_corr "%files_corr% $file$_corr.$sfx$"
    
    setbb i ( %i + 1 )
-   if %i le 2
+   if %i% le 2
       setbb hfiles "%hfiles% $file$.$sfx$"
       setbb hfiles_corr "%hfiles_corr% $file$_corr.$sfx$"
    else
@@ -122,7 +122,7 @@ if %pick% eq yes
                $break
          endif
          setbb beg &1,a& ; setbb end &1,f&
-         chnhdr user0 %beg user2 %end ka START kf END; wh
+         chnhdr user0 %beg% user2 %end% ka START kf END; wh
       else
          message "Pick range of window STARTS - A begins window, F ends it."
          message "NOTE: NOT WHOLE PHASE!"
@@ -131,7 +131,7 @@ if %pick% eq yes
                $break
          endif
          setbb beg &1,a& ; setbb end &1,f&
-         chnhdr user0 %beg user1 %end ka START kf END; wh
+         chnhdr user0 %beg% user1 %end% ka START kf END; wh
 
          message "Pick range of window END - A begins window, F ends it."
          message "NOTE: NOT WHOLE PHASE!"
@@ -140,7 +140,7 @@ if %pick% eq yes
                $break
          endif
          setbb beg &1,a& ; setbb end &1,f&
-         chnhdr user2 %beg user3 %end ka START kf END; wh
+         chnhdr user2 %beg% user3 %end% ka START kf END; wh
       endif      
 endif
 **----------------------------------------------------------------------------**
@@ -222,7 +222,7 @@ message "Header values recovered"
 sgf number 1
 picks on
 r %files% ; 
-chnhdr a %WBEG f %WEND
+chnhdr a %WBEG% f %WEND%
 if 'no' eq $usett$
    if 'off' eq $xlim$
       ylim all; ticks only left bottom;border off; p1
@@ -238,7 +238,7 @@ else
 endif   
 
 
-%pause " -> Input traces in input orientation "
+%pause% " -> Input traces in input orientation "
 
 ** PANEL 2 - original versus corrected waveforms
 sgf number 2
@@ -277,7 +277,7 @@ else
 endif   
 
 
-%pause " -> Original and linearised traces in source radial-transverse "
+%pause% " -> Original and linearised traces in source radial-transverse "
 
 ** PANEL 3 - particle motion and wavelet comparison **
 * restart xwindow so vspace command works OK
@@ -303,7 +303,7 @@ beginframe
 ** top row
 yvport 0.55 0.90
 
-cut %WBEG %WEND
+cut %WBEG% %WEND%
 
 ** Find out whether we need to flip the slow wavelet (purely for show)
 r %hfiles%
@@ -369,7 +369,7 @@ xvport 0.10 0.45
 r $file$.xy1 
 setbb vmax (MAXIMUM &1,xmaximum &1,ymaximum )
 setbb vmin (MINIMUM &1,xminimum &1,yminimum )
-xlim %vmin %vmax ; ylim %vmin %vmax
+xlim %vmin% %vmax% ; ylim %vmin% %vmax%
 
 p1
 xlim off; ylim off
@@ -378,7 +378,7 @@ xvport 0.55 0.90
 r $file$.xy2 
 setbb vmax (MAXIMUM &1,xmaximum &1,ymaximum )
 setbb vmin (MINIMUM &1,xminimum &1,yminimum )
-xlim %vmin %vmax ; ylim %vmin %vmax
+xlim %vmin% %vmax% ; ylim %vmin% %vmax%
 p1
 xlim off; ylim off
 
@@ -387,7 +387,7 @@ if no ne $src_corr
    message "Warning, wavelet plots may be incorrect for source-corrected results"
 endif
 
-%pause " -> Particle motion "
+%pause% " -> Particle motion "
 
 
 **--------------------------------------------------------------------------- **

@@ -72,9 +72,9 @@
 
 !  ** find the minimum position
 		call zerror_min(error_stack,np1,np2int,ifast,itlag,lam2min)
-      print*,'Minimum at:', -90.0+real(ifast),0+real(itlag)*dtlag_step
-      fast = -90.0+real(ifast)
-      tlag = 0.0+real(itlag)*dtlag_step
+      print*,'Minimum at:', -90.0+real(ifast-1),0+real(itlag-1)*dtlag_step
+      fast = -90.0+real(ifast-1)
+      tlag = 0.0+real(itlag-1)*dtlag_step
 
 !  ** calculate errors from the 95% confidence interval
       call zerror95(error_stack,ndf,lam2min,idfast,idtlag)
@@ -229,6 +229,13 @@
          if (filename(1:1)=='%' .or. filename(1:1)=='!') then ! comment line
             nsurf = nsurf - 1
             goto 50 ! sorry
+         endif
+         
+!     ** check whether NSURF has been exceeded. 
+         if (nsurf>nsurfmax) then
+            write(0,'(a)') &
+            'Maximum number of surfaces exceeded. Check the value of NSURFMAX.'
+            stop
          endif
          open(20,file=filename)
 
