@@ -138,19 +138,6 @@ $(MACRODIR)/split_sheba:sheba
 $(MACRODIR)/sheba:sheba
 	cp -f sheba $(MACRODIR)
 
-distrib:
-	rm -rf ../SHEBA_distrib
-	mkdir ../SHEBA_distrib
-	cp -f *.f90 ../SHEBA_distrib
-	cp -f *.F90 ../SHEBA_distrib
-	cp -f *.f ../SHEBA_distrib
-	cp -f *.gmt ../SHEBA_distrib
-	cp -f *.csh ../SHEBA_distrib
-	cp -f sheba ../SHEBA_distrib
-	cp -f Makefile ../SHEBA_distrib
-	cp -f INSTALL ../SHEBA_distrib
-	cp -f cleansheba ../SHEBA_distrib	
-
 clean:
 	rm -f *.o *.mod
 
