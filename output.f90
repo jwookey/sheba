@@ -103,8 +103,11 @@
       write(99,'(a,e12.4,a)') '            <wend>', event % wend,'</wend>'
 !  ** SNR
       write(99,'(a,f7.2,a)') '            <snr>', event % snr,'</snr>'
+      write(99,'(a,f7.5,a)') &
+         '            <l2s>', event % eigrat_corr,'</l2s>'
 !  ** NDF      
       write(99,'(a,i4.4,a)') '            <ndf>', event % ndf,'</ndf>'
+      
       write(99,'(a)') '         </data>'
       close(99)
 
