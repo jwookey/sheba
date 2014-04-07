@@ -17,7 +17,7 @@
       use sheba_config ! use the config module
 !-------------------------------------------------------------------------------
       implicit none
-         real, parameter :: sheba_version = 1.00
+         real, parameter :: sheba_version = 1.01
 
 ! ** print copyright information
      call sheba_banner(sheba_version) 

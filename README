@@ -52,6 +52,12 @@ SHEBA also now incorporates the Quality measure from:
 Wüstefeld, A.; and  Bokelmann, G., (2007). "Null Detection in Shear-Wave 
 Splitting Measurements." BSSA, vol 97, 1204 – 1211.
 
+Parts of the original calculation have been modified following:
+
+Walsh, E., Arnold, R., & Savage, M. K. (2013). Silver and Chan revisited. 
+Journal of Geophysical Research-Solid Earth, 118(10), 5500–5515. 
+doi:10.1002/jgrb.50386
+
 Various other academic papers are referenced in individual subroutines. 
 
 --------------------------------------------------------------------------------
@@ -142,7 +148,7 @@ Section 5: Stacking error surfaces
   This software is distributed under the term of the BSD free software license.
 
   Copyright:
-     (c) 2003-2011, James Wookey
+     (c) 2003-2014, James Wookey
 
   All rights reserved.
 
