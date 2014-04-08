@@ -7,7 +7,6 @@
 !===============================================================================
 !
 !  James Wookey, School of Earth Sciences, University of Bristol
-!  CVS: $Revision: 1.1 $ $Date: 2011/02/11 16:09:41 $
 !
 
 	subroutine crosscorr(s1, s2, n, ss, norm)
