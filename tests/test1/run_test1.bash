@@ -61,9 +61,9 @@ tail -1 SWAV_test1_sheba.result | awk '
 {\
 printf("Checking SHEBA outputs:"); \
 printf("   Checking "); if (abs($11-34)>1) print "FAST: FAILED."; else print "FAST: PASSED"; \
-printf("   Checking "); if (abs($12-3.25)>1) print "DFAST: FAILED."; else print "DFAST: PASSED"; \
+printf("   Checking "); if (abs($12-3.50)>1) print "DFAST: FAILED."; else print "DFAST: PASSED"; \
 printf("   Checking "); if (abs($13-1.2)>0.05) print "TLAG: FAILED."; else print "TLAG: PASSED"; \
-printf("   Checking "); if (abs($14-0.06)>0.01) print "DTLAG: FAILED."; else print "DTLAG: PASSED"; \
+printf("   Checking "); if (abs($14-0.08)>0.01) print "DTLAG: FAILED."; else print "DTLAG: PASSED"; \
 }
 function abs(value)
 {
