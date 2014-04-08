@@ -4,7 +4,6 @@
 *-------------------------------------------------------------------------------
 *   (c) James Wookey 2004-2010
 *-------------------------------------------------------------------------------
-*	 CVS: $Revision: 1.9 $ $Date: 2011/02/11 13:38:11 $
 *
 * This is a SAC macro to run to run the shear-wave splitting analysis code, 
 * SHEBA. It basically inserts the correct picks into the data files to be 

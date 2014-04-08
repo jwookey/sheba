@@ -8,7 +8,6 @@
 !
 !  PROGRAM : f90sac
 !  VERSION : 4.43
-!  CVS: $Revision: 1.9 $ $Date: 2009/04/20 08:43:32 $
 !
 !  (C) James Wookey
 !  Department of Earth Sciences, University of Bristol
