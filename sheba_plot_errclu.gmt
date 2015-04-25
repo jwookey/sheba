@@ -1,36 +1,32 @@
 #!/bin/csh
 # $1 = event name
 # $2 = log file extensition ='ilog.ass' or 'ilog_nt'
+set GMT_PREFIX = X1X
 unalias rm
 rm -f .gmtdefaults
-gmtset PAPER_MEDIA A4+ MEASURE_UNIT inch PAGE_ORIENTATION landscape
+$GMT_PREFIX gmtset PAPER_MEDIA A4+ MEASURE_UNIT inch PAGE_ORIENTATION landscape
 # script to contour the error surface
 # data is gridded at 0.25 in tlag, and 1 in fast direction
 # get plotting information
 source $1.gmt
 #
-xyz2grd $1.error -Gdata.grd -I"$ERROR_GRID_TLAG_INT"/1 -R0/"$TLAG_SCALE"/-90/90
-#grdcontour data.grd -C5 -L0.9/20 -JX6/6 -R0/"$TLAG_SCALE"/-90/90 -B"$TLAG_MINORTICK"a"$TLAG_MAJORTICK":"@~\144@~t (s)":\5a30:"Fast Direction (@~\260@~)"::"":WSne -A -K > $1_errclu.eps
-grdcontour data.grd -C5 -L0.9/20 -JX6/6 -R0/"$TLAG_SCALE"/-90/90 -B${TLAG_MINORTICK}a${TLAG_MAJORTICK}:"@~\144@~t (s)":/5a30:"Fast Direction (@~\260@~)":WSne -A -K > $1_errclu.eps
-grdcontour data.grd -L0.9/5.1 -C1 -JX -R -W1 -A -O -K >> $1_errclu.eps
-grdcontour data.grd -L0.9/1.1 -C1 -JX -R -W10 -A -O -K >> $1_errclu.eps
-psxy -JX -R -Sx0.5 -W5/0/0/255 -O -K <<END>> $1_errclu.eps
+$GMT_PREFIX xyz2grd $1.error -Gdata.grd -I"$ERROR_GRID_TLAG_INT"/1 -R0/"$TLAG_SCALE"/-90/90
+$GMT_PREFIX grdcontour data.grd -C5 -L0.9/20 -JX6/6 -R0/"$TLAG_SCALE"/-90/90 -B${TLAG_MINORTICK}a${TLAG_MAJORTICK}:"@~\144@~t (s)":/5a30:"Fast Direction (@~\260@~)":WSne -A -K > $1_errclu.eps
+$GMT_PREFIX grdcontour data.grd -L0.9/5.1 -C1 -JX -R -W1 -A -O -K >> $1_errclu.eps
+$GMT_PREFIX grdcontour data.grd -L0.9/1.1 -C1 -JX -R -W10 -A -O -K >> $1_errclu.eps
+$GMT_PREFIX psxy -JX -R -Sx0.5 -W5/0/0/255 -O -K <<END>> $1_errclu.eps
 $TLAG $FAST
 END
 set NWINDOWS = `cat $1.clustxy | wc -l`
-pstext -JX3/7 -R0/3/0/7 -X0 -Y0 -O -K <<END>> $1_errclu.eps
-#0.15 5.8  14 0 0 5 [ENZ frame]
+$GMT_PREFIX pstext -JX3/7 -R0/3/0/7 -X0 -Y0 -O -K <<END>> $1_errclu.eps
 0.2  6.5 24 0 0 5 $1
-#0.2  4.2  14 0 0 5 no. of windows = $NWINDOWS
 END
 #
-pstext -JX3/7 -R0/3/0/7 -X3 -Y0 -O -K <<END>> $1_errclu.eps
-#0.15 5.8  14 0 0 5 [ENZ frame]
+$GMT_PREFIX pstext -JX3/7 -R0/3/0/7 -X3 -Y0 -O -K <<END>> $1_errclu.eps
 0.2 6.8 14 0 0 5 @~\144@~t = $TLAG +/- $DTLAG (s)
 0.2  6.6 14 0 0 5 fast = $FAST +/- $DFAST (@~\260@~)
 0.2  6.4  14 0 0 5 spol = $SPOL +/- $DSPOL (@~\260@~)
 0.2  6.2  14 0 0 5 Qual = $QUALITY
-#0.2  4.2  14 0 0 5 no. of windows = $NWINDOWS
 END
 #
 
@@ -41,11 +37,10 @@ if ($NWIND == 1) then
 else
 awk '{print $6,$4,$7,$5}' $1.clustxy > xy.sheba_tmp
 #
-#psxy xy.sheba_tmp -JX3/3 -R0/"$TLAG_SCALE"/-90/90 -B"$TLAG_MINORTICK"a"$TLAG_MAJORTICK":"@~\144@~t (s)":/15a30:"@~\146@~ (@~\260@~)":::WSne -Sc0.05 -G0 -X3.5 -Y0 -K -O >> $1_errclu.eps
-psxy xy.sheba_tmp -JX3/3 -R0/"$TLAG_SCALE"/-90/90 -B${TLAG_MINORTICK}a${TLAG_MAJORTICK}:"@~\144@~t (s)":/15a30::WSne -Sc0.05 -G0 -X3.5 -Y0 -K -O >> $1_errclu.eps
-psxy $1.clusters -JX -R -St.2 -W1/255/0/0 -O -K -Exy0.05/1/255/0/0 >> $1_errclu.eps
+$GMT_PREFIX psxy xy.sheba_tmp -JX3/3 -R0/"$TLAG_SCALE"/-90/90 -B${TLAG_MINORTICK}a${TLAG_MAJORTICK}:"@~\144@~t (s)":/15a30::WSne -Sc0.05 -G0 -X3.5 -Y0 -K -O >> $1_errclu.eps
+$GMT_PREFIX psxy $1.clusters -JX -R -St.2 -W1/255/0/0 -O -K -Exy0.05/1/255/0/0 >> $1_errclu.eps
 echo $TLAG $FAST > soln.sheba_tmp
-psxy soln.sheba_tmp -JX -R -Sx0.5 -W1/0/0/255 -O -K >> $1_errclu.eps
+$GMT_PREFIX psxy soln.sheba_tmp -JX -R -Sx0.5 -W1/0/0/255 -O -K >> $1_errclu.eps
 
 # stick the window plot on as well!
 awk '{print $1,$4,$5}' $1.clustxy > fast.sheba_tmp
@@ -57,12 +52,10 @@ awk '{print $1,$6,$7}' $1.clustxy > tlag.sheba_tmp
 echo $IBEST $FAST > fast_soln.sheba_tmp
 echo $IBEST $TLAG > tlag_soln.sheba_tmp
 cat tlag_limit.sheba_tmp >! tlag_limit.jwo
-#psxy tlag.sheba_tmp -JX6/3 `minmax -I1 tlag_limit.sheba_tmp` -B5a20:"Window number":/"$TLAG_MINORTICK"a"$TLAG_MAJORTICK":"@~\144@~t"::".":WSne -Sc0.05 -Ey0.1 -G0 -X1 -Y1 -K -P > $1_errclu.eps
-psxy tlag.sheba_tmp -JX3/1.5 -R1/$NWIND/0/$TLAG_SCALE -B5a20:"window":/${TLAG_MINORTICK}a${TLAG_MAJORTICK}:""::".":WSne -Sc0.05 -Ey0.1 -G0 -X0 -Y3.75 -K -O -P >> $1_errclu.eps
-psxy tlag_soln.sheba_tmp -JX -R -Sx0.2 -W10/0/0/255 -G0/0/255 -K -O >> $1_errclu.eps
-#psxy fast.sheba_tmp -JX `minmax -I0.1 fast_limit.sheba_tmp` -B5a20:"":/15a30:"@~\146@~ (@~\260@~)"::".$1":Wsne -Sc0.05 -Ey0.1 -G0 -O -K -X0 -Y3>> $1_errclu.eps
-psxy fast.sheba_tmp -JX -R1/$NWIND/-90/90 -B5a20/15a30Wsne -Sc0.05 -Ey0.1 -G0 -O -K -X0 -Y1.5>> $1_errclu.eps
-psxy fast_soln.sheba_tmp -JX -R -Sx0.2 -W10/0/0/255 -G0/0/255 -O >> $1_errclu.eps
+$GMT_PREFIX psxy tlag.sheba_tmp -JX3/1.5 -R1/$NWIND/0/$TLAG_SCALE -B5a20:"window":/${TLAG_MINORTICK}a${TLAG_MAJORTICK}:""::".":WSne -Sc0.05 -Ey0.1 -G0 -X0 -Y3.75 -K -O -P >> $1_errclu.eps
+$GMT_PREFIX psxy tlag_soln.sheba_tmp -JX -R -Sx0.2 -W10/0/0/255 -G0/0/255 -K -O >> $1_errclu.eps
+$GMT_PREFIX psxy fast.sheba_tmp -JX -R1/$NWIND/-90/90 -B5a20/15a30Wsne -Sc0.05 -Ey0.1 -G0 -O -K -X0 -Y1.5>> $1_errclu.eps
+$GMT_PREFIX psxy fast_soln.sheba_tmp -JX -R -Sx0.2 -W10/0/0/255 -G0/0/255 -O >> $1_errclu.eps
 rm -f *.sheba_tmp
 endif
 
