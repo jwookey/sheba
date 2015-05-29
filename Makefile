@@ -55,10 +55,10 @@ F90FLAGS =
 #===============================================================================
 
 ## Uncomment for sac/sac2000 (binaries sac files are native endian)
-#F90SAC_FLAGS = -DDISABLE_C_IO
+#F90SAC_FLAGS = 
 
 ## Uncomment for MacSAC (binary sac files are always big-endian)
-F90SAC_FLAGS = -DDISABLE_C_IO -DFORCE_BIGENDIAN_SACFILES 
+F90SAC_FLAGS = -DFORCE_BIGENDIAN_SACFILES 
 
 #===============================================================================
 # GMT Compatibility options
