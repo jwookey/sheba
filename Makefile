@@ -124,7 +124,7 @@ $(EXECDIR)/sheba_plot_stackerr.gmt:sheba_plot_stackerr.gmt
 	cat sheba_plot_stackerr.gmt | sed 's/X1X/$(GMT_PREFIX)/g' > $(EXECDIR)/sheba_plot_stackerr.gmt; chmod +x $(EXECDIR)/sheba_plot_stackerr.gmt;
 
 $(EXECDIR)/sheba_plot_errclu.gmt:sheba_plot_errclu.gmt
-	cat sheba_plot_errclu.gmt | sed 's/X1X/$(GMT_PREFIX)/g' > $(EXECDIR)/sheba_plot_errclu.gmt; chmod +x $(EXECDIR)/sheba_plot_stackerr.gmt
+	cat sheba_plot_errclu.gmt | sed 's/X1X/$(GMT_PREFIX)/g' > $(EXECDIR)/sheba_plot_errclu.gmt; chmod +x $(EXECDIR)/sheba_plot_errclu.gmt
 
 $(EXECDIR)/sheba_combine_plots.csh:sheba_combine_plots.csh
 	chmod +x sheba_combine_plots.csh; \cp sheba_combine_plots.csh $(EXECDIR)
