@@ -18,6 +18,7 @@
          type event_info_type
             real*4 :: dist,az,baz ! event info
             real*4 :: tlag,dtlag,fast,dfast,spol,dspol ! splitting pars
+            real*4 :: tlagXC,dtlagXC,fastXC,dfastXC ! XC splitting pars
             real*4 :: wbeg,wend ! best window
             real*4 :: snr ! signal-to-noise
             real*4 :: eigrat_orig,eigrat_corr

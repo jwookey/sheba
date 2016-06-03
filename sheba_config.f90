@@ -58,6 +58,9 @@
 !        ** ordering 
             integer :: iorder(3)
             
+!        ** no Z mode
+            logical :: no_Z_mode
+            
          end type sheba_config_type     
 
 !        * data structure for various config flags

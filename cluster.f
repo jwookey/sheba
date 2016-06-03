@@ -399,6 +399,11 @@ c  ** upload splitting parameters to event_info modules **
       event % spol = spol_best
       event % dspol = dspol_best
 
+      event % fastXC = fastXC
+      event % dfastXC = dfastXC
+      event % tlagXC = tlagXC
+      event % dtlagXC = dtlagXC
+
       event % wbeg = wbeg_best
       event % wend = wend_best
       
