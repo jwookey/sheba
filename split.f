@@ -324,15 +324,10 @@ c  ** first rotate into spol-fast (so y is signal and x is noise) **
 c  ** estimate signal to noise ratio *
       call calcsnr(ynoise,xnoise,noverlap,snr)
 
-      print*,'error_int',error_int(1,1)
-
-
 c  ** normalise error surface and calc errors in fast and lag**
       call zerror95(error_int,ndf,lambda2_min,idfast,idtlag)
       dtlag = delta * idtlag * itlag_step / real(f)
       dfast = 180.  * idfast / real(np1-1)
-
-      print*,'error_int',error_int(1,1)
 
 c  ** normalise error surface and calc errors in fast and lag (XC version)
       call zerror95XC(xc_grid_int,ndf,xc_max,xcidfast,xcidtlag)     
