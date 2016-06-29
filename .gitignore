@@ -1,0 +1,12 @@
+# Ignore compiled files, Fortran modules and TMPROJ files. 
+
+*.o
+*.mod
+*.tmproj
+
+# OS generated files #
+
+.DS_Store?
+ehthumbs.db
+Icon?
+Thumbs.db
