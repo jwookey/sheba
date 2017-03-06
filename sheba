@@ -147,7 +147,8 @@ endif
 **----------------------------------------------------------------------------**
 r %zfile%
 sc cat /dev/null > sheba.in
-sc echo "# sheba.in" >> sheba.in
+setbb headerline "SHEBA.IN"
+sc echo %headerline% >> sheba.in
 sc echo $file$ >> sheba.in
 do sfx list $comps
    sc echo $sfx$ >> sheba.in
