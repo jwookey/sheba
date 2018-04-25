@@ -39,7 +39,7 @@
                     event % tlag, event % dtlag, &
                     event % spol, event % dspol, &
                     event % wbeg, event % wend, &
-                    t1 % kstnm
+                    trim(t1 % kstnm)
 
        
       close(99) 
