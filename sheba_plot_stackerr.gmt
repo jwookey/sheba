@@ -3,7 +3,7 @@
 # data is gridded at 0.25 in tlag, and 1 in fast direction
 set GMT_PREFIX = X1X
 
-$GMT_PREFIX gmtset PAPER_MEDIA A4+ MEASURE_UNIT inch
+$GMT_PREFIX gmtset PS_MEDIA A4 PROJ_LENGTH_UNIT inch
 
 # get plotting information
 set FAST = `tail -1 sheba_stack.sol | awk '{print $1}'`
@@ -29,12 +29,12 @@ $GMT_PREFIX psxy -JX -R -Sx0.5 -W5/0/0/255 -O -K <<END>> sheba_stack_error.eps
 $TLAG $FAST
 END
 
-$GMT_PREFIX pstext -JX6/7 -R0/6/0/7 -X0 -Y0 -O <<END>> sheba_stack_error.eps
-3.2  6.6 14 0 0 5 @~\144@~t = $TLAG +/- $DTLAG (s)
-3.2  6.4 14 0 0 5 fast = $FAST +/- $DFAST (@~\260@~)
-3.2  6.2  14 0 0 5 no. of results stacked = $NSTACKED
-0.2  6.5  16 0 0 5 STACKED  ERROR
-0.2  6.25  16 0 0 5    SURFACES
+$GMT_PREFIX pstext -F+f14p,Helvetica,black+jLB -JX6/7 -R0/6/0/7 -X0 -Y0 -O <<END>> sheba_stack_error.eps
+3.2  6.6 @~\144@~t = $TLAG +/- $DTLAG (s)
+3.2  6.4 fast = $FAST +/- $DFAST (@~\260@~)
+3.2  6.2 no. of results stacked = $NSTACKED
+0.2  6.5 STACKED  ERROR
+0.2  6.25 SURFACES
 END
 
 rm -f data.grd

@@ -76,7 +76,8 @@ Section 2: Prerequisites
 
 	- SAC, SAC2000 or MacSAC (the sacio.a library is NOT required however)
 
-	- GMT (several GMT programs are used for plotting) 
+	- GMT (several GMT programs are used for plotting). GMT version 5 is 
+    required. 
 
 	- A postscript viewer. GV is recommended (and assumed by the SAC macro).  
 
@@ -147,7 +148,7 @@ Section 5: Stacking error surfaces
   This software is distributed under the term of the BSD free software license.
 
   Copyright:
-     (c) 2003-2014, James Wookey
+     (c) 2003-2018, James Wookey
 
   All rights reserved.
 
