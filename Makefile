@@ -78,7 +78,7 @@ GMT_PREFIX =
 #
 #	Code Objects
 #
-MODULES = sheba_config.o event_info.o array_sizes.o
+MODULES = sheba_config.o array_sizes.o event_info.o
 SUBROUTINES = sheba_core.o misc.o input.o desplit.o output.o teanby.o \
                   rumpker.o cluster.o split.o\
                   traceops.o particle.o ndf.o\
