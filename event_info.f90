@@ -26,6 +26,8 @@
             integer :: ndf
             integer :: ibest ! best window number
             real*4 :: Quality ! AW quality factor (-1 -> 1)
+            real*4 :: intensity ! splitting intensity as predicted from
+                                ! the best fitting tlag, fast and spol.
 !        ** other information
             real :: error_grid_tlag_int           
             real*4 :: lam1_raw(np1,np2int),lam2_raw(np1,np2int) 

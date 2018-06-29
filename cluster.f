@@ -142,6 +142,8 @@ c
       integer itlag_step
       real test_tlag,test_fast
       real snr ! signal to noise ratio
+      real beta ! difference between spol and fast (used in calculation
+                ! of splitting intensity)
 
 c  ** cross-corr data
       real xc_grid_int(np1,np2XCint)
@@ -412,6 +414,14 @@ c  ** upload splitting parameters to event_info modules **
 
       event % ibest = ibest
       event % Quality = Quality
+
+c  ** calculate and save the splitting intensity
+      beta = fast_best-spol_best
+      call unwind_pm90(beta)
+      beta = abs(beta)*pi/180.
+
+      event % intensity = tlag_best * sin(2*beta) 
+
       
 c  ** calc itlag_step from tlag_scale **
 c  ** itlag_step is the grid spacing in tlag for the grid search **

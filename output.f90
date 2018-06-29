@@ -91,11 +91,12 @@
       
       open(99,file=fname)
       
-      write(99,'(3a)') '%  DATE TIME EIGORIG EIGCORR      Q     SNR   NDF   STAT'
+      write(99,'(3a)') '%  DATE TIME EIGORIG EIGCORR      Q     SNR   NDF   INTENS  STAT'
       write(99,101) t1 % nzyear,t1 % nzjday,  &
                     t1 % nzhour, t1 % nzmin, &
                     event % eigrat_orig, event % eigrat_corr, &
                     event % Quality, event % snr, event % ndf, &
+                    event % intensity, &
                     t1 % kstnm
 
        
@@ -145,7 +146,7 @@
 
       return           
 100   format(i4.4,i3.3,1x,2i2.2,14f8.2,2f8.2,'  % ',a)      
-101   format(i4.4,i3.3,1x,2i2.2,2f8.4,f7.3,f8.3,x,i5,x,'  % ',a)      
+101   format(i4.4,i3.3,1x,2i2.2,2f8.5,f7.3,f8.3,x,i5,x,f8.4,'  % ',a)      
       end subroutine output_result
 !=======================================================================
 

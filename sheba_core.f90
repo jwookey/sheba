@@ -100,19 +100,20 @@
       call windowed_coveig(h1_corr,h2_corr, & 
                      lam1_corr,lam2_corr,event % wbeg,event % wend)
 
-      eigrat = lam2/lam1 * 100.0
-      eigrat_corr = lam2_corr/lam1_corr * 100.0
+      eigrat = lam2/lam1 
+      eigrat_corr = lam2_corr/lam1_corr 
 
 !  ** save in the event data structure
       event % eigrat_orig = lam2/lam1
       event % eigrat_corr = lam2_corr/lam1_corr
 
-      write(*,'(a,f6.3,a,f6.2,a,f6.2,a,a,f6.2)') &
+      write(*,'(a,f6.3,a,f6.4,a,f6.4,a,a,f6.2,a,f7.4)') &
          ' Q = ', event%Quality, &
-         '  L2/L1(%) =  ', & 
-         eigrat,' (pre-corr.) ', & 
-         eigrat_corr,' (post-corr.)', &
-         '  SNR = ',event%snr                          
+         '  L2/L1 = ', & 
+         eigrat,' (pre) ', & 
+         eigrat_corr,' (post)', &
+         ' SNR = ',event%snr, &
+         '  Intens. = ', event % intensity                          
       write(*,"(80('='))")
 
 !  ** output result information
