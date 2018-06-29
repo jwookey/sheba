@@ -12,6 +12,7 @@
 !=======================================================================
       module event_info ! Utility module for F90/95 for SAC files
 !=======================================================================      
+      use array_sizes
       implicit none
 
 !     ** DATA STRUCTURE FOR EVENT INFORMATION
@@ -27,6 +28,7 @@
             real*4 :: Quality ! AW quality factor (-1 -> 1)
 !        ** other information
             real :: error_grid_tlag_int           
+            real*4 :: lam1_raw(np1,np2int),lam2_raw(np1,np2int) 
          end type event_info_type     
 
          type (event_info_type),public :: event

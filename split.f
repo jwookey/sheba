@@ -137,6 +137,7 @@ c                              be independent of number of grid points.
 c-----------------------------------------------------------------------
       use array_sizes ! use the array_sizes modules
       use sheba_config
+      use event_info
 c-----------------------------------------------------------------------
       
       implicit none
@@ -226,6 +227,10 @@ c  ** interpolate error surface in tlag direction **
       call zerror_interp(lam1,lam1_int)
       call zerror_interp_xc(xc_grid,xc_grid_int)
 
+c  ** save the raw lam1, lam2 surfaces before normalisation
+      event % lam2_raw = error_int
+      event % lam1_raw = lam1_int
+
 c  ** find the interpolated minimum position **
       call zerror_min(error_int,np1,np2int,ifast,itlag,lambda2_min)
 
@@ -309,8 +314,6 @@ c         print*,tlag,itlag,delta
 C  ** calculate the covariance in the window.       
       call zcovariance(xlag,ylag,noverlap,np,cov)
       call zeigen2x2(cov,lambda1,lambda2,vec1,vec2)
-
-
 
 C  ** change for option T
       if (config % imode == 0) then

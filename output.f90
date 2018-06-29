@@ -22,8 +22,9 @@
 !-----------------------------------------------------------------------
       implicit none
       type (SACTrace) :: t1
-      character*50 fname
-      integer :: j
+      character*50 :: fname
+      integer :: j,i
+      character*12 :: fmt
 
       open(99,file='sheba.result')
 
@@ -128,6 +129,18 @@
       write(99,'(a,i4.4,a)') '            <ndf>', event % ndf,'</ndf>'
       
       write(99,'(a)') '         </data>'
+      close(99)
+
+!  ** Output a raw lam2/lam1 grid 
+      fname = trim(config % fname_base) // '.lamR'
+      
+      open(99,file=fname)
+      write(fmt,'(a1,i5.5,a)') '(',np2int,'f8.5)'
+      do i=1,np1
+         write(99,fmt) &
+            ((event % lam2_raw(i,j)/event % lam1_raw(i,j)),j=1,np2int) 
+      enddo
+
       close(99)
 
       return           
