@@ -29,7 +29,7 @@
 !  This software is distributed under the term of the BSD free software license.
 !
 !  Copyright:
-!     (c) 2003-2015, James Wookey, Andy Nowacki
+!     (c) 2003-2019, James Wookey, Andy Nowacki
 !
 !  All rights reserved.
 !
@@ -89,6 +89,7 @@
       public :: f90sac_clonetrace
       public :: f90sac_copytraceheader
       public :: f90sac_deletetrace
+      public :: f90sac_time_derivative
 
 !  ** Trace transformation/calculation routines 
       public :: f90sac_orient2d
@@ -99,7 +100,7 @@
       public :: f90sac_corr
       public :: f90sac_covar2
       public :: f90sac_covar3
-	   public :: f90sac_orth2d
+      public :: f90sac_orth2d
 
 !  ** Trace header manipulation routines
       public :: f90sac_setevent
@@ -118,7 +119,7 @@
       public :: f90sac_setdate
       public :: f90sac_ymd2jd
       public :: f90sac_jd2ymd
-	   public :: f90sac_compare_origin_time
+      public :: f90sac_compare_origin_time
       public :: f90sac_dateseed
 
 !  ** Utility routines
@@ -171,7 +172,7 @@
       integer, private :: f90sac_random_seed ;      
 
 !  ** standard filename length
-      integer, parameter :: f90sac_fnlength = 256 ;      
+      integer, parameter, public :: f90sac_fnlength = 256 ;      
 
 !=============================================================================== 
 !  ** Define a specialised data structure for containing SAC files
@@ -760,7 +761,7 @@ tr%kt2   = SAC_cnull ; tr%kf  = SAC_cnull ;
 !  ** create a new trace
       call f90sac_clonetrace(tr_in,tr_out)
 
-!  ** deallocate it's trace memory, and reallocate the correct amount           
+!  ** deallocate its trace memory, and reallocate the correct amount           
       deallocate (tr_out % trace, stat = istatus)
       allocate (tr_out % trace(new_npts))
 
@@ -776,6 +777,49 @@ tr%kt2   = SAC_cnull ; tr%kf  = SAC_cnull ;
       return
    end subroutine f90sac_window
 !===============================================================================
+
+!===============================================================================
+   subroutine f90sac_time_derivative(tr)
+!===============================================================================
+!
+!     Replace a trace with its time derivative
+!
+      implicit none
+      type (SACtrace) :: tr
+      integer :: i
+
+      real(real4),allocatable :: dxdt(:)
+      !integer :: n
+
+      if (tr%npts < 3) then
+         write(0,'(a)') &
+         'F90SAC_TIME_DERIVATIVE: Error: Trace has less than 3 points'
+         STOP
+      endif
+      
+      allocate(dxdt(tr%npts))
+
+      ! first point
+      dxdt(1) = (tr%trace(2)-tr%trace(1))/tr%delta ;
+
+      ! intermediate points
+      do i=2,tr%npts-1
+         dxdt(i) = (tr%trace(i+1)-tr%trace(i-1))/(tr%delta*2.) ;
+      enddo
+
+      ! last point
+      dxdt(tr%npts) = (tr%trace(tr%npts)-tr%trace(tr%npts-1))/tr%delta ;
+
+      ! copy
+      tr%trace(1:tr%npts) = dxdt(1:tr%npts) ;
+
+      ! deallocate temporary array
+      deallocate(dxdt)
+
+      return
+   end subroutine f90sac_time_derivative
+!===============================================================================
+
 
 !===============================================================================
    subroutine f90sac_setdate(trace,iyr,ijd,ihr,imi,ise,ims)
@@ -2351,6 +2395,7 @@ tr%kt2   = SAC_cnull ; tr%kf  = SAC_cnull ;
       if (iostat /= 0) then
          write(0,'(a)') 'F90SAC_READTRACE: ERROR: Problem reading trace ' // &
             'from file "' // trim(fname) // '"'
+            write(0,*) iostat
          stop
       endif
 

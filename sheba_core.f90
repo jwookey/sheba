@@ -26,7 +26,7 @@
       type (SACTrace) :: h1_proc,h2_proc ! traces to run in the analysis
       
       real plat
-      real lam1,lam2,lam1_corr,lam2_corr,eigrat,eigrat_corr
+      real lam1,lam2,lam1_corr,lam2_corr,eigrat,eigrat_corr,SI
       character*50 fname
 
       open(iulog,file='sheba.log')
@@ -103,17 +103,21 @@
       eigrat = lam2/lam1 
       eigrat_corr = lam2_corr/lam1_corr 
 
+!  ** calculate the splitting intensity via the projection method
+      call calc_split_intensity(h1,h2,event%spol,event%wbeg,event%wend,SI)
+      event % intensity_p = SI ;
+
 !  ** save in the event data structure
       event % eigrat_orig = lam2/lam1
       event % eigrat_corr = lam2_corr/lam1_corr
 
-      write(*,'(a,f6.3,a,f6.4,a,f6.4,a,a,f6.2,a,f7.4)') &
+      write(*,'(a,f6.3,a,f6.4,a,f6.4,a,a,f6.2,a,f5.2,a,f5.2)') &
          ' Q = ', event%Quality, &
          '  L2/L1 = ', & 
          eigrat,' (pre) ', & 
          eigrat_corr,' (post)', &
          ' SNR = ',event%snr, &
-         '  Intens. = ', event % intensity                          
+         ' SI = ', event % intensity,' / ',SI                          
       write(*,"(80('='))")
 
 !  ** output result information

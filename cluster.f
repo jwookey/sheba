@@ -416,9 +416,9 @@ c  ** upload splitting parameters to event_info modules **
       event % Quality = Quality
 
 c  ** calculate and save the splitting intensity
-      beta = fast_best-spol_best
+      beta = spol_best-fast_best
       call unwind_pm90(beta)
-      beta = abs(beta)*pi/180.
+      beta = beta*pi/180.
 
       event % intensity = tlag_best * sin(2*beta) 
 
