@@ -30,7 +30,7 @@
 
       write(99,'(3a)') '%  DATE TIME    EVLA    EVLO    STLA    STLO', &
       '    EVDP    DIST     AZI     BAZ    FAST   DFAST    TLAG   ', &
-       'DTLAG    SPOL   DSPOL    WBEG    WEND  STAT'
+       'DTLAG    SPOL   DSPOL        WBEG        WEND  STAT'
       write(99,100) t1 % nzyear,t1 % nzjday,  &
                     t1 % nzhour, t1 % nzmin, &
                     t1 % evla, t1 % evlo, &
@@ -51,7 +51,7 @@
       
       write(99,'(3a)') '%  DATE TIME    EVLA    EVLO    STLA    STLO', &
       '    EVDP    DIST     AZI     BAZ    FAST   DFAST    TLAG   ', &
-       'DTLAG    SPOL   DSPOL    WBEG    WEND  STAT'
+       'DTLAG    SPOL   DSPOL        WBEG        WEND  STAT'
       write(99,100) t1 % nzyear,t1 % nzjday,  &
                     t1 % nzhour, t1 % nzmin, &
                     t1 % evla, t1 % evlo, &
@@ -72,7 +72,7 @@
       
       write(99,'(3a)') '%  DATE TIME    EVLA    EVLO    STLA    STLO', &
       '    EVDP    DIST     AZI     BAZ    FAST   DFAST    TLAG   ', &
-       'DTLAG    SPOL   DSPOL    WBEG    WEND  STAT'
+       'DTLAG    SPOL   DSPOL        WBEG        WEND  STAT'
       write(99,100) t1 % nzyear,t1 % nzjday,  &
                     t1 % nzhour, t1 % nzmin, &
                     t1 % evla, t1 % evlo, &
