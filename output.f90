@@ -145,8 +145,8 @@
 
       close(99)
 
-      return           
-100   format(i4.4,i3.3,1x,2i2.2,10f8.2,2f8.5,2f8.2,2f8.5,'  % ',a)      
+      return            
+100   format(i4.4,i3.3,1x,2i2.2,10f8.2,2f8.5,2f8.2,2f12.5,'  % ',a)      
 101   format(i4.4,i3.3,1x,2i2.2,2f8.5,f7.3,f8.3,x,i5,&
       x,f8.4,x,f8.4,'  % ',a)      
       end subroutine output_result
