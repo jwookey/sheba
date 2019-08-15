@@ -70,7 +70,7 @@
       call stack_error_surfaces(nsurf,n1,n2,error_stack,error_in,ndf_in,wgt,ndf)
 
 !  ** find the minimum position
-		call zerror_min(error_stack,np1,np2int,ifast,itlag,lam2min)
+      call zerror_min(error_stack,np1,np2int,ifast,itlag,lam2min)
       print*,'Minimum at:', -90.0+real(ifast-1),0+real(itlag-1)*dtlag_step
       fast = -90.0+real(ifast-1)
       tlag = 0.0+real(itlag-1)*dtlag_step
@@ -78,8 +78,8 @@
 !  ** calculate errors from the 95% confidence interval
       call zerror95(error_stack,ndf,lam2min,idfast,idtlag)
 !      print*,idfast,idtlag,ndf
-		dtlag = idtlag * dtlag_step
-		dfast = real(idfast) 
+      dtlag = idtlag * dtlag_step
+      dfast = real(idfast) 
 
       print*,'Minimum at:'
       print*,'   FAST',fast,' +/- ',dfast
@@ -91,10 +91,10 @@
       open(32,file='sheba_stack.sol')     
 
       write(fmt,'(a1,i5.5,a)') '(',np2int,'f12.4)'
-		do i=1,np1
-		     write(31,fmt) (error_stack(i,j),j=1,np2int) 
-		enddo
-		close(31)
+      do i=1,np1
+           write(31,fmt) (error_stack(i,j),j=1,np2int) 
+      enddo
+      close(31)
 
       write(32,'(a)') '% FAST DFAST TLAG DTLAG, NSTACKED, TLAG_STEP'
       write(32,'(4f12.4,i5,f12.4)') fast,dfast,tlag,dtlag,nsurf,dtlag_step
