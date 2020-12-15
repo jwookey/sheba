@@ -34,7 +34,6 @@
 *  srcpol [(baz)|x]     - In conjunction with option t, the inital shear-wave
 *                         polarisation. The default is for use with SKS, i.e.
 *                         the back-azimuth.
-*  psviewer [(gv)|prog] - Program called to display postscript files.
 *  batch [(no)|yes]     - Suppress all plotting in plot yes mode:
 *                         useful in running in batch mode
 *  wdev [(x)|mac]       - Windowing device
@@ -58,7 +57,7 @@
 * but WITHOUT ANY WARRANTY; without even the implied warranty of
 * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 *-------------------------------------------------------------------------------
-$keys file comps plot xlim pick corr src_corr scs nwind max_tlag option srcpol psviewer batch wdev usett 
+$keys file comps plot xlim pick corr src_corr scs nwind max_tlag option srcpol batch wdev usett 
 $default comps BHE BHN BHZ
 $default plot no
 $default xlim off
@@ -70,7 +69,6 @@ $default nwind one
 $default max_tlag 4.0
 $default option e
 $default srcpol baz
-$default psviewer gv
 $default batch no
 $default wdev x
 $default usett yes
@@ -394,10 +392,10 @@ endif
 ** plot GMT results
 **--------------------------------------------------------------------------- **
 * error surface and cluster analysis
- message "-> Error surface and cluster analysis, q in window to exit ..."
+ message "-> Error surface and cluster analysis"
  sc sheba_plot_errclu.gmt $file$
- if $plot$ eq no
-       sc $psviewer$ --orientation=landscape --scale=-2 $file$_errclu.eps
+ if $plot$ eq no 
+       sc X1X $file$_errclu.eps
  endif
 
 
@@ -414,7 +412,7 @@ if $plot$ eq yes
       sc sheba_combine_plots.csh $file$
       sc rm -f split_inp.ps split_rot.ps split_wav.ps
       if $batch$ eq no
-            sc $psviewer$ --media=A4 --orientation=landscape --scale=-2 $file$_result.ps
+            sc X1X $file$_result.ps
       endif
 
 *     backup the results file

@@ -65,10 +65,21 @@ F90SAC_FLAGS = -DFORCE_BIGENDIAN_SACFILES
 #===============================================================================
 
 ## gmt prefix (required by some gmt installations)
-#GMT_PREFIX = gmt 
+GMT_PREFIX = gmt 
 
 ## For traditional gmt installations
-GMT_PREFIX = 
+#GMT_PREFIX = 
+
+#===============================================================================
+# Helper programmes
+#===============================================================================
+
+## gv 
+PSVIEWER = gv --media=A4 --orientation=landscape --scale=-2 
+
+## macOS open (uses preview by default)
+PSVIEWER = open 
+
 
 #===============================================================================
 #===============================================================================
@@ -96,7 +107,6 @@ all:$(EXECDIR)/sheba_exec \
       $(EXECDIR)/sheba_plot_stackerr.gmt \
       $(EXECDIR)/sheba_combine_plots.csh \
       $(EXECDIR)/cleansheba \
-      $(MACRODIR)/split_sheba\
       $(MACRODIR)/sheba\
       $(EXECDIR)/sheba_stack\
 		$(EXECDIR)/stack_wgtcalc
@@ -135,11 +145,9 @@ $(EXECDIR)/cleansheba:cleansheba
 #
 #     SAC Macro
 #
-$(MACRODIR)/split_sheba:sheba
-	cp -f sheba $(MACRODIR)/split_sheba; cp -f sheba $(MACRODIR)
 
 $(MACRODIR)/sheba:sheba
-	cp -f sheba $(MACRODIR)
+	cat sheba | sed 's/X1X/$(PSVIEWER)/g' > $(MACRODIR)/sheba
 
 distrib:
 	rm -rf ../SHEBA_distrib
