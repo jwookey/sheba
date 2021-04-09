@@ -14,10 +14,10 @@
 !
 !      variables
 !    in:
-!      y(np)                        real      time series
+!      y(np)                    real      time series
 !      n                        int      number of points
-!      norig                        int      original (uninterpolated) number of points
-!                                    in the shear wave window
+!      norig                    int      original (uninterpolated) number of points
+!                               in the shear wave window
 !    out:
 !      ndf                        int      number of degrees of freedom
 !    local:
@@ -44,9 +44,9 @@
       integer ndf
       integer n,n2,nf,norig
       real y(np),yint(np),yfft(np*2),yfft_amp(np)
-   	real sce2,sce4
+      real sce2,sce4
       integer scndf
-   	real e2,e4
+      real e2,e4
       integer i
 
 !  -- calc the fft of y --
@@ -63,24 +63,24 @@
          yfft_amp(i) = sqrt(yfft(2*i-1)**2 + yfft(2*i)**2)
       enddo
 
-   	e2=0.
-   	e4=0.
-   	do i=1,nf
+      e2=0.
+      e4=0.
+      do i=1,nf
    !!          yfft_amp(i)**2 is |f_i|^2|g_i|^2
    !!          note that have used i as the index rather than n
-   	   e2   = e2 + yfft_amp(i)**2
+         e2   = e2 + yfft_amp(i)**2
    !!          yfft_amp(i)**4 is |f_i|^4|g_i|^4
    !!          note that have used i as the index rather than n
-   	   e4   = e4 + yfft_amp(i)**4
-	      
-   	   if(i.eq.1.or.i.eq.nf)then
+         e4   = e4 + yfft_amp(i)**4
+         
+         if(i.eq.1.or.i.eq.nf)then
    !!            coefficients from SC equation A3
-   !!            note adding 1/2 is the same as adding 1 then subtracting 1/2	  
-   	      sce2 = e2 - 0.5*yfft_amp(i)**2
+   !!            note adding 1/2 is the same as adding 1 then subtracting 1/2     
+            sce2 = e2 - 0.5*yfft_amp(i)**2
    !!            coefficients from SC original code (see Walsh eq (33))
-   !!            note adding 1/2 is the same as adding 1 then subtracting 1/2	    
-   	      sce4 = e4 - 0.5*yfft_amp(i)**4
-   	   endif
+   !!            note adding 1/2 is the same as adding 1 then subtracting 1/2       
+            sce4 = e4 - 0.5*yfft_amp(i)**4
+         endif
       enddo
       e2 = sce2
 
@@ -91,8 +91,8 @@
 !!    e4 by 4/3. The end points (n=0,N) now have coefficients
 !!    4/3 so we must subtract off 1 to get 1/3      
       e4 = 4.*e4/3. - yfft_amp(1)**4 - yfft_amp(nf)**4 
-   	ndf = nint( 2.0 * (2.0*e2**2/e4 - 1.) )
-   	
+      ndf = nint( 2.0 * (2.0*e2**2/e4 - 1.) )
+      
       ! original version
       scndf = nint( 2.0 * (2.0*sce2**2/sce4 - 1.) )
       
@@ -104,47 +104,47 @@
 
 ! MFAST VERSION
 ! c-----------------------------------------------------------------------
-! 	subroutine zndf(y,n,norig,ndf)
+!    subroutine zndf(y,n,norig,ndf)
 ! c-----------------------------------------------------------------------
 ! c
-! c	subroutine to calculate number of degrees of freedom (ndf) of a time
-! c	series y, with length n, and physical dimension np. If y has been 
-! c	interpolated then norig is the original number of points in the shear
-! c	wave window
+! c   subroutine to calculate number of degrees of freedom (ndf) of a time
+! c   series y, with length n, and physical dimension np. If y has been 
+! c   interpolated then norig is the original number of points in the shear
+! c   wave window
 ! c
-! c	calculated according to appendix in Silver and Chan 1991
+! c   calculated according to appendix in Silver and Chan 1991
 ! c    Modifed by Walsh, Arnold and Savage 2013. (Silver and Chan Revisited,
 ! c     submitted to J. Geophysical Research June 18, 2013.
 ! c
-! c	For a gaussian white noise ndf should be equal to n.
-! c	The true ndf should be less than n
+! c   For a gaussian white noise ndf should be equal to n.
+! c   The true ndf should be less than n
 ! c
-! c	variables
+! c   variables
 ! c    in:
-! c	y(np)				real	time series
-! c	n				int	number of points
-! c	norig				int	original (uninterpolated) number of points
-! c						in the shear wave window
+! c   y(np)            real   time series
+! c   n            int   number of points
+! c   norig            int   original (uninterpolated) number of points
+! c                  in the shear wave window
 ! c    out:
-! c	ndf				int	number of degrees of freedom
+! c   ndf            int   number of degrees of freedom
 ! c    local:
-! c	np				int	array dimension
-! c						(read from SIZE_np.h at compile time)
-! c	n2				int	next power of 2 up from n
-! c	yint(np)			real	y interpolated onto n2 points
-! c	yfft(np*2) 			real	fft of interpolated (to n2) y in NR format
-! c	yfft_amp(np) 		real	amplitude spectum
-! c	nf				int	number of freq points for n data points
-! c	yfft_amp			real	interpolated amp spec on nf points
-! c	sce2,sce4				real	f2 and f4 from Silver and Chan 1991
-! c       scndf,ndf				int	number off degrees of freedom from Silver and Chan--i.e., previous codes
-! c						used to calc ndf
-! c       e2, e4				real	e2 and e4 from Walsh et al. 2013
+! c   np            int   array dimension
+! c                  (read from SIZE_np.h at compile time)
+! c   n2            int   next power of 2 up from n
+! c   yint(np)         real   y interpolated onto n2 points
+! c   yfft(np*2)          real   fft of interpolated (to n2) y in NR format
+! c   yfft_amp(np)       real   amplitude spectum
+! c   nf            int   number of freq points for n data points
+! c   yfft_amp         real   interpolated amp spec on nf points
+! c   sce2,sce4            real   f2 and f4 from Silver and Chan 1991
+! c       scndf,ndf            int   number off degrees of freedom from Silver and Chan--i.e., previous codes
+! c                  used to calc ndf
+! c       e2, e4            real   e2 and e4 from Walsh et al. 2013
 ! 
 ! c
 ! c-----------------------------------------------------------------------
-! c	N. Teanby	5-7-02	Original code, based on ndf_fun2.f
-! c					and ndf_spect.f in DTM
+! c   N. Teanby   5-7-02   Original code, based on ndf_fun2.f
+! c               and ndf_spect.f in DTM
 ! c
 ! c   M. Savage 15 June 2013  Fixing to use modified f2 and f4 from Walsh et al.
 ! c
@@ -152,30 +152,30 @@
 ! c      Revisited), submitted to JGR June 2013.
 ! c-----------------------------------------------------------------------
 ! 
-! 	implicit none
-! 	integer ndf
-! 	integer n,np,n2,nf,norig
-! 	include "SIZE_np.h"
-! 	real y(np),yint(np),yfft(np*2),yfft_amp(np)
-! !	real f2,f4
-! 	real sce2,sce4
+!    implicit none
+!    integer ndf
+!    integer n,np,n2,nf,norig
+!    include "SIZE_np.h"
+!    real y(np),yint(np),yfft(np*2),yfft_amp(np)
+! !   real f2,f4
+!    real sce2,sce4
 !         integer scndf
-! 	real e2,e4
-! 	integer i
-! 	
+!    real e2,e4
+!    integer i
+!    
 ! c  -- calc the fft of y --
 ! c  ** calc n2, the next power of 2 from n (or n if n=power of 2) **
-! 	n2 = 2**(int(log(real(n)-0.1)/log(2.0)) + 1)
+!    n2 = 2**(int(log(real(n)-0.1)/log(2.0)) + 1)
 ! c  ** interpolate to have n2 points **
-! 	call zlinint(y,n,np,n2,yint)
+!    call zlinint(y,n,np,n2,yint)
 ! c  ** perform fft (1 means do forward fft)**
-! 	call zfft(yint,n2,np,1,yfft)
+!    call zfft(yint,n2,np,1,yfft)
 ! c  ** determine number of frequency points for original time series.
-! 	nf=(norig+2)/2
+!    nf=(norig+2)/2
 ! c  ** calculate amplitude spectrum **
-! 	do 2 i=1,nf
-! 	   yfft_amp(i) = sqrt(yfft(2*i-1)**2 + yfft(2*i)**2)
-! 2	continue
+!    do 2 i=1,nf
+!       yfft_amp(i) = sqrt(yfft(2*i-1)**2 + yfft(2*i)**2)
+! 2   continue
 ! 
 ! !! below is the original code based on the SC codes
 ! !! they refer to f2 and f4 but these are actually
@@ -186,48 +186,48 @@
 ! !! from the data
 ! !!c  -- calc f2 and f4 from Silver and Chan 1991 --
 ! !! which are actually e2 and e4
-! !!	f2=0.
-! !!	f4=0.
-! !!	do 7 i=1,nf
+! !!   f2=0.
+! !!   f4=0.
+! !!   do 7 i=1,nf
 ! !!        yfft_amp(i)**2 is |f_i|^2|g_i|^2
 ! !!        note that have used i as the index rather than n
-! !!	  f2   = f2 + yfft_amp(i)**2
+! !!     f2   = f2 + yfft_amp(i)**2
 ! !!        yfft_amp(i)**4 is |f_i|^4|g_i|^4
 ! !!        note that have used i as the index rather than n
-! !!	  f4   = f4 + yfft_amp(i)**4
-! !!cc	  for zero frequency and for Nyquist:
-! !!c	  if(i.eq.1.or.i.eq.nf)then
+! !!     f4   = f4 + yfft_amp(i)**4
+! !!cc     for zero frequency and for Nyquist:
+! !!c     if(i.eq.1.or.i.eq.nf)then
 ! !!          coefficients from SC equation A3
 ! !!          note adding 1/2 is the same as adding 1 then subtracting 1/2
-! !!c	    f2 = f2 - 0.5*yfft_amp(i)**2
+! !!c       f2 = f2 - 0.5*yfft_amp(i)**2
 ! !!          coefficients from SC original code (see Walsh eq (33))
 ! !!          note adding 1/2 is the same as adding 1 then subtracting 1/2
-! !!c	    f4 = f4 - 0.5*yfft_amp(i)**4
-! !!c	  endif
+! !!c       f4 = f4 - 0.5*yfft_amp(i)**4
+! !!c     endif
 ! 
 ! 
 ! !!  testing SC coefficients to compare  (equation 33 Walsh et al.)
 ! !!  relabel coefficients to make it less confusing
 ! 
-! 	e2=0.
-! 	e4=0.
-! 	do 7 i=1,nf
+!    e2=0.
+!    e4=0.
+!    do 7 i=1,nf
 ! !!        yfft_amp(i)**2 is |f_i|^2|g_i|^2
 ! !!        note that have used i as the index rather than n
-! 	  e2   = e2 + yfft_amp(i)**2
+!      e2   = e2 + yfft_amp(i)**2
 ! !!        yfft_amp(i)**4 is |f_i|^4|g_i|^4
 ! !!        note that have used i as the index rather than n
-! 	  e4   = e4 + yfft_amp(i)**4
-! 	  
-! 	  if(i.eq.1.or.i.eq.nf)then
+!      e4   = e4 + yfft_amp(i)**4
+!      
+!      if(i.eq.1.or.i.eq.nf)then
 ! !!          coefficients from SC equation A3
-! !!          note adding 1/2 is the same as adding 1 then subtracting 1/2	  
-! 	    sce2 = e2 - 0.5*yfft_amp(i)**2
+! !!          note adding 1/2 is the same as adding 1 then subtracting 1/2     
+!        sce2 = e2 - 0.5*yfft_amp(i)**2
 ! !!          coefficients from SC original code (see Walsh eq (33))
-! !!          note adding 1/2 is the same as adding 1 then subtracting 1/2	    
-! 	    sce4 = e4 - 0.5*yfft_amp(i)**4
-! 	  endif
-! 7 	continue
+! !!          note adding 1/2 is the same as adding 1 then subtracting 1/2       
+!        sce4 = e4 - 0.5*yfft_amp(i)**4
+!      endif
+! 7    continue
 ! c
 ! !!  put in Walsh' coefficients
 ! !!  Replace sce2 and sce4 with e2 and e4 from Walsh et al. (eqn 25 and 27)
@@ -255,10 +255,10 @@
 ! 
 ! !! estimate the degrees of freedom using (Walsh et al 31 aka SC A12)
 ! !! based on our defintion of e4 (Walsh et al eq 27)
-! 	ndf = nint( 2.0 * (2.0*e2**2/e4 - 1.) )
+!    ndf = nint( 2.0 * (2.0*e2**2/e4 - 1.) )
 ! !! estimate the degrees of freedom using (Walsh et al 31 aka SC A12)
 ! !! based on our the original SC code definition of e4 (Walsh et al eq 33)
-! 	scndf = nint( 2.0 * (2.0*sce2**2/sce4 - 1.) )
+!    scndf = nint( 2.0 * (2.0*sce2**2/sce4 - 1.) )
 ! c  MKS 15 June 2013 replacing with Walsh method (Equation 31)
 !         print *, "e2,e4,sce2,sce4,e2,e4,ndf,scndf are "
 !         print *, e2,e4,sce2,sce4,e2,e4,ndf,scndf
@@ -270,8 +270,8 @@
 !         write (59,*) e2,e4,sce2,sce4,e2,e4,ndf,scndf
 !         close (59)
 ! c
-! 	return
-! 	end
+!    return
+!    end
 
       
       
