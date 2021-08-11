@@ -7,7 +7,6 @@
 !===============================================================================
 !
 !  PROGRAM : f90sac
-!  VERSION : 5.0
 !
 !  (C) James Wookey
 !  School of Earth Sciences, University of Bristol
@@ -17,19 +16,20 @@
 !-------------------------------------------------------------------------------
 !
 !   The module provides data structures and functions for reading,
-!   writing and handling SAC files in Fortran 90/95.
+!   writing and handling SAC files in Fortran 90 or newer.
 !
 !   Please report bugs/problems to email address above
 !
 !   NOTE: This version of the code assumes IO filestream 99 is available 
-!         for reading and writing. 
+!         for reading and writing. The number can be altered with the
+!         parameter iounit.
 !
 !-------------------------------------------------------------------------------
 !
 !  This software is distributed under the term of the BSD free software license.
 !
 !  Copyright:
-!     (c) 2003-2019, James Wookey, Andy Nowacki
+!     (c) 2003-2021, James Wookey, Andy Nowacki
 !
 !  All rights reserved.
 !
@@ -72,8 +72,6 @@
    private
 
 !  ** DECLARE CONTAINED FUNCTIONS
-!  ** status routine
-      public :: f90sac_status
       
 !  ** Input/output routines 
       public :: f90sac_filename
@@ -90,6 +88,7 @@
       public :: f90sac_copytraceheader
       public :: f90sac_deletetrace
       public :: f90sac_time_derivative
+      public :: f90sac_combine_xy
 
 !  ** Trace transformation/calculation routines 
       public :: f90sac_orient2d
@@ -143,14 +142,6 @@
 !  ** define the unit number to use for reading and writing (opened and closed
 !  ** within each call)
       integer, parameter, public :: f90sac_iounit = 99 ;
-
-!  ** endian configuration
-
-#ifdef FORCE_BIGENDIAN_SACFILES
-      character, parameter :: f90sac_endian_mode = 'b'
-#else      
-      character, parameter :: f90sac_endian_mode = 'n'
-#endif      
 
 !  ** OPTIONAL suppression of warnings, set to 1 to supress      
 #ifdef SUPPRESS_WARNINGS
@@ -209,51 +200,15 @@
          character (len = 8) :: kt5,kt6,kt7,kt8,kt9
          character (len = 8) :: kf,kuser0,kuser1,kuser2
          character (len = 8) :: kcmpnm,knetwk,kdatrd,kinst
+
 !     ** the trace
-         real(real4), allocatable :: trace(:)
+         real(real4), allocatable :: x1(:),x2(:),x3(:)
+
+
+         
                   
       end type SACtrace      
-
-!=============================================================================== 
-!  ** Define a data structure for containing SAC xy files
-!=============================================================================== 
-      type, public :: SACxy
-!     ** Header floating point part
-         real(real4) :: delta,depmin,depmax,scale,odelta,b,e,o,a,internal0
-         real(real4) :: t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,f
-         real(real4) :: resp0,resp1,resp2,resp3,resp4,resp5
-         real(real4) :: resp6,resp7,resp8,resp9
-         real(real4) :: stla,stlo,stel,stdp,evla,evlo,evel,evdp,mag
-         real(real4) :: user0,user1,user2,user3,user4
-         real(real4) :: user5,user6,user7,user8,user9
-         real(real4) :: dist,az,baz,gcarc,internal1,internal2,depmen
-         real(real4) :: cmpaz,cmpinc
-         real(real4) :: xminimum,xmaximum,yminimum,ymaximum
-         real(real4) :: unused1,unused2,unused3,unused4
-         real(real4) :: unused5,unused6,unused7
-!     ** Header integer part
-         integer(int4) :: nzyear,nzjday,nzhour,nzmin,nzsec,nzmsec
-         integer(int4) :: nvhdr,norid,nevid,npts
-         integer(int4) :: internal3,nwfid,nxsize,nysize,unused8
-         integer(int4) :: iftype,idep,iztype,unused9
-         integer(int4) :: iinst,istreg,ievreg,ievtyp
-         integer(int4) :: iqual,isynth,imagtyp,imagsrc
-         integer(int4) :: unused10,unused11,unused12,unused13,unused14
-         integer(int4) :: unused15,unused16,unused17         
-!     ** Header logical part (stored as integers)
-         integer(int4) ::  leven,lpspol,lovrok,lcalda,unused18 
-!     ** Header character part
-         character (len = 16) :: kevnm
-         character (len = 8) :: kstnm,khole,ko,ka
-         character (len = 8) :: kt0,kt1,kt2,kt3,kt4
-         character (len = 8) :: kt5,kt6,kt7,kt8,kt9
-         character (len = 8) :: kf,kuser0,kuser1,kuser2
-         character (len = 8) :: kcmpnm,knetwk,kdatrd,kinst
-!     ** The trace
-
-         real(real4), allocatable :: x(:)
-         real(real4), allocatable :: y(:)
-      end type SACxy      
+      
 
 !  ** tolerance for the comparison of angles      
       real, parameter :: f90sac_angle_tolerance = 0.001
@@ -272,65 +227,6 @@
 !===============================================================================
 
    CONTAINS
-
-!===============================================================================
-   subroutine f90sac_io_init()
-!===============================================================================
-!
-!     Initialise SAC file IO configuration:
-!
-      implicit none
-      if (f90sac_init_flag == 6514236) return ! configuration is already done
-         
-!  ** configure endian behaviour. If forced big-endian, then swapping is 
-!     required on little-endian machines.   
-      if (f90sac_endian_mode == 'b') then   
-         if(f90sac_isBigEndian()) then
-            f90sac_force_byteswap = .false.
-         else
-            f90sac_force_byteswap = .true.
-         endif      
-      else
-            f90sac_force_byteswap = .false.
-      endif
-      f90sac_init_flag = 6514236 ! need only do this once
-         
-      return
-      end subroutine f90sac_io_init
-!===============================================================================
-
-!===============================================================================
-   subroutine f90sac_status()
-!===============================================================================
-!
-!     Report current operating conditions
-!
-      implicit none
-      if (f90sac_init_flag == 6514236) then
-         print*,'F90SAC: IO is initialised'
-      else   
-         print*,'F90SAC: IO is not initialised'
-      endif
-         
-!  ** report endian behaviour. 
-      if (f90sac_IsBigEndian) then
-         print*,'F90SAC: Your machine appears to be BIG endian.'
-      else
-         print*,'F90SAC: Your machine appears to be LITTLE endian.'
-      endif
-      
-      print*,'F90SAC: Selected endian mode is ',trim(f90sac_endian_mode)      
-      
-      if (f90sac_force_byteswap) then   
-         print*,'F90SAC: Forced byteswap is ENABLED'
-      else
-         print*,'F90SAC: Forced byteswap is DISABLED'
-      endif
-      
-      return
-   end subroutine f90sac_status
-!===============================================================================
-
 
 !===============================================================================
    subroutine f90sac_deletetrace(tr)
@@ -390,12 +286,51 @@ tr%kt0   = SAC_cnull ; tr%kt8 = SAC_cnull ; tr%kdatrd  = SAC_cnull
 tr%kt1   = SAC_cnull ; tr%kt9 = SAC_cnull ; tr%kinst   = SAC_cnull
 tr%kt2   = SAC_cnull ; tr%kf  = SAC_cnull ; 
       
-      if (allocated(tr%trace)) then
-         deallocate(tr%trace)
-      endif 
+      if (allocated(tr%x1)) deallocate(tr%x1)
+      if (allocated(tr%x2)) deallocate(tr%x2)
+      if (allocated(tr%x3)) deallocate(tr%x3)
       
       return
       end subroutine f90sac_deletetrace
+!===============================================================================
+
+!===============================================================================
+   subroutine f90sac_combine_xy(t1,t2,out)
+!===============================================================================
+!
+!     Combine two 1d files into one 2d. 
+!
+!     All header values are assumed from t1 except iftype and leven. The traces
+!     must be the same length.
+!
+      implicit none
+      type (SACtrace) :: t1,t2,out
+
+      if (t1 % npts /= t2 % npts) then
+         write(0,'(a)') &
+         'F90SAC_COMBINE_XY: Error: unequal file lengths'
+         STOP
+      endif
+
+      call f90sac_newtrace(t1 % npts, t1 % delta, out, iftype=4)
+
+      call f90sac_copytraceheader(t1,out)
+
+      out % iftype = 4
+      out % leven = 0
+
+      out % x1(1:out % npts) = t1 % x1(1:out % npts)
+
+      out % x2(1:out % npts) = t2 % x1(1:out % npts)
+
+      out % xmaximum = maxval(t1%x1(1:t1 % npts))
+      out % xminimum = minval(t1%x1(1:t1 % npts))
+
+      out % ymaximum = maxval(t2%x1(1:t2 % npts))
+      out % yminimum = minval(t2%x1(1:t2 % npts))
+
+      return
+      end subroutine f90sac_combine_xy
 !===============================================================================
 
 !===============================================================================
@@ -490,7 +425,7 @@ tr%kt2   = SAC_cnull ; tr%kf  = SAC_cnull ;
 !  ** calculate correlation
       cc = 0.0
       do i=1,t1 % npts
-         cc = cc + t1%trace(i)*t2%trace(i)         
+         cc = cc + t1%x1(i)*t2%x1(i)         
       enddo   
 
       
@@ -520,9 +455,9 @@ tr%kt2   = SAC_cnull ; tr%kf  = SAC_cnull ;
 !  ** calculate covariance matrix
       cov(:,:) = 0.0
       do i=1,t1 % npts
-         cov(1,1) = cov(1,1) + t1%trace(i)**2.
-         cov(2,2) = cov(2,2) + t2%trace(i)**2
-         cov(1,2) = cov(1,2) + t1%trace(i)*t2%trace(i)         
+         cov(1,1) = cov(1,1) + t1%x1(i)**2.
+         cov(2,2) = cov(2,2) + t2%x1(i)**2
+         cov(1,2) = cov(1,2) + t1%x1(i)*t2%x1(i)         
       enddo   
       cov(2,1) = cov(1,2)
       
@@ -556,9 +491,9 @@ tr%kt2   = SAC_cnull ; tr%kf  = SAC_cnull ;
       allocate(m1(t1%npts,3))
       allocate(m2(3,t1%npts))
       
-      m1(:,1) = t1%trace(:)
-      m1(:,2) = t2%trace(:)
-      m1(:,3) = t3%trace(:)
+      m1(:,1) = t1%x1(:)
+      m1(:,2) = t2%x1(:)
+      m1(:,3) = t3%x1(:)
       
       m2 = transpose(m1)
       
@@ -677,8 +612,8 @@ tr%kt2   = SAC_cnull ; tr%kf  = SAC_cnull ;
       endif
       
 !  ** copy the traces      
-      tc % trace(1:t1 % npts) = t1 % trace(1:t1 % npts)
-      tc % trace(t1%npts + 1 : t1%npts + t2%npts) = t2%trace(1:t2 % npts)
+      tc % x1(1:t1 % npts) = t1 % x1(1:t1 % npts)
+      tc % x1(t1%npts + 1 : t1%npts + t2%npts) = t2%x1(1:t2 % npts)
       
          
       return
@@ -762,8 +697,8 @@ tr%kt2   = SAC_cnull ; tr%kf  = SAC_cnull ;
       call f90sac_clonetrace(tr_in,tr_out)
 
 !  ** deallocate its trace memory, and reallocate the correct amount           
-      deallocate (tr_out % trace, stat = istatus)
-      allocate (tr_out % trace(new_npts))
+      deallocate (tr_out % x1, stat = istatus)
+      allocate (tr_out % x1(new_npts))
 
 !  ** set header values
       tr_out % npts = new_npts
@@ -772,7 +707,7 @@ tr%kt2   = SAC_cnull ; tr%kf  = SAC_cnull ;
 
 !  ** copy the trace
       do i = 1,new_npts
-         tr_out % trace(i) = tr_in % trace( iwbeg + (i-1) )          
+         tr_out % x1(i) = tr_in % x1( iwbeg + (i-1) )          
       enddo
       return
    end subroutine f90sac_window
@@ -800,18 +735,18 @@ tr%kt2   = SAC_cnull ; tr%kf  = SAC_cnull ;
       allocate(dxdt(tr%npts))
 
       ! first point
-      dxdt(1) = (tr%trace(2)-tr%trace(1))/tr%delta ;
+      dxdt(1) = (tr%x1(2)-tr%x1(1))/tr%delta ;
 
       ! intermediate points
       do i=2,tr%npts-1
-         dxdt(i) = (tr%trace(i+1)-tr%trace(i-1))/(tr%delta*2.) ;
+         dxdt(i) = (tr%x1(i+1)-tr%x1(i-1))/(tr%delta*2.) ;
       enddo
 
       ! last point
-      dxdt(tr%npts) = (tr%trace(tr%npts)-tr%trace(tr%npts-1))/tr%delta ;
+      dxdt(tr%npts) = (tr%x1(tr%npts)-tr%x1(tr%npts-1))/tr%delta ;
 
       ! copy
-      tr%trace(1:tr%npts) = dxdt(1:tr%npts) ;
+      tr%x1(1:tr%npts) = dxdt(1:tr%npts) ;
 
       ! deallocate temporary array
       deallocate(dxdt)
@@ -880,7 +815,7 @@ tr%kt2   = SAC_cnull ; tr%kf  = SAC_cnull ;
 
 !  ** now check whether t2 needs to be reversed
       if ( (abs(t2 % cmpaz-270.0) <= f90sac_angle_tolerance) ) then
-         t2 % trace(1:t2 % npts) = -t2 % trace(1:t2 % npts)
+         t2 % x1(1:t2 % npts) = -t2 % x1(1:t2 % npts)
       endif
       
 !  ** update component azimuths
@@ -936,6 +871,9 @@ tr%kt2   = SAC_cnull ; tr%kf  = SAC_cnull ;
       real,parameter :: pi = 3.1415927410125732421875
       real :: cmpazdiff
 
+      call f90sac_require_ts_file(t1,'in f90sac_rotate2d_rz')
+      call f90sac_require_ts_file(t2,'in f90sac_rotate2d_rz')
+
 !  ** check CMPINC header is present
       if (t1 % cmpinc == SAC_rnull .or. t2 % cmpinc == SAC_rnull) then
          if (f90sac_suppress_warnings /= 1) then
@@ -975,13 +913,13 @@ tr%kt2   = SAC_cnull ; tr%kf  = SAC_cnull ;
       
 !  ** rotate traces      
       do isamp = 1 , t1 % npts     
-         sample(1,1) = t1 % trace(isamp) ; 
-         sample(2,1) = t2 % trace(isamp) ; 
+         sample(1,1) = t1 % x1(isamp) ; 
+         sample(2,1) = t2 % x1(isamp) ; 
          
          rsample = matmul(rotmat,sample) ;
          
-         t1 % trace(isamp) = rsample(1,1) ;
-         t2 % trace(isamp) = rsample(2,1) ; 
+         t1 % x1(isamp) = rsample(1,1) ;
+         t2 % x1(isamp) = rsample(2,1) ; 
       enddo
 
 !  ** update component azimuths      
@@ -1073,13 +1011,13 @@ tr%kt2   = SAC_cnull ; tr%kf  = SAC_cnull ;
       
 !  ** rotate traces      
       do isamp = 1 , t1 % npts     
-         sample(1,1) = t1 % trace(isamp) ; 
-         sample(2,1) = t2 % trace(isamp) ; 
+         sample(1,1) = t1 % x1(isamp) ; 
+         sample(2,1) = t2 % x1(isamp) ; 
          
          rsample = matmul(rotmat,sample) ;
          
-         t1 % trace(isamp) = rsample(1,1) ;
-         t2 % trace(isamp) = rsample(2,1) ; 
+         t1 % x1(isamp) = rsample(1,1) ;
+         t2 % x1(isamp) = rsample(2,1) ; 
       enddo
 
 !  ** update component azimuths      
@@ -1144,6 +1082,8 @@ tr%kt2   = SAC_cnull ; tr%kf  = SAC_cnull ;
       real :: dt
       type (SACtrace) :: trace
       
+      call f90sac_require_ts_file(trace,'in f90sac_tshift')
+
       ishift = nint (dt / (trace % delta) )
             
 !  ** check for no shift      
@@ -1153,25 +1093,61 @@ tr%kt2   = SAC_cnull ; tr%kf  = SAC_cnull ;
       endif      
          
 !  ** shift array      
-      trace % trace = cshift((trace % trace),-ishift)
+      trace % x1 = cshift((trace % x1),-ishift)
       
 !  ** if negative shift, zero last ishift points      
       if (ishift < 0) &
-         trace % trace(trace % npts - abs(ishift): trace % npts) = 0.0
+         trace % x1(trace % npts - abs(ishift): trace % npts) = 0.0
 !  ** if positive shift, zero first ishift points      
-      if (ishift > 0) trace % trace(1:abs(ishift)) = 0.0
+      if (ishift > 0) trace % x1(1:abs(ishift)) = 0.0
       
       return
    end subroutine f90sac_tshift
 !===============================================================================
 
 !===============================================================================
-   subroutine f90sac_newtrace(nsamp,delta,out)
+   subroutine f90sac_require_ts_file(trace,msg)
+!===============================================================================
+!
+!     Abort execution if a trace is not a time-series file
+!
+      implicit none
+      type (SACtrace) :: trace
+      character(len=*), intent(in), optional :: msg ! error message to append 
+      
+      if (trace%iftype/=1) then
+         write(0,'(a,a)') 'Error: time series file required ',msg
+         stop
+      endif
+      return
+   end subroutine f90sac_require_ts_file
+!===============================================================================
+
+!===============================================================================
+   subroutine f90sac_newtrace(nsamp,delta,out,iftype)
 !===============================================================================
       implicit none
       type (SACtrace) :: out
       integer :: nsamp ! number of samples for trace 
       real :: delta
+      integer, intent(in), optional :: iftype
+
+      integer :: ift,leven
+      
+      if (present(iftype)) then
+         ift = iftype
+      else
+         ift = 1 ! default to time-series file   
+      endif
+
+!  ** set the even sampling flag appropriate to the file type
+      if (ift == 4) then
+         leven = 0 
+      elseif (ift == 51) then
+         leven = 0 
+      else
+         leven = 1 
+      endif
       
       out%delta     = delta
       out%depmin    = SAC_rnull
@@ -1259,7 +1235,7 @@ tr%kt2   = SAC_cnull ; tr%kf  = SAC_cnull ;
       out%nxsize    = SAC_inull
       out%nysize    = SAC_inull
       out%unused8   = SAC_inull
-      out%iftype    = 1 ! default (time series file)
+      out%iftype    = ift ! 1 ! default (time series file)
       out%idep      = 5 ! default
       out%iztype    = 9 ! default
       out%unused9   = SAC_inull
@@ -1279,7 +1255,7 @@ tr%kt2   = SAC_cnull ; tr%kf  = SAC_cnull ;
       out%unused15  = SAC_inull
       out%unused16  = SAC_inull
       out%unused17  = SAC_inull
-      out%leven     = 1 ! default
+      out%leven     = leven ! default
       out%lpspol    = 0
       out%lovrok    = 1
       out%lcalda    = 1
@@ -1310,9 +1286,19 @@ tr%kt2   = SAC_cnull ; tr%kf  = SAC_cnull ;
       out%kinst   = SAC_cnull
  
 !  ** allocate memory for the trace
-      call f90sac_malloc(out%trace,out%npts)
-   
-      out % trace(1:out % npts) = 0.0
+      call f90sac_malloc(out%x1,out%npts)
+      out % x1(1:out % npts) = 0.0
+
+!  ** If required read the second and third components
+      if ((out%iftype==2) .or. (out%iftype==2) .or. &
+          (out%iftype==3) .or. (out%iftype==4) .or. (out%iftype==51)) then
+         call f90sac_malloc(out%x2, out%npts)
+         out % x2(1:out % npts) = 0.0
+      endif   
+      if (out%iftype==51) then
+         call f90sac_malloc(out%x3, out%npts)
+         out % x3(1:out % npts) = 0.0
+      endif
       
 
    end subroutine f90sac_newtrace
@@ -1359,7 +1345,16 @@ tr%kt2   = SAC_cnull ; tr%kf  = SAC_cnull ;
 !  ** duplicate target header
       call f90sac_copytraceheader(target,clone) 
 !  ** copy data   
-      clone % trace(1:clone % npts) = target % trace(1:target % npts)
+      clone % x1(1:clone % npts) = target % x1(1:target % npts)
+
+!  ** If required copy the second and third components
+      if ((target%iftype==2) .or. (target%iftype==2) .or. &
+          (target%iftype==3) .or. (target%iftype==4) .or. (target%iftype==51))  then
+         clone % x2(1:clone % npts) = target % x2(1:target % npts)
+      endif   
+      if (target%iftype==51) then
+         clone % x3(1:clone % npts) = target % x3(1:target % npts)
+      endif
       
    end subroutine f90sac_clonetrace
 !===============================================================================
@@ -2325,144 +2320,32 @@ tr%kt2   = SAC_cnull ; tr%kf  = SAC_cnull ;
       implicit none
       character(len=*), intent(in) :: fname
       type(SACtrace), intent(in) :: out
-      integer :: iostat
+      integer :: iostat,lu
 
 !  ** Open lu and write the header
       call f90sac_open_writeheader(fname, f90sac_iounit, out)
 
 !  ** Write the trace
-      write(f90sac_iounit, iostat=iostat) out%trace
+      write(f90sac_iounit, iostat=iostat) out%x1(1:out%npts)
+
+!  ** If required write the second and third components
+      if ((out%iftype==2) .or. (out%iftype==2) .or. &
+          (out%iftype==3) .or. (out%iftype==4) .or. (out%iftype==51)) &
+         write(f90sac_iounit, iostat=iostat) out%x2(1:out%npts)
+      if (out%iftype==51) &
+         write(f90sac_iounit, iostat=iostat) out%x3(1:out%npts)
+
       if (iostat /= 0) then
          write(0,'(a)') 'F90SAC_WRITETRACE: Error: Problem writing trace to' &
             // ' file "' // trim(fname) // '"'
+            print*,'npts, lu = ',out%npts,lu
+            print*,'iostat=',iostat
          stop
       endif
 
       close(f90sac_iounit)
    end subroutine f90sac_writetrace
 !===============================================================================
-
-!===============================================================================
-   subroutine f90sac_readheader(fname,out)
-!===============================================================================
-!
-!  read a SAC header from a file. This is a trace object but with a single null
-!  value as the trace.
-!
-!  If we can read the file in a different endianness to that expected, we do,
-!  but warn the user on stdout.  The only way to silence this is by byteswapping
-!  the file (which is intentional).
-
-      implicit none
-      character(len=*), intent(in) :: fname
-      type(SACtrace), intent(inout) :: out
-      integer, parameter :: lu = f90sac_iounit
-
-!  ** Open file for reading and read header, leaving lu open
-      call f90sac_open_readheader(fname, lu, out)
-
-!  ** allocate memory for the trace
-      call f90sac_malloc(out%trace,1)
-
-      out%trace(1) = SAC_rnull
-
-      close(lu)
-
-   end subroutine f90sac_readheader
-!===============================================================================
-
-!===============================================================================
-   subroutine f90sac_readtrace(fname,out)
-!===============================================================================
-!
-!  read a SAC time-series object from a file
-!
-      implicit none
-      character(len=*), intent(in) :: fname
-      type(SACtrace), intent(inout) :: out
-      integer, parameter :: lu = f90sac_iounit
-      integer :: iostat
-
-!  ** Read in the header and leave lu open for further reading
-      call f90sac_open_readheader(fname, lu, out)
-
-!  ** allocate memory for the trace and read it in
-      call f90sac_malloc(out%trace, out%npts)
-      read(lu,iostat=iostat) out%trace
-
-      close(lu)
-
-      if (iostat /= 0) then
-         write(0,'(a)') 'F90SAC_READTRACE: ERROR: Problem reading trace ' // &
-            'from file "' // trim(fname) // '"'
-            write(0,*) iostat
-         stop
-      endif
-
-   end subroutine f90sac_readtrace
-!===============================================================================
-
-!===============================================================================
-   function f90sac_get_file_endianness(fname) result(convert)
-!===============================================================================
-!
-!  Determine the endianness of a file.  The routine returns one of the following:
-!     'native'    : The file is the same endianness as the machine
-!     'swap'      : The file is the opposite endianness as the machine.
-!     'error'     : The file does not have a valid NVHDR header value
-!
-      implicit none
-      character(len=*), intent(in) :: fname
-      character(len=6) :: convert
-      integer, parameter :: lu = f90sac_iounit
-      integer, parameter :: irec_nvhdr = 77
-      integer :: nvhdr, iostat
-
-      ! Try opening with native endianness
-      open(lu, file=trim(fname), access='direct', form='unformatted', &
-            recl=f90sac_32bit_record_length, status='old', iostat=iostat)
-      if (iostat /= 0) then
-         write(0,'(a)') 'GET_FILE_ENDIANNESS: Error: Cannot open file "' &
-            // trim(fname) // '"'
-         stop
-      endif
-      read(lu, rec=irec_nvhdr, iostat=iostat) nvhdr
-      close(lu)
-      if (iostat /= 0) then
-         write(0,'(a)') 'GET_FILE_ENDIANNESS: Error: Cannot read value of ' &
-            // ' nvhdr from file "' // trim(fname) // '"'
-         stop
-      endif
-      if (nvhdr == f90sac_current_nvhdr) then
-         convert = 'native'
-         return
-      endif
-
-      ! Try opening with opposite endianness
-      open(lu, file=trim(fname), access='direct', form='unformatted', &
-            recl=f90sac_32bit_record_length, status='old', convert='swap', &
-            iostat=iostat)
-      if (iostat /= 0) then
-         write(0,'(a)') 'GET_FILE_ENDIANNESS: Error: Cannot open file "' &
-            // trim(fname) // '"'
-         stop
-      endif
-      read(lu, rec=irec_nvhdr, iostat=iostat) nvhdr
-      close(lu)
-      if (iostat /= 0) then
-         write(0,'(a)') 'GET_FILE_ENDIANNESS: Error: Cannot read value of ' &
-            // ' nvhdr from file "' // trim(fname) // '"'
-         stop
-      endif
-      if (nvhdr == f90sac_current_nvhdr) then
-         convert = 'swap'
-         return
-      endif
-
-      ! Can't find an endianness which gives us the expected header version
-      convert = 'error'
-   end function f90sac_get_file_endianness
-!-------------------------------------------------------------------------------
 
 !===============================================================================
    subroutine f90sac_open_writeheader(fname, lu, out)
@@ -2481,15 +2364,18 @@ tr%kt2   = SAC_cnull ; tr%kf  = SAC_cnull ;
       integer(int4) :: sacih(40)
       character(192) :: sacch
 
-      call f90sac_io_init()
-
-!  ** Decide on endianness for output
-      convert = 'native'
-      if (f90sac_force_byteswap) convert = 'swap'
 
 !  ** Open unit for writing
+
+#ifdef BIGENDIAN_SACFILES
       open(lu, file=trim(fname), form='unformatted', status='replace', &
-            access='stream', convert=trim(convert), iostat=iostat)
+            access='stream', convert='big_endian', iostat=iostat)
+#else      
+      open(lu, file=trim(fname), form='unformatted', status='replace', &
+            access='stream', iostat=iostat)
+#endif
+
+
       if (iostat /= 0) then
          write(0,'(a)') 'F90SAC_OPEN_WRITEHEADER: Error: Cannot open file "' &
             // trim(fname) // '" for writing'
@@ -2570,7 +2456,7 @@ tr%kt2   = SAC_cnull ; tr%kf  = SAC_cnull ;
 
       write(lu, iostat=iostat) sacrh
       if (iostat /= 0) then
-         write(0,'(a)') 'F90SAC_OPEN_READHEADER: Error: Problem writing real ' &
+         write(0,'(a)') 'F90SAC_OPEN_WRITEHEADER: Error: Problem writing real ' &
             // 'part of header to file "' // trim(fname) // '"'
          stop
       endif
@@ -2619,7 +2505,7 @@ tr%kt2   = SAC_cnull ; tr%kf  = SAC_cnull ;
 
       write(lu, iostat=iostat) sacih
       if (iostat /= 0) then
-         write(0,'(a)') 'F90SAC_OPEN_READHEADER: Error: Problem writing integer ' &
+         write(0,'(a)') 'F90SAC_OPEN_WRITEHEADER: Error: Problem writing integer ' &
             // 'part of header to file "' // trim(fname) // '"'
          stop
       endif
@@ -2651,7 +2537,7 @@ tr%kt2   = SAC_cnull ; tr%kf  = SAC_cnull ;
 
       write(lu, iostat=iostat) sacch
       if (iostat /= 0) then
-         write(0,'(a)') 'F90SAC_OPEN_READHEADER: Error: Problem writing character ' &
+         write(0,'(a)') 'F90SAC_OPEN_WRITEHEADER: Error: Problem writing character ' &
             // 'part of header to file "' // trim(fname) // '"'
          stop
       endif
@@ -2659,6 +2545,78 @@ tr%kt2   = SAC_cnull ; tr%kf  = SAC_cnull ;
 !  ** NB: LOGICAL UNIT lu IS NOT CLOSED!!!
    end subroutine f90sac_open_writeheader
 !-------------------------------------------------------------------------------
+
+!===============================================================================
+   subroutine f90sac_readheader(fname,out)
+!===============================================================================
+!
+!  read a SAC header from a file. This is a trace object but with a single null
+!  value as the trace.
+!
+!  If we can read the file in a different endianness to that expected, we do,
+!  but warn the user on stdout.  The only way to silence this is by byteswapping
+!  the file (which is intentional).
+
+      implicit none
+      character(len=*), intent(in) :: fname
+      type(SACtrace), intent(inout) :: out
+      integer, parameter :: lu = f90sac_iounit
+
+!  ** Open file for reading and read header, leaving lu open
+      call f90sac_open_readheader(fname, lu, out)
+
+!  ** allocate memory for the trace
+      call f90sac_malloc(out%x1,1)
+
+      out%x1(1) = SAC_rnull
+
+      close(lu)
+
+   end subroutine f90sac_readheader
+!===============================================================================
+
+!===============================================================================
+   subroutine f90sac_readtrace(fname,out)
+!===============================================================================
+!
+!  read a SAC time-series object from a file
+!
+      implicit none
+      character(len=*), intent(in) :: fname
+      type(SACtrace), intent(inout) :: out
+      integer, parameter :: lu = f90sac_iounit
+      integer :: iostat
+
+!  ** Read in the header and leave lu open for further reading
+      call f90sac_open_readheader(fname, lu, out)
+
+!  ** allocate memory for the trace components and read them in
+      call f90sac_malloc(out%x1, out%npts)
+      read(lu,iostat=iostat) out%x1(1:out%npts)
+
+!  ** If required read the second and third components
+      if ((out%iftype==2) .or. (out%iftype==2) .or. &
+          (out%iftype==3) .or. (out%iftype==4) .or. (out%iftype==51)) then
+         call f90sac_malloc(out%x2, out%npts)
+         read(lu,iostat=iostat) out%x2(1:out%npts)
+      endif   
+      if (out%iftype==51) then
+         call f90sac_malloc(out%x3, out%npts)
+         read(lu,iostat=iostat) out%x3(1:out%npts)
+      endif
+
+      close(lu)
+
+      if (iostat /= 0) then
+         write(0,'(a)') 'F90SAC_READTRACE: ERROR: Problem reading trace ' // &
+            'from file "' // trim(fname) // '"'
+            print*,'npts, lu = ',out%npts,lu
+            print*,'iostat=',iostat
+         stop
+      endif
+
+   end subroutine f90sac_readtrace
+!===============================================================================
 
 !===============================================================================
    subroutine f90sac_open_readheader(fname, lu, out)
@@ -2672,30 +2630,28 @@ tr%kt2   = SAC_cnull ; tr%kf  = SAC_cnull ;
       integer, intent(in) :: lu
       type(SACtrace), intent(inout) :: out
       integer :: iostat
-      character(len=6) :: convert
       real(real4) :: sacrh(70) ! SAC floating point header
       integer(int4) :: sacih(40) ! SAC floating point header
       character(192) :: sacch ! SAC character header
 
-      call f90sac_io_init()
-
 !  ** Determine endianness and warn if we're automatically reading in a different
 !     endianness to that expected.
-      convert = f90sac_get_file_endianness(fname)
-      if (convert == 'error') then
-         write(0,'(a)') 'F90SAC_OPEN_READHEADER: Error: File "' // trim(fname) // &
-               '" does not appear to be a valid SAC file'
-         stop
-      endif
-      if ((convert == 'swap' .and. .not.f90sac_force_byteswap) .or. &
-          (convert == 'native' .and. f90sac_force_byteswap)) then
-         write(0,'(a)') 'F90SAC_OPEN_READHEADER: Warning: ' // &
-            'Auto-byteswapping file "' // trim(fname) // '"'
-      endif
+      
+!      if (.not.f90sac_check_file_endianness(fname)) then
+!         write(0,'(a)') 'F90SAC_OPEN_READHEADER: Error: File "' // trim(fname) // &
+!               '" does not appear to be a valid SAC file (e.g., check byte order).'
+!        stop
+!      endif
 
 !  ** Open the file for reading
-      open(unit=lu, file=trim(fname),form='unformatted', &
-            access='stream', status='old', convert=trim(convert), iostat=iostat)
+#ifdef BIGENDIAN_SACFILES
+      open(lu, file=trim(fname), form='unformatted', status='old', &
+            access='stream', convert='big_endian', iostat=iostat)
+#else      
+      open(lu, file=trim(fname), form='unformatted', status='old', &
+            access='stream', iostat=iostat)
+#endif
+
       if (iostat /= 0) then
          write(0,'(a)') 'F90SAC_OPEN_READHEADER: Error: Cannot open file "' &
             // trim(fname) // '" for reading'
@@ -2871,6 +2827,54 @@ tr%kt2   = SAC_cnull ; tr%kf  = SAC_cnull ;
 !  ** NB: LOGICAL UNIT lu IS NOT CLOSED!!!
    end subroutine f90sac_open_readheader
 !-------------------------------------------------------------------------------
+
+
+!===============================================================================
+   function f90sac_check_file_endianness(fname) result(ok)
+!===============================================================================
+!
+!  Determine the endianness of a file.  The routine returns one of the following:
+!     'native'    : The file is the same endianness as the machine
+!     'swap'      : The file is the opposite endianness as the machine.
+!     'error'     : The file does not have a valid NVHDR header value
+!
+      implicit none
+      character(len=*), intent(in) :: fname
+      logical :: ok
+      integer, parameter :: lu = f90sac_iounit
+      integer, parameter :: irec_nvhdr = 77
+      integer :: nvhdr, iostat
+
+      ok = .false.
+      ! Check file endianness
+      open(lu, file=trim(fname), access='direct', form='unformatted', &
+            recl=f90sac_32bit_record_length, status='old', iostat=iostat)
+      if (iostat /= 0) then
+         write(0,'(a)') 'GET_FILE_ENDIANNESS: Error: Cannot open file "' &
+            // trim(fname) // '"'
+         stop
+      endif
+      read(lu, rec=irec_nvhdr, iostat=iostat) nvhdr
+      close(lu)
+      if (iostat /= 0) then
+         write(0,'(a)') 'GET_FILE_ENDIANNESS: Error: Cannot read value of ' &
+            // ' nvhdr from file "' // trim(fname) // '"'
+         stop
+      endif
+      if (nvhdr == f90sac_current_nvhdr) then
+         ok = .true.
+         return
+      endif
+
+
+
+      ! Can't find an endianness which gives us the expected header version
+      ok = .false.
+   end function f90sac_check_file_endianness
+!-------------------------------------------------------------------------------
+
+
+
 
 !===============================================================================
    subroutine f90sac_fnfix(fn,fnfixed)

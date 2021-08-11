@@ -49,8 +49,8 @@
       r2 = 0 
       SI = 0 
       do i = 1,wh1%npts
-         r2 = r2 + wh1%trace(i)*wh1%trace(i)
-         SI = SI + wh1%trace(i)*wh2%trace(i)
+         r2 = r2 + wh1%x1(i)*wh1%x1(i)
+         SI = SI + wh1%x1(i)*wh2%x1(i)
       enddo
 !     
       SI = -2.*SI/r2

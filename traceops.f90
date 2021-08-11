@@ -53,9 +53,9 @@
 		cov(2,1) = 0.
 
 		do 1 i=1,h1 % npts
-		   cov(1,1) = cov(1,1) + h1 % trace(i)**2
-		   cov(2,2) = cov(2,2) + h2 % trace(i)**2
-		   cov(1,2) = cov(1,2) + h1 % trace(i)*h2 % trace(i)
+		   cov(1,1) = cov(1,1) + h1 % x1(i)**2
+		   cov(2,2) = cov(2,2) + h2 % x1(i)**2
+		   cov(1,2) = cov(1,2) + h1 % x1(i)*h2 % x1(i)
 1		continue
 		cov(2,1) = cov(1,2)
 

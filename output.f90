@@ -168,6 +168,7 @@
       implicit none
       type (SACTrace) :: t1,t2 ! the traces
       type (SACTrace) :: t1_wind,t2_wind ! windowed traces
+      type (SACTrace) :: pm ! pm file
       character*50 fname
 
 !     * window the traces
@@ -175,7 +176,9 @@
       call f90sac_window(t2,t2_wind,event % wbeg,event % wend)
 
 !     * create the hybrid file
-      call write_xyfile(t1_wind,t2_wind,fname)
+!      call write_xyfile(t1_wind,t2_wind,fname)
+      call f90sac_combine_xy(t1_wind,t2_wind,pm)
+      call f90sac_writetrace(fname,pm)
       return           
       end subroutine output_pm_files
 !=======================================================================

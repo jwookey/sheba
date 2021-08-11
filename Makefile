@@ -58,7 +58,7 @@ F90FLAGS =
 #F90SAC_FLAGS = 
 
 ## Uncomment for MacSAC (binary sac files are always big-endian)
-F90SAC_FLAGS = -DFORCE_BIGENDIAN_SACFILES 
+F90SAC_FLAGS = -DBIGENDIAN_SACFILES 
 
 #===============================================================================
 # GMT Compatibility options

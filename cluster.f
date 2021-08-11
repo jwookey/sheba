@@ -201,8 +201,8 @@ C  user0 (beg_beg) user1(beg_end) user2(end_beg) user3(end_end)
 C      
       n = trace1 % npts 
       do i = 1,n
-         x0(i) = trace2 % trace(i) ! EAST
-         y0(i) = trace1 % trace(i) ! NORTH
+         x0(i) = trace2 % x1(i) ! EAST
+         y0(i) = trace1 % x1(i) ! NORTH
       enddo
       b = trace1 % b
       delta = trace1 % delta
