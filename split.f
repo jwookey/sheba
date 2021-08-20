@@ -228,8 +228,8 @@ c  ** interpolate error surface in tlag direction **
       call zerror_interp_xc(xc_grid,xc_grid_int)
 
 c  ** save the raw lam1, lam2 surfaces before normalisation
-      event % lam2_raw = error_int
-      event % lam1_raw = lam1_int
+      event % lam2_raw_grid = error_int
+      event % lam1_raw_grid = lam1_int
 
 c  ** find the interpolated minimum position **
       call zerror_min(error_int,np1,np2int,ifast,itlag,lambda2_min)
