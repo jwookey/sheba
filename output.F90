@@ -9,6 +9,156 @@
 !  James Wookey, School of Earth Sciences, University of Bristol
 !
 !=======================================================================
+
+#ifndef NO_NETCDF
+
+!=======================================================================
+   subroutine output_result_nc()
+!=======================================================================
+!  
+!     Output results information to netCDF format
+!  
+!-----------------------------------------------------------------------
+   use sheba_config ! use the sheba_config module
+   use event_info ! use the event_info module
+   use netcdf, only: nf90_create, nf90_def_dim, nf90_def_var, nf90_enddef, &
+      nf90_put_var, nf90_close, NF90_CLOBBER, NF90_FLOAT, nf90_noerr, &
+      nf90_strerror, NF90_GLOBAL, nf90_put_att      
+!-----------------------------------------------------------------------
+      implicit none
+      character*50 :: fname
+      integer :: j,i
+      character*12 :: fmt
+
+      integer :: ncid, tlag_dimid, fast_dimid, window_dimid, cluster_dimid
+      integer :: result_dimid ! scalar dimension for single numbers
+
+!  ** variable ids
+      integer :: mw_wbeg_varid
+      integer :: mw_wend_varid
+      integer :: mw_tlag_varid
+      integer :: mw_dtlag_varid
+      integer :: mw_fast_varid
+      integer :: mw_dfast_varid
+      integer :: cluster_xc0_varid
+      integer :: cluster_yc0_varid
+      integer :: cluster_vxc0_varid
+      integer :: cluster_vyc0_varid
+      integer :: fast_vector_varid     
+      integer :: tlag_vector_varid     
+      integer :: lam1_raw_grid_varid 
+      integer :: lam2_raw_grid_varid 
+      integer :: lam2_norm_grid_varid
+
+!  ** open the file
+      fname = trim(config % fname_base) // '_sheba_result.nc'
+      call check_ncf(nf90_create(trim(fname), NF90_CLOBBER, ncid))
+
+!  ** Make a title
+      call check_ncf(nf90_put_att(ncid, NF90_GLOBAL, 'title', &
+      'SHEBA splitting result'))
+
+!  ** Save the result details as global attributes
+      call check_ncf(nf90_put_att(ncid, NF90_GLOBAL, 'tlag', event % tlag))
+      call check_ncf(nf90_put_att(ncid, NF90_GLOBAL, 'dtlag', event % dtlag))
+      call check_ncf(nf90_put_att(ncid, NF90_GLOBAL, 'fast', event % fast))
+      call check_ncf(nf90_put_att(ncid, NF90_GLOBAL, 'dfast', event % dfast))
+      call check_ncf(nf90_put_att(ncid, NF90_GLOBAL, 'spol', event % spol))
+      call check_ncf(nf90_put_att(ncid, NF90_GLOBAL, 'dspol', event % dspol))
+      call check_ncf(nf90_put_att(ncid, NF90_GLOBAL, 'tlagXC', event % tlagXC))
+      call check_ncf(nf90_put_att(ncid, NF90_GLOBAL, 'dtlagXC', event % dtlagXC))
+      call check_ncf(nf90_put_att(ncid, NF90_GLOBAL, 'fastXC', event % fastXC))
+      call check_ncf(nf90_put_att(ncid, NF90_GLOBAL, 'dfastXC', event % dfastXC))
+      call check_ncf(nf90_put_att(ncid, NF90_GLOBAL, 'wbeg', event % wbeg))
+      call check_ncf(nf90_put_att(ncid, NF90_GLOBAL, 'wend', event % wend))
+      call check_ncf(nf90_put_att(ncid, NF90_GLOBAL, 'snr', event % snr))
+      call check_ncf(nf90_put_att(ncid, NF90_GLOBAL, 'eigrat_orig', event % eigrat_orig))
+      call check_ncf(nf90_put_att(ncid, NF90_GLOBAL, 'eigrat_corr', event % eigrat_corr))
+      call check_ncf(nf90_put_att(ncid, NF90_GLOBAL, 'ndf', event % ndf))
+      call check_ncf(nf90_put_att(ncid, NF90_GLOBAL, 'best_window', event % ibest))
+      call check_ncf(nf90_put_att(ncid, NF90_GLOBAL, 'best_cluster', event % kbest))
+      call check_ncf(nf90_put_att(ncid, NF90_GLOBAL, 'qfactor', event % Quality))
+      call check_ncf(nf90_put_att(ncid, NF90_GLOBAL, 'intensity_estimated', event % intensity))
+      call check_ncf(nf90_put_att(ncid, NF90_GLOBAL, 'intensity', event % intensity_p))
+
+!  ** Define dimensions
+      call check_ncf(nf90_def_dim(ncid, 'result', 1, result_dimid))
+      call check_ncf(nf90_def_dim(ncid, 'search_tlag',    np2int, tlag_dimid))
+      call check_ncf(nf90_def_dim(ncid, 'search_fast',    np1, fast_dimid))
+      call check_ncf(nf90_def_dim(ncid, 'window', event % nwindows, window_dimid))
+      call check_ncf(nf90_def_dim(ncid, 'cluster', event % ncluster, cluster_dimid))
+
+!  ** Multiwindow variables
+      call check_ncf(nf90_def_var(ncid, 'mw_wbeg', NF90_FLOAT, window_dimid, mw_wbeg_varid))
+      call check_ncf(nf90_def_var(ncid, 'mw_wend', NF90_FLOAT, window_dimid, mw_wend_varid))
+      call check_ncf(nf90_def_var(ncid, 'mw_tlag', NF90_FLOAT, window_dimid, mw_tlag_varid))
+      call check_ncf(nf90_def_var(ncid, 'mw_dtlag', NF90_FLOAT, window_dimid, mw_dtlag_varid))
+      call check_ncf(nf90_def_var(ncid, 'mw_fast', NF90_FLOAT, window_dimid, mw_fast_varid))
+      call check_ncf(nf90_def_var(ncid, 'mw_dfast', NF90_FLOAT, window_dimid, mw_dfast_varid))
+
+!  ** Cluster variables
+      call check_ncf(nf90_def_var(ncid, 'cluster_xc0', NF90_FLOAT, cluster_dimid, cluster_xc0_varid))
+      call check_ncf(nf90_def_var(ncid, 'cluster_yc0', NF90_FLOAT, cluster_dimid, cluster_yc0_varid))
+      call check_ncf(nf90_def_var(ncid, 'cluster_vxc0', NF90_FLOAT, cluster_dimid, cluster_vxc0_varid))
+      call check_ncf(nf90_def_var(ncid, 'cluster_vyc0', NF90_FLOAT, cluster_dimid, cluster_vyc0_varid))
+
+!  ** Grid variables
+!call check_ncf(nf90_def_var(ncid, 'amplitude', NF90_FLOAT, &
+!      (/x_dimid, y_dimid, twtt_dimid/), amp_varid))
+      call check_ncf(nf90_def_var(ncid, 'fast_vector'     , NF90_FLOAT, fast_dimid , fast_vector_varid     ))
+      call check_ncf(nf90_def_var(ncid, 'tlag_vector'     , NF90_FLOAT, tlag_dimid , tlag_vector_varid     ))
+
+      call check_ncf(nf90_def_var(ncid, 'lam1_raw_grid' , NF90_FLOAT, (/fast_dimid,tlag_dimid/), lam1_raw_grid_varid ))
+      call check_ncf(nf90_def_var(ncid, 'lam2_raw_grid' , NF90_FLOAT, (/fast_dimid,tlag_dimid/), lam2_raw_grid_varid ))
+      call check_ncf(nf90_def_var(ncid, 'lam2_norm_grid', NF90_FLOAT, (/fast_dimid,tlag_dimid/), lam2_norm_grid_varid))
+
+      print*, 'here!'
+
+!  ** End definition
+      call check_ncf(nf90_enddef(ncid))
+
+!  ** Populate variables
+      call check_ncf(nf90_put_var(ncid, mw_wbeg_varid       , event % mw_wbeg(1:event % nwindows)))
+      call check_ncf(nf90_put_var(ncid, mw_wend_varid       , event % mw_wend(1:event % nwindows)))
+      call check_ncf(nf90_put_var(ncid, mw_tlag_varid       , event % mw_tlag(1:event % nwindows)))
+      call check_ncf(nf90_put_var(ncid, mw_dtlag_varid      , event % mw_dtlag(1:event % nwindows)))
+      call check_ncf(nf90_put_var(ncid, mw_fast_varid       , event % mw_fast(1:event % nwindows)))
+      call check_ncf(nf90_put_var(ncid, mw_dfast_varid      , event % mw_dfast(1:event % nwindows)))
+
+      call check_ncf(nf90_put_var(ncid, cluster_xc0_varid   , event % cluster_xc0(1:event % ncluster)))
+      call check_ncf(nf90_put_var(ncid, cluster_yc0_varid   , event % cluster_yc0(1:event % ncluster)))
+      call check_ncf(nf90_put_var(ncid, cluster_vxc0_varid  , event % cluster_vxc0(1:event % ncluster)))
+      call check_ncf(nf90_put_var(ncid, cluster_vyc0_varid  , event % cluster_vyc0(1:event % ncluster)))
+
+      call check_ncf(nf90_put_var(ncid, fast_vector_varid     , event % fast_vector           ))
+      call check_ncf(nf90_put_var(ncid, tlag_vector_varid     , event % tlag_vector           ))
+
+      call check_ncf(nf90_put_var(ncid, lam1_raw_grid_varid , event % lam1_raw_grid       ))
+      call check_ncf(nf90_put_var(ncid, lam2_raw_grid_varid , event % lam2_raw_grid       ))
+      call check_ncf(nf90_put_var(ncid, lam2_norm_grid_varid, event % lam2_norm_grid      ))
+
+!  ** Finalise file
+      call check_ncf(nf90_close(ncid))
+
+      return
+   end subroutine output_result_nc
+!=======================================================================
+
+!===============================================================================
+   subroutine check_ncf(status)
+!===============================================================================
+   use netcdf, only: nf90_noerr, nf90_strerror
+      integer, intent(in) :: status
+      if (status /= nf90_noerr) then
+         write(0,*) 'netCDF error: ' // trim(nf90_strerror(status))
+         stop
+      endif
+   end subroutine check_ncf
+!-------------------------------------------------------------------------------
+
+#endif
+
+!=======================================================================
       subroutine output_result(t1)
 !=======================================================================
 !  
@@ -140,7 +290,7 @@
       write(fmt,'(a1,i5.5,a)') '(',np2int,'f8.5)'
       do i=1,np1
          write(99,fmt) &
-            ((event % lam2_raw(i,j)/event % lam1_raw(i,j)),j=1,np2int) 
+            ((event % lam2_raw_grid(i,j)/event % lam2_raw_grid(i,j)),j=1,np2int) 
       enddo
 
       close(99)

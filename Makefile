@@ -71,6 +71,16 @@ GMT_PREFIX = gmt
 #GMT_PREFIX = 
 
 #===============================================================================
+# netcdf output
+#===============================================================================
+
+# Uncomment (and update) to use NETCDF
+FFLAGS += -L/usr/local/lib -lnetcdff -I/usr/local/include
+
+# Uncomment to disable NETCDF
+#FFLAGS += -DNO_NETCDF
+
+#===============================================================================
 # Helper programmes
 #===============================================================================
 
@@ -123,7 +133,7 @@ $(EXECDIR)/sheba_stack:${F90SAC} ${MODULES} sheba_stack.o ${SUBROUTINES}
 $(EXECDIR)/stack_wgtcalc:stack_wgtcalc.o 
 	$(FC) $(FFLAGS) -o $(EXECDIR)/stack_wgtcalc stack_wgtcalc.o
 
-#	F90SAC requires special options to compile ...
+#	F90SAC requires special options to compile
 f90sac_distrib.o: f90sac_distrib.F90
 	$(FC) $(FFLAGS) $(F90FLAGS) $(F90SAC_FLAGS) -c $*.F90 
 

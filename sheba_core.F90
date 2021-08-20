@@ -122,9 +122,11 @@
 
 !  ** output result information
       call output_result(h1) 
-      
-!  ** output extra information
-      
+
+!  ** output result information (in netCDF format)
+#ifndef NO_NETCDF
+      call output_result_nc()
+#endif
       
 
 !  ** output particle motion files
