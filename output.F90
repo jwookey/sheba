@@ -112,8 +112,6 @@
       call check_ncf(nf90_def_var(ncid, 'lam2_raw_grid' , NF90_FLOAT, (/fast_dimid,tlag_dimid/), lam2_raw_grid_varid ))
       call check_ncf(nf90_def_var(ncid, 'lam2_norm_grid', NF90_FLOAT, (/fast_dimid,tlag_dimid/), lam2_norm_grid_varid))
 
-      print*, 'here!'
-
 !  ** End definition
       call check_ncf(nf90_enddef(ncid))
 

@@ -6,7 +6,7 @@
 #-------------------------------------------------------------------------------
 #===============================================================================
 #
-#  (C) James Wookey, December 2003 - February 2011
+#  (C) James Wookey, December 2003 - February 2021
 #  Department of Earth Sciences, University of Bristol
 #  Wills Memorial Building, Queen's Road, Bristol, BR8 1RJ, UK
 #  j.wookey@bristol.ac.uk
@@ -22,10 +22,9 @@
 #   SHEBA requires a FORTRAN 90 compiler. Compilers known to work are:    
 #      Linux : ifc/ifort, g95, gfortran
 #      Mac (PowerPC) : g95, gfortran, XLF
-#      Mac (i386) : gfortran, ifort (maybe)
+#      Mac (intel) : gfortran, ifort
 #      Sun (sparc) : Solaris f90
 #
-
 
 #===============================================================================
 # Path options
@@ -74,7 +73,7 @@ GMT_PREFIX = gmt
 # netcdf output
 #===============================================================================
 
-# Uncomment (and update) to use NETCDF
+# Uncomment (and update as necessary) to use NETCDF
 FFLAGS += -L/usr/local/lib -lnetcdff -I/usr/local/include
 
 # Uncomment to disable NETCDF
@@ -101,9 +100,9 @@ PSVIEWER = open
 #
 MODULES = sheba_config.o array_sizes.o event_info.o
 SUBROUTINES = sheba_core.o misc.o input.o desplit.o output.o teanby.o \
-                  rumpker.o cluster.o split.o\
-                  traceops.o ndf.o calcsnr.o \
-                  reorient.o crosscorr.o split_intensity.o
+              rumpker.o cluster.o split.o\
+              traceops.o ndf.o calcsnr.o \
+              reorient.o crosscorr.o split_intensity.o
 
 F90SAC = f90sac_distrib.o 
 #
