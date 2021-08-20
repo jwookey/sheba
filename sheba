@@ -34,7 +34,7 @@
 *  srcpol [(baz)|x]     - In conjunction with option t, the inital shear-wave
 *                         polarisation. The default is for use with SKS, i.e.
 *                         the back-azimuth.
-*  batch [(no)|yes]     - Suppress all plotting in plot yes mode:
+*  batch [(no)|yes]     - Suppress all screen plotting in plot yes mode:
 *                         useful in running in batch mode
 *  wdev [(x)|mac]       - Windowing device
 *  usett [(yes)|no]     - disable ttsac as plotting script. This is useful
@@ -57,14 +57,13 @@
 * but WITHOUT ANY WARRANTY; without even the implied warranty of
 * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
 *-------------------------------------------------------------------------------
-$keys file comps plot xlim pick corr src_corr scs nwind max_tlag option srcpol batch wdev usett 
+$keys file comps plot xlim pick corr src_corr nwind max_tlag option srcpol batch wdev usett 
 $default comps BHE BHN BHZ
 $default plot no
 $default xlim off
 $default pick yes
 $default corr no
 $default src_corr no
-$default scs no
 $default nwind one
 $default max_tlag 4.0
 $default option e
@@ -74,9 +73,9 @@ $default wdev x
 $default usett yes
 *
 message "---------------------------------------------"
-message "-         S H E B A - Version 0.997         -"
+message "-                S H E B A                  -"
 message "---------------------------------------------"
-message "-            James Wookey, 2010             -"
+message "-            James Wookey, 2021             -"
 message "---------------------------------------------"
 
 
