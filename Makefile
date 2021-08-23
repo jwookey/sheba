@@ -117,6 +117,9 @@ all:$(EXECDIR)/sheba_exec \
       $(EXECDIR)/sheba_combine_plots.csh \
       $(EXECDIR)/cleansheba \
       $(MACRODIR)/sheba\
+      $(MACRODIR)/sheba_pick\
+      $(MACRODIR)/sheba_build_input\
+      $(MACRODIR)/sheba_plot_result\
       $(EXECDIR)/sheba_stack\
 		$(EXECDIR)/stack_wgtcalc
       
@@ -156,7 +159,16 @@ $(EXECDIR)/cleansheba:cleansheba
 #
 
 $(MACRODIR)/sheba:sheba
-	cat sheba | sed 's/X1X/$(PSVIEWER)/g' > $(MACRODIR)/sheba
+	cat sheba > $(MACRODIR)/sheba
+
+$(MACRODIR)/sheba_pick:sheba_pick
+	cat sheba_pick > $(MACRODIR)/sheba_pick
+
+$(MACRODIR)/sheba_build_input:sheba_build_input
+	cat sheba_build_input > $(MACRODIR)/sheba_build_input
+
+$(MACRODIR)/sheba_plot_result:sheba_plot_result
+	cat sheba_plot_result | sed 's/X1X/$(PSVIEWER)/g' > $(MACRODIR)/sheba_plot_result
 
 distrib:
 	rm -rf ../SHEBA_distrib

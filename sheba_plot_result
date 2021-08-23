@@ -1,0 +1,327 @@
+*SACMACRO
+*-------------------------------------------------------------------------------
+*   SHEBA macro - sheba_plot_result
+*-------------------------------------------------------------------------------
+*   (c) James Wookey 2004-2021
+*-------------------------------------------------------------------------------
+*
+* This is a SAC macro to run to plot the results of a of run the shear-wave 
+* splitting analysis code, SHEBA. This uses a combination of SAC and GMT
+*
+* The input parameters are as follows:
+*
+* Required parameters:
+*  file [xxxx]          - prefix to file names
+*
+* Optional parameters:
+*  comps [BHE BHN BHZ]  - suffix to file names 
+*                         (so files are xxxx.e xxxx.n xxxx.z)
+*  plot [(yes)|no]      - produce postscript version of the plots combined.
+*                         This also saves the result (text) file in a
+*                         separate file.
+*  xlim [(off)|t1 t2]   - *plot* window limits, defaults to whole trace
+*  corr [(no)|phi t]    - remove a given phi/dt before analysis
+*  src_corr [(no)|phi t]- remove a given phi/dt AFTER analysis (at each node) 
+*                         (see Wookey, Kendall and Rumpker, GJI, 2005)
+*  batch [(no)|yes]     - Suppress all screen plotting in plot yes mode:
+*                         useful in running in batch mode
+*  wdev [(x)|mac]       - Windowing device
+*  usett [(yes)|no]     - disable ttsac as plotting script. This is useful
+*                         in situations where non-teleseismic data is being
+*                         used, trace headers requires for ttsac are missing, or
+*                         systems where ttsac is unavailable 
+*
+*-------------------------------------------------------------------------------
+* This software is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+*-------------------------------------------------------------------------------
+$keys file comps xlim plot batch wdev usett src_corr corr
+$default comps BHE BHN BHZ
+$default xlim off
+$default corr no
+$default src_corr no
+$default plot yes
+$default batch no
+$default usett yes
+$default wdev x
+*
+
+message " "
+message "** Plotting results"
+
+vspace full
+
+*
+setbb files " "
+setbb hfiles " "
+*
+setbb files_corr " "
+setbb hfiles_corr " "
+
+*
+setbb i 0
+do sfx list $comps
+   setbb files "%files% $file$.$sfx$"
+   setbb files_corr "%files_corr% $file$_corr.$sfx$"
+   
+   setbb i ( %i + 1 )
+   if %i% le 2
+      setbb hfiles "%hfiles% $file$.$sfx$"
+      setbb hfiles_corr "%hfiles_corr% $file$_corr.$sfx$"
+   else
+      setbb zfile "$file$.$sfx$"
+      setbb zfile_corr "$file$_corr.$sfx$"
+   endif
+enddo
+
+if no ne $plot
+   setbb pause "message 'Generating postscript ...'"
+   if $batch$ eq no
+      bd $wdev  sgf
+   else
+      bd sgf
+   endif
+else
+   setbb pause "pause message "
+endif
+
+plabel 1 off
+plabel 2 off
+
+** recover the neccessary parameters by running the .scm file, a sac macro 
+** produced by SHEBA
+ 
+m $file$.scm
+message "... complete."
+
+** PANEL 1 - original waveforms
+sgf number 1
+picks on
+r %files% ; 
+chnhdr a %WBEG% f %WEND%
+if 'no' eq $usett$
+   if 'off' eq $xlim$
+      ylim all; ticks only left bottom;border off; p1
+   else
+      ylim all; ticks only left bottom;border off; xlim $xlim$; p1
+   endif   
+else
+   if 'off' eq $xlim$
+      ylim all; m ttsac
+   else
+      ylim all; m ttsac xlim $xlim$
+   endif
+endif   
+
+
+%pause% " -> Input traces in input orientation "
+
+** PANEL 2 - original versus corrected waveforms
+sgf number 2
+if off ne $corr
+   plabel 3 "Receiver phi, dt: $corr$" p 0.6 0.05 size tiny
+else
+   plabel 3 off
+endif   
+
+if off ne $src_corr
+   plabel 4 "Source phi, dt: $src_corr$" p 0.6 0.02 size tiny
+else
+   plabel 4 off
+endif   
+
+
+r %hfiles_corr%
+rotate to %SPOL%
+w tmp.r tmp.t
+r %hfiles%
+rotate to %SPOL%
+r more tmp.r tmp.t
+chnhdr a %WBEG% f %WEND%
+if 'no' eq $usett$
+   if 'off' eq $xlim$
+      ylim all; ticks only left bottom;border off; p1
+   else
+      ylim all; xlim $xlim$; ticks only left bottom; border off; p1
+   endif   
+else
+   if 'off' eq $xlim$
+      ylim all; m ttsac
+   else
+      ylim all; m ttsac xlim $xlim$
+   endif
+endif   
+
+
+%pause% " -> Original and linearised traces in source radial-transverse "
+
+** PANEL 3 - particle motion and wavelet comparison **
+* restart xwindow so vspace command works OK
+sgf number 3
+if no ne $plot
+   if $batch$ eq no
+      bd $wdev  sgf
+   else
+      bd sgf
+   endif
+else      
+      bg $wdev
+endif 
+vspace 1.0
+
+**
+**
+picks off ; xlabel off ; fileid off ; line on increment on list 1 3
+setbb id "(substring 3 4 &1,nzyear& )(substring 2 4 (1000 + &1,nzjday&)) (before @( '&1,kzdate&' ) &1,kstnm&"
+plabel 1 on "%id% FAST %FAST%+/-%DFAST% TLAG %TLAG%+/-%DTLAG%" p 0.2 0.97 size small
+plabel 2 on "_______________ SPOL %SPOL%+/-%DSPOL%" below size small
+beginframe 
+** top row
+yvport 0.55 0.90
+
+cut %WBEG% %WEND%
+
+** Find out whether we need to flip the slow wavelet (purely for show)
+r %hfiles%
+rotate to %FAST%
+correlate master 1
+setbb corr1 &2,depmax&
+r %hfiles%
+rotate to %FAST%
+correlate master 1
+mul 1 -1
+setbb corr2 &2,depmax&
+if %corr2% gt %corr1%
+      setbb polarity -1
+else
+      setbb polarity 1
+endif            
+
+
+* Uncorrected fast-slow, normalised
+xvport 0.02 0.32
+r %hfiles% ; 
+rotate to %FAST%
+div (MAXIMUM &1,depmax (ABSOLUTE &1,depmin ) ) (MAXIMUM &2,depmax (ABSOLUTE &2,depmin ) ) 
+mul 1 %polarity%
+p2 ; ylim off; 
+
+** Find out whether we need to flip the slow wavelet (purely for show)
+r %hfiles_corr%
+rotate to %FAST%
+correlate master 1
+setbb corr1 &2,depmax&
+r %hfiles_corr%
+rotate to %FAST%
+correlate master 1
+mul 1 -1
+setbb corr2 &2,depmax&
+if %corr2% gt %corr1%
+      setbb polarity -1
+else
+      setbb polarity 1
+endif            
+
+
+* Corrected fast-slow, normalised
+xvport 0.35 0.65
+r %hfiles_corr% ; 
+rotate to %FAST%; 
+div (MAXIMUM &1,depmax (ABSOLUTE &1,depmin ) ) (MAXIMUM &2,depmax (ABSOLUTE &2,depmin ) ) 
+mul 1 %polarity%
+p2 ; ylim off; 
+
+* Corrected fast-slow, not normalised
+xvport 0.68 0.98
+r %hfiles_corr% ; rotate to %FAST%; 
+mul 1 %polarity%
+p2 ; ylim off; 
+
+cut off
+
+** bottom row
+yvport 0.1 0.45
+xvport 0.10 0.45
+r $file$.xy1 
+setbb vmax (MAXIMUM &1,xmaximum &1,ymaximum )
+setbb vmin (MINIMUM &1,xminimum &1,yminimum )
+xlim %vmin% %vmax% ; ylim %vmin% %vmax%
+
+p1
+xlim off; ylim off
+
+xvport 0.55 0.90
+r $file$.xy2 
+setbb vmax (MAXIMUM &1,xmaximum &1,ymaximum )
+setbb vmin (MINIMUM &1,xminimum &1,yminimum )
+xlim %vmin% %vmax% ; ylim %vmin% %vmax%
+p1
+xlim off; ylim off
+
+endframe ; 
+if no ne $src_corr
+   message "Warning, wavelet plots may be incorrect for source-corrected results"
+endif
+
+%pause% " -> Particle motion "
+
+
+**--------------------------------------------------------------------------- **
+** plot GMT results
+**--------------------------------------------------------------------------- **
+* error surface and cluster analysis
+ message "-> Error surface and cluster analysis"
+ sc sheba_plot_errclu.gmt $file$
+ if $plot$ eq no 
+       sc X1X $file$_errclu.eps
+ endif
+
+
+**--------------------------------------------------------------------------- **
+** gather plots if plot=yes
+**--------------------------------------------------------------------------- **
+if $plot$ eq yes
+      sc sgftops f001.sgf split_inp.ps 3
+      sc sgftops f002.sgf split_rot.ps 3
+      sc sgftops f003.sgf split_wav.ps 3
+
+      sc rm -f f00?.sgf
+*     merge them      
+      sc sheba_combine_plots.csh $file$
+      sc rm -f split_inp.ps split_rot.ps split_wav.ps
+      if $batch$ eq no
+            sc X1X $file$_result.ps
+      endif
+
+*     backup the results file
+      sc \cp $file$_sheba.result $file$_sheba.final_result
+endif
+
+**--------------------------------------------------------------------------- **
+** clean up temporary files
+**--------------------------------------------------------------------------- **
+sc rm -f tmp.r tmp.t
+if yes eq $usett
+   sc rm -rf ttsac.pcf ttsac.xlim
+endif
+
+**--------------------------------------------------------------------------- **
+** reset SAC plotting defaults
+**--------------------------------------------------------------------------- **
+xvport 0.1 0.9; yvport 0.1 0.9; vspace full
+line on solid increment off; fileid on; picks on
+plabel 1 off; plabel 2 off; plabel 3 off; plabel 4 off; xlabel off; ylabel off; symbol off
+unsetbb beg end vmax vmin hfiles zfile log i id pick
+unsetbb files_corr hfiles_corr zfile_corr srcaz t_srcaz pause
+unsetbb corr1 corr2 polarity
+ticks on all;border on;gt s si small;
+if $batch$ eq no
+     bd $wdev  
+endif
+if 'off' ne xlim
+   xlim off
+endif
+
+message "** Plotting complete"
+message " "

@@ -1,0 +1,121 @@
+*SACMACRO
+*-------------------------------------------------------------------------------
+*   SHEBA macro - sheba_build_input
+*-------------------------------------------------------------------------------
+*   (c) James Wookey 2004-2021
+*-------------------------------------------------------------------------------
+*
+* This is a SAC macro to run to build the input file to configure SHEBA, the
+* shear-wave splitting analysis code.
+*
+* The input parameters are as follows:
+*
+* Required parameters:
+*  file [xxxx]          - prefix to file names
+*
+* Optional parameters:
+*  comps [BHE BHN BHZ]  - suffix to file names 
+*                         (so files are xxxx.e xxxx.n xxxx.z)
+*  nwind [(one)|n1 n2]  - number of starting and ending windows, these
+*                         are analysed using N. Teanby's cluster analysis
+*                         algorithm. If 'one' is entered, a single window
+*                         analysis if performed.
+*  corr [(no)|phi t]    - remove a given phi/dt before analysis
+*  src_corr [(no)|phi t]- remove a given phi/dt AFTER analysis (at each node) 
+*                         (see Wookey, Kendall and Rumpker, GJI, 2005)
+*  max_tlag [(4)|x]     - Maximum time-lag in grid search.
+*  option [(e)|t]       - Grid search parameter, second (e)igenvalue or
+*                         (t)ransverse energy. 
+*  srcpol [(baz)|x]     - In conjunction with option t, the inital shear-wave
+*                         polarisation. The default is for use with SKS, i.e.
+*                         the back-azimuth.
+*
+*-------------------------------------------------------------------------------
+* This software is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+*-------------------------------------------------------------------------------
+$keys file comps nwind corr src_corr max_tlag option srcpol  
+$default comps BHE BHN BHZ
+$default nwind one
+$default corr no
+$default src_corr no
+$default max_tlag 4.0
+$default option e
+$default srcpol baz
+
+message " "
+message "** Building SHEBA config file"
+
+vspace full
+
+*
+setbb files " "
+setbb hfiles " "
+*
+setbb files_corr " "
+setbb hfiles_corr " "
+
+*
+setbb i 0
+do sfx list $comps
+   setbb files "%files% $file$.$sfx$"
+   setbb files_corr "%files_corr% $file$_corr.$sfx$"
+   
+   setbb i ( %i + 1 )
+   if %i% le 2
+      setbb hfiles "%hfiles% $file$.$sfx$"
+      setbb hfiles_corr "%hfiles_corr% $file$_corr.$sfx$"
+   else
+      setbb zfile "$file$.$sfx$"
+      setbb zfile_corr "$file$_corr.$sfx$"
+   endif
+enddo
+
+r %zfile%
+sc cat /dev/null > sheba.in
+setbb headerline "SHEBA.IN"
+sc echo %headerline% >> sheba.in
+sc echo $file$ >> sheba.in
+do sfx list $comps
+   sc echo $sfx$ >> sheba.in
+enddo
+if $option$ eq t
+      sc echo 0 >> sheba.in
+** put in source pol information
+      if 'baz' eq $srcpol$
+            setbb srcaz (&1,baz& - 180)
+      else
+            setbb srcaz ($srcpol$ - 180)      
+      endif
+      if %srcaz% lt 0
+            setbb t_srcaz (%srcaz% + 360)
+      endif
+      sc echo %srcaz% >> sheba.in      
+*      message "Transverse energy minimisation with source pol.=%srcaz%"
+elseif $option$ eq e
+      sc echo 1 >> sheba.in
+*      message "Second eignval. minimisation."
+      
+endif
+if 'one' eq $nwind$
+   sc echo "1 1" >> sheba.in
+else
+   sc echo $nwind$ >> sheba.in
+endif      
+sc echo $max_tlag$ >> sheba.in
+if no ne $corr$
+      sc echo 1 >> sheba.in
+      sc echo $corr$ >> sheba.in
+else
+      sc echo 0 >> sheba.in
+endif
+if no ne $src_corr$
+      sc echo 1 >> sheba.in
+      sc echo $src_corr$ >> sheba.in
+else
+      sc echo 0 >> sheba.in
+endif
+
+message "** SHEBA config file complete"
+message " "

@@ -387,7 +387,7 @@
       open(99,file=fname)
 
 !        * output splitting solution parameters
-         write(99,'(a)') 'Message "Reading pars"'
+         write(99,'(a)') 'Message "Setting result parameters ..."'
          write(99,'(a,f10.4)') 'setbb TLAG ', event % tlag 
          write(99,'(a,f10.4)') 'setbb DTLAG', event % dtlag 
          write(99,'(a,f10.4)') 'setbb FAST ', event % fast

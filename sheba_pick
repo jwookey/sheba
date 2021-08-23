@@ -1,0 +1,111 @@
+*SACMACRO
+*-------------------------------------------------------------------------------
+*   SHEBA macro - sheba_pick
+*-------------------------------------------------------------------------------
+*   (c) James Wookey 2004-2010
+*-------------------------------------------------------------------------------
+*
+* This is a SAC macro to pick the necessary analysis windows in input data for
+* SHEBA.
+*
+* Required parameters:
+*  file [xxxx]          - prefix to file names
+*
+* Optional parameters:
+*  comps [BHE BHN BHZ]  - suffix to file names 
+*                         (so files are xxxx.e xxxx.n xxxx.z)
+*  pick [(maybe)|yes]   - (re)pick analysis window limits
+*  nwind [(one)|n1 n2]  - number of starting and ending windows, these
+*                         are analysed using N. Teanby's cluster analysis
+*                         algorithm. If 'one' is entered, a single window
+*                         analysis if performed.
+*  wdev [(x)|mac]       - Windowing device
+*
+*-------------------------------------------------------------------------------
+* This software is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+*-------------------------------------------------------------------------------
+$keys file comps pick nwind wdev
+$default comps BHE BHN BHZ
+$default pick yes
+$default nwind one
+$default wdev x
+
+message " "
+message "** Picking windows"
+
+vspace full
+*
+setbb files " "
+setbb hfiles " "
+*
+setbb files_corr " "
+setbb hfiles_corr " "
+
+setbb pick $pick
+*
+setbb i 0
+do sfx list $comps
+   setbb files "%files% $file$.$sfx$"
+   setbb files_corr "%files_corr% $file$_corr.$sfx$"
+   
+   setbb i ( %i + 1 )
+   if %i% le 2
+      setbb hfiles "%hfiles% $file$.$sfx$"
+      setbb hfiles_corr "%hfiles_corr% $file$_corr.$sfx$"
+   else
+      setbb zfile "$file$.$sfx$"
+      setbb zfile_corr "$file$_corr.$sfx$"
+   endif
+enddo
+**----------------------------------------------------------------------------**
+** repick window ranges
+**----------------------------------------------------------------------------**
+if %pick% eq yes
+      bd $wdev
+         message " "
+         message "Interactive picking controls:"
+         message "- Press A to set start marker, F to set end. Press Q when done."
+         message "- Plot can be zoomed in with X, or reset to default zoom with O."
+         message " "
+
+      if 'one' eq $nwind$
+         message "! Pick complete analysis window."
+         r %files% ; plotpk zero markall on bell off
+         if &1,a& eq UNDEFINED
+               $break
+         endif
+         setbb beg &1,a& ; setbb end &1,f&
+         chnhdr user0 %beg% user2 %end% ka START kf END; wh
+      else
+
+         message "! Pick range of window STARTS. NOTE: NOT WHOLE PHASE!"
+         r %files% 
+*     ** if windows are already defined, pre-populate the range from the header
+         chnhdr a &1,user0& f &1,user1& ka START kf END
+         plotpk zero markall on bell off
+         if &1,a& eq UNDEFINED
+               $break
+         endif
+         setbb beg &1,a& ; setbb end &1,f&
+         chnhdr user0 %beg% user1 %end% ka START kf END; wh
+
+         message "! Pick range of window ENDS. NOTE: NOT WHOLE PHASE!"
+         r %files% 
+*     ** if windows are already defined, pre-populate the range from the header
+         chnhdr a &1,user2& f &1,user3& ka START kf END
+         plotpk zero markall on bell off
+         if &1,a& eq UNDEFINED
+               $break
+         endif
+         setbb beg &1,a& ; setbb end &1,f&
+         chnhdr user2 %beg% user3 %end% ka START kf END; wh
+      endif      
+else
+      message "Using existing picks from SAC header"
+endif
+message "** Picking complete"
+message " "
+
+
