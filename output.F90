@@ -13,7 +13,7 @@
 #ifndef NO_NETCDF
 
 !=======================================================================
-   subroutine output_result_nc()
+   subroutine output_result_nc(t1)
 !=======================================================================
 !  
 !     Output results information to netCDF format
@@ -21,29 +21,35 @@
 !-----------------------------------------------------------------------
    use sheba_config ! use the sheba_config module
    use event_info ! use the event_info module
+   use f90sac, only : SACTrace
    use netcdf, only: nf90_create, nf90_def_dim, nf90_def_var, nf90_enddef, &
       nf90_put_var, nf90_close, NF90_CLOBBER, NF90_FLOAT, nf90_noerr, &
       nf90_strerror, NF90_GLOBAL, nf90_put_att      
 !-----------------------------------------------------------------------
       implicit none
+      type (SACTrace) :: t1
+
       character*50 :: fname
-      integer :: j,i
       character*12 :: fmt
+      character*7 :: zdate
+      character*10 :: ztime
 
       integer :: ncid, tlag_dimid, fast_dimid, window_dimid, cluster_dimid
-      integer :: result_dimid ! scalar dimension for single numbers
 
 !  ** variable ids
+!     ** multiwindow      
       integer :: mw_wbeg_varid
       integer :: mw_wend_varid
       integer :: mw_tlag_varid
       integer :: mw_dtlag_varid
       integer :: mw_fast_varid
       integer :: mw_dfast_varid
+!     ** cluster analysis      
       integer :: cluster_xc0_varid
       integer :: cluster_yc0_varid
       integer :: cluster_vxc0_varid
       integer :: cluster_vyc0_varid
+!     ** error surface      
       integer :: fast_vector_varid     
       integer :: tlag_vector_varid     
       integer :: lam1_raw_grid_varid 
@@ -58,7 +64,28 @@
       call check_ncf(nf90_put_att(ncid, NF90_GLOBAL, 'title', &
       'SHEBA splitting result'))
 
-!  ** Save the result details as global attributes
+!  ** GLOBAL ATTRIBUTES
+!  ** data details
+      write(zdate,'(i4.4,i3.3)') t1 % nzyear, t1 % nzjday 
+      write(ztime,'(i2.2,i2.2,i2.2,1a,i3.3)') t1 % nzhour, t1 % nzmin, t1 % nzsec,'.',t1 % nzmsec
+      call check_ncf(nf90_put_att(ncid, NF90_GLOBAL, 'zdate', zdate))
+      call check_ncf(nf90_put_att(ncid, NF90_GLOBAL, 'ztime', ztime))
+
+!  ** event/station details
+      call check_ncf(nf90_put_att(ncid, NF90_GLOBAL, 'evla',t1 % evla))
+      call check_ncf(nf90_put_att(ncid, NF90_GLOBAL, 'evlo',t1 % evlo))
+      call check_ncf(nf90_put_att(ncid, NF90_GLOBAL, 'evdp',t1 % evdp))
+      call check_ncf(nf90_put_att(ncid, NF90_GLOBAL, 'station',trim(t1 % kstnm)))
+      call check_ncf(nf90_put_att(ncid, NF90_GLOBAL, 'stla',t1 % stla))
+      call check_ncf(nf90_put_att(ncid, NF90_GLOBAL, 'stlo',t1 % stlo))
+
+!  ** path details
+      call check_ncf(nf90_put_att(ncid, NF90_GLOBAL, 'gcarc',t1 % gcarc))
+      call check_ncf(nf90_put_att(ncid, NF90_GLOBAL, 'dist',t1 % dist))
+      call check_ncf(nf90_put_att(ncid, NF90_GLOBAL, 'az',t1 % az))
+      call check_ncf(nf90_put_att(ncid, NF90_GLOBAL, 'baz',t1 % baz))
+
+!  ** result details 
       call check_ncf(nf90_put_att(ncid, NF90_GLOBAL, 'tlag', event % tlag))
       call check_ncf(nf90_put_att(ncid, NF90_GLOBAL, 'dtlag', event % dtlag))
       call check_ncf(nf90_put_att(ncid, NF90_GLOBAL, 'fast', event % fast))
@@ -82,9 +109,9 @@
       call check_ncf(nf90_put_att(ncid, NF90_GLOBAL, 'intensity', event % intensity_p))
 
 !  ** Define dimensions
-      call check_ncf(nf90_def_dim(ncid, 'result', 1, result_dimid))
-      call check_ncf(nf90_def_dim(ncid, 'search_tlag',    np2int, tlag_dimid))
-      call check_ncf(nf90_def_dim(ncid, 'search_fast',    np1, fast_dimid))
+!      call check_ncf(nf90_def_dim(ncid, 'result', 1, result_dimid))
+      call check_ncf(nf90_def_dim(ncid, 'search_tlag', np2int, tlag_dimid))
+      call check_ncf(nf90_def_dim(ncid, 'search_fast', np1, fast_dimid))
       call check_ncf(nf90_def_dim(ncid, 'window', event % nwindows, window_dimid))
       call check_ncf(nf90_def_dim(ncid, 'cluster', event % ncluster, cluster_dimid))
 
@@ -103,10 +130,8 @@
       call check_ncf(nf90_def_var(ncid, 'cluster_vyc0', NF90_FLOAT, cluster_dimid, cluster_vyc0_varid))
 
 !  ** Grid variables
-!call check_ncf(nf90_def_var(ncid, 'amplitude', NF90_FLOAT, &
-!      (/x_dimid, y_dimid, twtt_dimid/), amp_varid))
-      call check_ncf(nf90_def_var(ncid, 'fast_vector'     , NF90_FLOAT, fast_dimid , fast_vector_varid     ))
-      call check_ncf(nf90_def_var(ncid, 'tlag_vector'     , NF90_FLOAT, tlag_dimid , tlag_vector_varid     ))
+      call check_ncf(nf90_def_var(ncid, 'fast_vector', NF90_FLOAT, fast_dimid , fast_vector_varid))
+      call check_ncf(nf90_def_var(ncid, 'tlag_vector', NF90_FLOAT, tlag_dimid , tlag_vector_varid))
 
       call check_ncf(nf90_def_var(ncid, 'lam1_raw_grid' , NF90_FLOAT, (/fast_dimid,tlag_dimid/), lam1_raw_grid_varid ))
       call check_ncf(nf90_def_var(ncid, 'lam2_raw_grid' , NF90_FLOAT, (/fast_dimid,tlag_dimid/), lam2_raw_grid_varid ))

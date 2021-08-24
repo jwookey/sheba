@@ -125,7 +125,7 @@
 
 !  ** output result information (in netCDF format)
 #ifndef NO_NETCDF
-      call output_result_nc()
+      call output_result_nc(h1)
 #endif
       
 
