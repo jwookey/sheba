@@ -18,7 +18,7 @@
          real, parameter :: sheba_version = 1.01
 
 ! ** print copyright information
-     call sheba_banner(sheba_version) 
+     call sheba_banner() 
 
 !  ** initialise configuration
       call sheba_config_init()
