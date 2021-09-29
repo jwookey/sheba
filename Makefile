@@ -89,6 +89,11 @@ PSVIEWER = gv --media=A4 --orientation=landscape --scale=-2
 ## macOS open (uses preview by default)
 PSVIEWER = open 
 
+## xpdf 
+PDFVIEWER = xpdf 
+
+## macOS open (uses preview by default)
+PDFVIEWER = open 
 
 #===============================================================================
 #===============================================================================
@@ -155,7 +160,7 @@ $(EXECDIR)/cleansheba:cleansheba
 	chmod +x cleansheba; \cp cleansheba $(EXECDIR)
 
 #
-#     SAC Macro
+#     SAC Macros
 #
 
 $(MACRODIR)/sheba:sheba
@@ -168,20 +173,7 @@ $(MACRODIR)/sheba_build_input:sheba_build_input
 	cat sheba_build_input > $(MACRODIR)/sheba_build_input
 
 $(MACRODIR)/sheba_plot_result:sheba_plot_result
-	cat sheba_plot_result | sed 's/X1X/$(PSVIEWER)/g' > $(MACRODIR)/sheba_plot_result
-
-distrib:
-	rm -rf ../SHEBA_distrib
-	mkdir ../SHEBA_distrib
-	cp -f *.f90 ../SHEBA_distrib
-	cp -f *.F90 ../SHEBA_distrib
-	cp -f *.f ../SHEBA_distrib
-	cp -f *.gmt ../SHEBA_distrib
-	cp -f *.csh ../SHEBA_distrib
-	cp -f sheba ../SHEBA_distrib
-	cp -f Makefile ../SHEBA_distrib
-	cp -f INSTALL ../SHEBA_distrib
-	cp -f cleansheba ../SHEBA_distrib	
+	cat sheba_plot_result | sed 's/X1X/$(PSVIEWER)/g' | sed 's/X2X/$(PSVIEWER)/g' > $(MACRODIR)/sheba_plot_result
 
 clean:
 	rm -f *.o *.mod

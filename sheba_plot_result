@@ -291,7 +291,7 @@ if $plot$ eq yes
       sc sheba_combine_plots.csh $file$
       sc rm -f split_inp.ps split_rot.ps split_wav.ps
       if $batch$ eq no
-            sc X1X $file$_result.ps
+            sc X2X $file$_result.pdf
       endif
 
 *     backup the results file
