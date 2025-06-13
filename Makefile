@@ -74,7 +74,7 @@ GMT_PREFIX = gmt
 #===============================================================================
 
 # Uncomment (and update as necessary) to use NETCDF
-FFLAGS += -L/usr/local/lib -lnetcdff -I/usr/local/include
+FFLAGS += -L/opt/homebrew/lib -lnetcdff -I/opt/homebrew/include
 
 # Uncomment to disable NETCDF
 #FFLAGS += -DNO_NETCDF
