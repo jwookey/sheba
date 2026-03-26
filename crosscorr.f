@@ -9,72 +9,72 @@
 !  James Wookey, School of Earth Sciences, University of Bristol
 !
 
-	subroutine crosscorr(s1, s2, n, ss, norm)
-c	routine to compute the cross correlation function
-c	between two time series of length n.  It is normalized
-c	by sqrt(acf1(0)*acf2(0)) if norm  = 1, or not if norm = 0.
-c	It is normalized by default.
-c	acf1(0) and acf2(0) are stored in common
-c  	The result ss is of length 2n + 1.  The zero-lag point
-c	is in position n + 1. ss(1) and ss(2n + 1) are set to zero.
-c	This is a test of shearsp by doing the cc in time domain
-c	Assumes the signal is zero outside the boundaries of the array
-c	
-	dimension s1(n),s2(n),ss(2*n + 1)
-	real acfs1,acfs2
-	integer norm
-c	data norm/1/
+      subroutine crosscorr(s1, s2, n, ss, norm)
+c      routine to compute the cross correlation function
+c      between two time series of length n.  It is normalized
+c      by sqrt(acf1(0)*acf2(0)) if norm  = 1, or not if norm = 0.
+c      It is normalized by default.
+c      acf1(0) and acf2(0) are stored in common
+c        The result ss is of length 2n + 1.  The zero-lag point
+c      is in position n + 1. ss(1) and ss(2n + 1) are set to zero.
+c      This is a test of shearsp by doing the cc in time domain
+c      Assumes the signal is zero outside the boundaries of the array
+c      
+      dimension s1(n),s2(n),ss(2*n + 1)
+      real acfs1,acfs2
+      integer norm
+c      data norm/1/
 c       *************************************************************
-	
-	
-	n2     = 2*n
-	indx   = 1
-	ss(1)  = 0.
-	ss(n2) = 0.
-	
-	do lag = -(n-1), n-1, 1
-	  indx     = indx + 1
-  	  ss(indx) = 0.
-c	  find overlap
-	  iover = n-iabs(lag)
-	  if(lag.le.0) then
-	    do i = 1,iover
-	      ss(indx)=ss(indx) + s1(i) * s2(i-lag)
-	    enddo
-	  else
-	    do i = 1,iover
-	      ss(indx)=ss(indx) + s1(i + lag) * s2(i)
-	    enddo
-	  endif
-	enddo
-	
-	
-	acfs1 = 0.
-	acfs2 = 0.
-	do i = 1,n	
-	  acfs1 = acfs1 + s1(i)**2
-	  acfs2 = acfs2 + s2(i)**2
-	enddo
-	fac  =  sqrt(acfs1 * acfs2)
-	
-	
-	
-c	normalize cc
-	if (norm.eq.1) then
-c	  write(*,*) 'cross correlation normalized'
-	  do i = 1,n2	
-	     ss(i) = ss(i) / fac 
-	  enddo	  
-	else
-c	  write(*,*) 'cross correlation not normalized'
-	endif
-	
-	
-	return
-	end
+      
+      
+      n2     = 2*n
+      indx   = 1
+      ss(1)  = 0.
+      ss(n2) = 0.
+      
+      do lag = -(n-1), n-1, 1
+        indx     = indx + 1
+          ss(indx) = 0.
+c        find overlap
+        iover = n-iabs(lag)
+        if(lag.le.0) then
+          do i = 1,iover
+            ss(indx)=ss(indx) + s1(i) * s2(i-lag)
+          enddo
+        else
+          do i = 1,iover
+            ss(indx)=ss(indx) + s1(i + lag) * s2(i)
+          enddo
+        endif
+      enddo
+      
+      
+      acfs1 = 0.
+      acfs2 = 0.
+      do i = 1,n      
+        acfs1 = acfs1 + s1(i)**2
+        acfs2 = acfs2 + s2(i)**2
+      enddo
+      fac  =  sqrt(acfs1 * acfs2)
+      
+      
+      
+c      normalize cc
+      if (norm.eq.1) then
+c        write(*,*) 'cross correlation normalized'
+        do i = 1,n2      
+           ss(i) = ss(i) / fac 
+        enddo        
+      else
+c        write(*,*) 'cross correlation not normalized'
+      endif
+      
+      
+      return
+      end
 
 
-	
+      
 c-----------------------------------------------------------------------
       subroutine zerror_interp_xc(error,error_int)
 c-----------------------------------------------------------------------
@@ -180,7 +180,7 @@ c  ** find the minimum lambda2 position **
 c       print *,np1,ifast,np2,itlag
       return
       end
-	  
+        
 
 c-----------------------------------------------------------------------
       subroutine zerror95XC(error,ndf,lambda2_min,ierror,jerror)
@@ -201,7 +201,7 @@ C-----------------------------------------------------------------------
       real ierror,jerror
       integer k,k1,irange_min,irange_max,istart,line_test(npc)
       real error(np1,np2XCint),lambda2_min,fftable,lambda_crit,Z_crit
-	  real Z
+        real Z
       external fftable
 
 c  ** check that npc is big enough **
@@ -211,34 +211,33 @@ c  ** check that npc is big enough **
       
 c     DO THE FISHER TRANSFORM
       Z = atanh(lambda2_min)
+
 c  ** calc value of lambda at 95% confidence limit from tabulated values **
-      if (ndf.ge.3) then
-		 Z_crit = Z + ( -2.*Z*sign(1.,Z) / (ndf-2) * fftable(ndf-2))
+      if (ndf.ge.4) then
+         Z_crit = Z + ( -2.*Z*sign(1.,Z) / real(ndf-2) * fftable(ndf-2))
      >                  * sqrt(1./real(ndf-3));
       else
-         print*,'WARNING: zerror95: ndf <=2, set to 3)'
+         print*,'WARNING: zerror95XC: ndf <=4, set to 2)'
          Z_crit= Z*( 1. + 2.*fftable(1))
       endif
-c	  BACKTRANSFORM
+c        BACKTRANSFORM
 
-c      print *, lambda_max,Z,lambda2_min
-	  lambda_crit = tanh(Z_crit)
-	  
-c      print *, lambda_max,lambda2_min
+        lambda_crit = tanh(Z_crit)
+        
 c  ** normalise errors by lambda_max, so that and error of 1 = 95% confidence **
       counter=0
-	  ierror=error(1,1)
-	  jerror=error(1,1)
-	  do i=1,np1
+        ierror=error(1,1)
+        jerror=error(1,1)
+        do i=1,np1
          do j=1,np2XCint 
-   		    error(i,j)=error(i,j)/lambda_crit
-		    if (error(i,j).le.ierror) then
-			   ierror=error(i,j)
-			endif
-		enddo
+                   error(i,j)=error(i,j)/lambda_crit
+                if (error(i,j).le.ierror) then
+                     ierror=error(i,j)
+                  endif
+            enddo
       enddo
-	  
-	  
+        
+        
 c  ** find i/j error (half width of 95% confidence contour) **
 c  ** find min and max j, simply search the array **
       jmin=np2int
@@ -249,9 +248,9 @@ c  ** find min and max j, simply search the array **
                jmin = min0(jmin,j)
                jmax = max0(jmax,j)
             endif
-	      enddo
+            enddo
       enddo
-	  
+        
       jrange=jmax-jmin
 c  ** finding min max i is more difficult because of cyclicity of angles **
 c  ** sweep a line over all j, set point on line equal to 1 if it falls within the 95% convidence contour for any j. The height of the bounding rectangle is defined by the shortest line which includes all points with a value of line(i)=1. This line is found by searching all line lengths from the minimum = sum_i linr(i) to maximum = np1**
@@ -306,16 +305,16 @@ c      (so x full width of 95% contour by 0.25 to get 1s.d.)**
       return
       end
   
-	  
-	  
+        
+        
 c-----------------------------------------------------------------------
       real function NULLCRITERION(fastEV,fastXC,tlagEV,tlagXC,
      >     dtlagNORM)
-c-----------------------------------------------------------------------	  
+c-----------------------------------------------------------------------        
 c     ** Now doing Quality and Null Check by comparign to methods:
 c     ** see Wuestefeld et al, BSSA, 2008
       real Omega, Rat, m1, m2, dis1, dis2
-	  
+        
       m1 = max(mod(fastEV+180., 180.), mod(fastXC+180., 180.))
       m2 = min(mod(fastEV+180., 180.), mod(fastXC+180., 180.))
       
@@ -323,68 +322,68 @@ c     ** see Wuestefeld et al, BSSA, 2008
       if (Omega .gt.45) then
          Omega = 90 - Omega
       endif
-	  
-c		Now Normalise	  
-	  Omega = Omega / 45
-	  Rat   = tlagXC / tlagEV
-	  
-c		normalised Distance:
+        
+c            Now Normalise        
+        Omega = Omega / 45
+        Rat   = tlagXC / tlagEV
+        
+c            normalised Distance:
 c       Quality of nulls is the distance from point 0/1
 c       Quality of non-nulls is the distance from point 1/0 
-	  dis1 = sqrt( Rat**2     + (Omega-1)**2 ) * sqrt(2.)
-	  dis2 = sqrt( (Rat-1)**2 + ( Omega )**2 ) * sqrt(2.)
-	  
+        dis1 = sqrt( Rat**2     + (Omega-1)**2 ) * sqrt(2.)
+        dis2 = sqrt( (Rat-1)**2 + ( Omega )**2 ) * sqrt(2.)
+        
 
 
-		 
-	  if (dis1<dis2) then
-		if (dis1>1) then
-			dis1=1.
-		endif
-		NULLCRITERION = -1.*(1.-dis1)
-	  else
-	  	if (dis2>1) then
-	        dis2=1.
-	    endif
-	    NULLCRITERION =  1.*(1.-dis2)
-	  endif
-	  
-	  
+             
+        if (dis1<dis2) then
+            if (dis1>1) then
+                  dis1=1.
+            endif
+            NULLCRITERION = -1.*(1.-dis1)
+        else
+              if (dis2>1) then
+              dis2=1.
+          endif
+          NULLCRITERION =  1.*(1.-dis2)
+        endif
+        
+        
 c     ** Now make sure that delay time close to itlag_scale are POOR
-       if (Rat.gt.0.9 .AND. tlagEV/dtlagNORM.gt.0.9) then	  
-	     NULLCRITERION=NULLCRITERION*(-10*tlagEV/dtlagNORM+10)
+       if (Rat.gt.0.9 .AND. tlagEV/dtlagNORM.gt.0.9) then        
+           NULLCRITERION=NULLCRITERION*(-10*tlagEV/dtlagNORM+10)
        endif
-	
+      
 
 
 
-	  
-	  
-	  
+        
+        
+        
 c      if (Omega<8.0 .AND. 0.8<=Rat .AND. Rat<=1.1) then
 c         if (dfast<8.0 .AND. dtlagNORM<0.15) then
-c		     NULLCRITERION = 2
-c		 else
-c		     NULLCRITERION = 1
-c		 endif
+c                 NULLCRITERION = 2
+c             else
+c                 NULLCRITERION = 1
+c             endif
 c      elseif (Omega<15.0.AND.0.7<=Rat.AND.Rat<=1.2) then 
-c    	  if (dfast<15.0 .AND. dtlagNORM<0.33) then
-c		     NULLCRITERION = 1
-c		 else
-c		     NULLCRITERION = 0
-c		 endif
+c            if (dfast<15.0 .AND. dtlagNORM<0.33) then
+c                 NULLCRITERION = 1
+c             else
+c                 NULLCRITERION = 0
+c             endif
 c      elseif (32.0<=Omega.AND.Omega<=58.0.AND.Rat<=0.2) then
 c         NULLCRITERION = -2
 c      elseif (37.0<=Omega.AND.Omega<=53.0.AND.Rat<=0.3) then
 c         NULLCRITERION = -1
 c      else
 c         NULLCRITERION = 0
-c      endif	  
+c      endif        
       
     
       return
       end
-	  
-	  
-	  
-	 
+        
+        
+        
+       

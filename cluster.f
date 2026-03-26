@@ -249,14 +249,12 @@ c  ** loop over window end points **
             l = (i-1)*nwbeg + j
 C        ** refine window to be relative to 4 header values
             wbeg(l) = t_off_beg + real(j-1)*dt_beg
-             wend(l) = t_off_end + real(i-1)*dt_end
-c            print*,l,wbeg(l),wend(l),temp_wbeg,temp_wend
+            wend(l) = t_off_end + real(i-1)*dt_end
             call zsplit(x0,y0,n,wbeg(l),wend(l),delta,b,tlag_scale,
      >                  fast(l),dfast(l),tlag(l),dtlag(l),
      >                  spol,dspol,error,error_int,lam1,lam1_int,f,
      >                  lam2m(l),ndf,snr,xc_grid_int,
      >                  fastXC, dfastXC, tlagXC, dtlagXC)
-         
             if (l==1) then
                min_lam2m = lam2m(l)
                imin_lam2m = 1

@@ -221,9 +221,10 @@ c     >                        lam1,error,delta)
       call zgrid_lambda2_XC(xwindow,ywindow,nwindow,iwextra,itlag_step,
      >                        itlag_stepXC,lam1,error,delta,
      >                        xc_grid)
-     
+      
 c  ** interpolate error surface in tlag direction **
       call zerror_interp(error,error_int)
+
       call zerror_interp(lam1,lam1_int)
       call zerror_interp_xc(xc_grid,xc_grid_int)
 
@@ -281,8 +282,6 @@ c  ** window the interpolated data **
 
 c  ** rotate, lag, calc the covariance and eigenvalues **
       call zrotate2d(xwindow,ywindow,nwindow,np,fast,xrot,yrot)
-
-
       
 c  **  first time lag
       call zlag(xrot,yrot,nwindow,np,itlag,iwextra,
@@ -290,7 +289,6 @@ c  **  first time lag
 
 c  ** perform any required post-correction      
       if (config % i_src_corr == 1) then
-         print*,'running source correction'
          
 c         print*,tlag,itlag,delta 
          
@@ -310,9 +308,10 @@ c         print*,tlag,itlag,delta
          xlag(1:np) = xtemp(1:np) ; ylag(1:np) = ytemp(1:np)
          
       endif 
-            
+      
 C  ** calculate the covariance in the window.       
       call zcovariance(xlag,ylag,noverlap,np,cov)
+
       call zeigen2x2(cov,lambda1,lambda2,vec1,vec2)
 
 C  ** change for option T
@@ -323,7 +322,6 @@ C  ** change for option T
          call zsourcepol(fast,lambda1,lambda2,vec1,vec2,spol,dspol)
       endif
       
-   
 c  ** calc the number of degrees of freedom **
 c  ** first rotate into spol-fast (so y is signal and x is noise) **
       call zrotate2d(xlag,ylag,noverlap,np,spol-fast,xnoise,ynoise)
@@ -332,22 +330,20 @@ c  ** first rotate into spol-fast (so y is signal and x is noise) **
 c  ** estimate signal to noise ratio *
       call calcsnr(ynoise,xnoise,noverlap,snr)
 
-
-
 c  ** normalise error surface and calc errors in fast and lag**
       call zerror95(error_int,ndf,lambda2_min,idfast,idtlag)
       dtlag = delta * idtlag * itlag_step / real(f)
       dfast = 180.  * idfast / real(np1-1)
 
 c  ** normalise error surface and calc errors in fast and lag (XC version)
-      call zerror95XC(xc_grid_int,ndf,xc_max,xcidfast,xcidtlag)     
+      call zerror95XC(xc_grid_int,ndf,xc_max,xcidfast,xcidtlag)   
+
       dtlagXC = delta * xcidtlag * itlag_stepXC / real(f)   
       dfastXC = 180.  * xcidfast / real(np1-1)
 
 c      print*,"AW:",fastXC,tlagXC
 c      print*,"AW:",dfastXC,dtlagXC,xcidtlag,xcidfast
       
-
       return
       
       end
@@ -532,7 +528,6 @@ c  ** initialise all arrays to zero
          ypol(i) = 0.0
       enddo ! i=1,np
 
-
 c  ** map out the lambda2 surface **
       do 1 i=1,np1
 c         ** set fast direction (range is -90 to 90deg) **
@@ -573,10 +568,14 @@ C           ** TRANSVERSE ENERGY MINIMISATION **
 C           ** do covariance calc. for eigenvalue ratio
                call zcovariance(xlag,ylag,noverlap,np,cov)
                call zeigen2x2(cov,lambda1,lambda2,vec1,vec2)
+
 C           ** SECOND EIGENVALUE MINIMISATION **
             elseif (config % imode == 1) then
+
                call zcovariance(xlag,ylag,noverlap,np,cov)
+
                call zeigen2x2(cov,lambda1,lambda2,vec1,vec2)
+
 c           ** test for bad eigenvalues
                if (isnan(lambda1).or.isnan(lambda2))  then
                   write(0,'(a,a)') '! Eigenvalue calculation failed, ',
@@ -588,6 +587,8 @@ c           ** test for bad eigenvalues
                
             endif
 2         continue ! j = 1,np2
+
+           
 
 c         **************************************************************               
 c         calculate cross correlation, mainly for quality control

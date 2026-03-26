@@ -936,10 +936,12 @@ c      see Boas p413 for maths
 c
 c-----------------------------------------------------------------------
 c      N. Teanby      16-7-02      Original code
+c.     J. Wookey.     26-3-26.     Added handling for complex roots.
 c-----------------------------------------------------------------------
 
       implicit none
       real matrix(2,2),lambda1,lambda2,a,b,c,temp,norm,vec1(2),vec2(2)
+      complex clambda1,clambda2,det
 
 c  ** EIGENVALUES **
 c  ** eigenvalue are the solution of a quadratic eqn with c.f.s **
@@ -947,8 +949,17 @@ c  ** eigenvalue are the solution of a quadratic eqn with c.f.s **
       b = - matrix(1,1) - matrix(2,2)
       c = matrix(1,1)*matrix(2,2) - matrix(1,2)*matrix(2,1)
 
-      lambda1 = 0.5*( -b + sqrt(b**2 - 4*a*c))
-      lambda2 = 0.5*( -b - sqrt(b**2 - 4*a*c))
+c  ** under some circumstances the determinant might be negative
+c  ** handle this by taking complex roots and then taking the 
+c  ** real part.      
+      det = (b**2 - 4*a*c)
+
+      clambda1 = 0.5*( -b + sqrt(det))
+      clambda2 = 0.5*( -b - sqrt(det))
+
+      lambda1 = real(clambda1)
+      lambda2 = real(clambda2)
+
 
 c  ** order the eigenvalues so that lambda2 is the smallest **
       if (lambda2.gt.lambda1) then
@@ -1150,6 +1161,7 @@ c  ** f needs to be an integer for zsplint to work **
       if (mod(np2int-1,np2-1).ne.0) then
          pause 'ERROR: zerror_interp: f not a whole number'
       endif
+
 
 c  ** interpolate error surface in tlag direction **
 c  ** do interpolation one row at a time **
