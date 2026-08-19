@@ -678,6 +678,8 @@ tr%kt2   = SAC_cnull ; tr%kf  = SAC_cnull ;
       if (iwbeg <=0 .or. iwend > tr_in % npts) then
          write(0,'(a)') &
          'F90SAC_WINDOW: Error: Window limits out of range of data.'
+         write(0,'(a,f10.4,f10.4,f10.4,f10.4)') &
+         ' b,e,t1,t2:',tr_in % b,tr_in % e,t1,t2
          STOP     
       endif      
 
