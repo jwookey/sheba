@@ -43,7 +43,7 @@ FC = gfortran
 # Production
 FFLAGS = -O2
 # Debug
-#FFLAGS = -fcheck=bounds -C -g
+#FFLAGS = -fcheck=bounds -C -g -ffpe-trap=zero,invalid
 # additional flags for .f/.F files 
 F77FLAGS = -w
 # additional flags for .f90/.F90 files 
@@ -74,7 +74,8 @@ GMT_PREFIX = gmt
 #===============================================================================
 
 # Uncomment (and update as necessary) to use NETCDF
-FFLAGS += -L/opt/homebrew/lib -lnetcdff -I/opt/homebrew/include
+#FFLAGS += -L/opt/homebrew/lib -lnetcdff -I/opt/homebrew/include
+FFLAGS += -L/usr/local/lib -lnetcdff -I/usr/local/include
 
 # Uncomment to disable NETCDF
 #FFLAGS += -DNO_NETCDF
@@ -103,7 +104,7 @@ PDFVIEWER = open
 #
 #	Code Objects
 #
-MODULES = sheba_config.o array_sizes.o event_info.o
+MODULES = sheba_config.o array_sizes.o event_info.o statistics.o
 SUBROUTINES = sheba_core.o misc.o input.o desplit.o output.o teanby.o \
               rumpker.o cluster.o split.o\
               traceops.o ndf.o calcsnr.o \
@@ -126,7 +127,7 @@ all:$(EXECDIR)/sheba_exec \
       $(MACRODIR)/sheba_build_input\
       $(MACRODIR)/sheba_plot_result\
       $(EXECDIR)/sheba_stack\
-		$(EXECDIR)/stack_wgtcalc
+	$(EXECDIR)/stack_wgtcalc
       
 #
 #     SHEBA EXECUTABLE

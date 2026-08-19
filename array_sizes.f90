@@ -22,6 +22,7 @@
          integer, parameter :: npc=500
          integer, parameter :: np=200000
          integer, parameter :: nsurfmax = 1000 ; ! this one is for stack 
+         integer, parameter :: nbsmax=10000 ! stack bootstrapping
  
 !=======================================================================
       end module array_sizes
