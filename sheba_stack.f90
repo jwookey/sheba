@@ -43,11 +43,9 @@
       integer :: iwmode ! 1=even weighting, 2=snr weighting, 3=file of weights
 
 !  ** Bootstrap mode variables
-      
       integer :: nbootstrap ! Number of stacks to bootstrap
       integer :: ibootstrap
       real :: bs_pdf(np1,np2int)
-
       real(dp) :: bs_fast(nbsmax), bs_tlag(nbsmax)
       real(dp) :: bs_fast_ave,bs_fast_std,bs_tlag_ave,bs_tlag_std
 
@@ -57,45 +55,43 @@
       nbootstrap = 1
       iskip = 0      
       do 5 i=1,iargc()
-       if (i .le. iskip) go to 5
-       call getarg(i,arg)
-       if (arg(1:4) == '-wgt') then
-          call getarg(i+1,arg)
-          if (arg(1:3) == 'one') then
-            iwmode = 1
-          elseif (arg(1:3) == 'snr') then
-            iwmode = 2
-          else
-            iwmode = 3
-            wfname = arg
-          endif
-          iskip = i+1
-       elseif (arg(1:3) == '-bs') then  
-          call getarg(i+1,arg)
-          read(arg,*,err=900) nbootstrap
-          iskip = i+1 
-       else
-          write(0,*) '**Unrecognized: ',arg(1:index(arg,' '))
-       endif
+         if (i .le. iskip) go to 5
+         call getarg(i,arg)
+         if (arg(1:4) == '-wgt') then
+            call getarg(i+1,arg)
+            if (arg(1:3) == 'one') then
+               iwmode = 1
+            elseif (arg(1:3) == 'snr') then
+               iwmode = 2
+            else
+               iwmode = 3
+               wfname = arg
+            endif
+            iskip = i+1
+         elseif (arg(1:3) == '-bs') then  
+            call getarg(i+1,arg)
+            read(arg,*,err=900) nbootstrap
+            iskip = i+1 
+         else
+            write(0,*) '**Unrecognized: ',arg(1:index(arg,' '))
+         endif
 5     continue
-      
-!      print*,nbootstrap
 
 !  ** load error surfaces from the file
       write(0,'(a)') 'Loading error surfaces ...'
-
       call load_error_surfaces(iwmode,wfname,nsurf,n1,n2, &
                                dtlag_step,ndf_in,wgt,error_in)
 
-
+!-------------------------------------------------------------------------------
       if (nbootstrap==1) then ! Normal mode. 
-
+!-------------------------------------------------------------------------------
          write(0,'(a)') 'Stacking ...'
 
          ind_surf = [(i, i = 1, nsurf)]
 
 !     ** stack the error surfaces
-         call stack_error_surfaces(nsurf,n1,n2,error_stack,ind_surf,error_in,ndf_in,wgt,ndf)
+         call stack_error_surfaces(nsurf,n1,n2,error_stack,&
+            ind_surf,error_in,ndf_in,wgt,ndf)
 
 !     ** find the minimum position
          call zerror_min(error_stack,np1,np2int,ifast,itlag,lam2min)
@@ -126,8 +122,9 @@
          write(32,'(4f12.4,i5,f12.4)') fast,dfast,tlag,dtlag,nsurf,dtlag_step
          close(31)
          close(32)
-
+!-------------------------------------------------------------------------------
       else ! Bootstrap mode
+!-------------------------------------------------------------------------------
 !     ** init random number generator, date/time based seed        
          call random_init(repeatable=.false.,image_distinct=.true.)
          write(0,'(a)') 'Bootstrapping stacking ...'
@@ -148,7 +145,6 @@
 
 !        ** find the minimum position
             call zerror_min(error_stack,np1,np2int,ifast,itlag,lam2min)
-            !print*,'Minimum at:', -90.0+real(ifast-1),0+real(itlag-1)*dtlag_step
 
 !        ** record            
             bs_fast(ibootstrap) = -90.0+real(ifast-1)
@@ -170,7 +166,6 @@
          print*,'   TLAG',bs_tlag_ave,' +/- ',2.0_dp*bs_tlag_std
 
 !     ** output solution, statistics and PDF
-   
          open(31,file='sheba_stack.bs_pdf')
          open(32,file='sheba_stack.bs_sol')     
    
@@ -178,13 +173,13 @@
          do i=1,np1
               write(31,fmt) (bs_pdf(i,j),j=1,np2int) 
          enddo
-         write(32,'(a)') '% FAST DFAST TLAG DTLAG, NSTACKED, TLAG_STEP, NBOOTSTRAP'
+         write(32,'(a)') &
+            '% FAST DFAST TLAG DTLAG, NSTACKED, TLAG_STEP, NBOOTSTRAP'
          write(32,'(4f12.4,i5,f12.4,i8)') &
-            bs_fast_ave,2.0_dp*bs_fast_std, &
-            bs_tlag_ave,2.0_dp*bs_tlag_std,nsurf,dtlag_step, nbootstrap
+            bs_fast_ave, 2.0_dp * bs_fast_std, &
+            bs_tlag_ave, 2.0_dp * bs_tlag_std,nsurf,dtlag_step, nbootstrap
          close(31)
          close(32)
-
       endif  
      
       stop
@@ -196,18 +191,16 @@
    subroutine generate_stack_index(nsurf,ind_surf)
 !===============================================================================
 !
-!   Stack error surfaces in the error_in 3D array. 
+!   Generate a randomised stack index for bootstrapping. 
 !
-    use array_sizes
+   use array_sizes
 !-------------------------------------------------------------------------------
    implicit none
       integer :: ind_surf(nsurfmax) ! array containing ordering of surfaces
       integer :: nsurf
       real :: rnum(nsurfmax) 
 
-
       call random_number(rnum)
-
       ind_surf(1:nsurf) = 1 + (rnum(1:nsurf)*nsurf) 
 
       return
@@ -220,7 +213,7 @@
 !
 !   Stack error surfaces in the error_in 3D array. 
 !
-    use array_sizes
+   use array_sizes
 !-------------------------------------------------------------------------------
    implicit none
       real :: error_in(np1,np2int,nsurfmax), error_stack(np1,np2int)
@@ -235,14 +228,14 @@
       
       real :: sumwgt ! sum of weights applied
 
-!     create local surface array based on index
+!  ** create local surface array based on index
       do isurf = 1,nsurf
          error_local(:,:,isurf) = error_in(:,:,ind_surf(isurf))
          ndf(isurf) = ndf_in(ind_surf(isurf))
          wgt(isurf) = wgt_in(ind_surf(isurf))
       enddo
-
       
+!  ** stack error surfaces
       error_stack(:,:) = 0.0
       rndf = 0.0
       sumwgt = 0.0
